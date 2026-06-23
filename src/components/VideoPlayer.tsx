@@ -289,7 +289,7 @@ export const VideoPlayer: React.FC = () => {
         ctx.textBaseline = 'bottom';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         ctx.shadowBlur = 4;
-        ctx.fillText('Clover Portal - Free Version', canvas.width - 30, canvas.height - 30);
+        ctx.fillText('Made with Clover - Sell Your Home Fast', canvas.width - 30, canvas.height - 30);
         ctx.restore();
       }
     };

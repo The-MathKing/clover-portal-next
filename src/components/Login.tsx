@@ -56,27 +56,27 @@ export const Login: React.FC = () => {
             </div>
             <span className="text-3xl font-bold font-heading tracking-tight text-white">Clover</span>
           </div>
-          <h2 className="text-lg text-neutral-400 font-medium">B2B Video Presentation Engine</h2>
+          <h2 className="text-lg text-neutral-400 font-medium">Cinematic Home Tour Generator</h2>
         </div>
 
         {/* Login Card */}
         <div className="bg-neutral-900/80 backdrop-blur-xl border border-neutral-800 rounded-2xl shadow-2xl p-8">
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-bold text-white mb-2">{isSignUp ? 'Create Account' : 'Welcome Back'}</h1>
-            <p className="text-sm text-neutral-500">Sign in to manage your real estate portfolio presentations.</p>
+            <p className="text-sm text-neutral-500">Sign in to create beautiful video tours and sell your home faster.</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">
-                Work Email
+                Your Email
               </label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@agency.com"
+                placeholder="you@example.com"
                 className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-neutral-200 focus:outline-none transition-colors"
               />
             </div>

@@ -22,38 +22,49 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
   } = useStore();
   const [checkoutTier, setCheckoutTier] = React.useState<{name: string, price: string} | null>(null);
 
-  const handleChooseTier = (tierName: string) => {
-    let paymentLink = '';
+  const handleChooseTier = async (tierName: string) => {
+    let priceId = '';
     let mappedTier: 'starter' | 'unlimited' | 'lifetime' = 'unlimited';
     
-    if (tierName.toLowerCase().includes('starter')) {
-      paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_STARTER || '';
+    if (tierName.toLowerCase().includes('starter') || tierName.toLowerCase().includes('single')) {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || '';
       mappedTier = 'starter';
-    } else if (tierName.toLowerCase().includes('unlimited')) {
-      paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_UNLIMITED || '';
+    } else if (
+      tierName.toLowerCase().includes('unlimited') || 
+      tierName.toLowerCase().includes('pass') || 
+      tierName.toLowerCase().includes('active')
+    ) {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_UNLIMITED || '';
       mappedTier = 'unlimited';
     } else if (tierName.toLowerCase().includes('lifetime')) {
-      paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_LIFETIME || '';
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_LIFETIME || '';
       mappedTier = 'lifetime';
     }
 
-    if (paymentLink) {
+    if (priceId) {
       try {
-        const url = new URL(paymentLink);
-        if (userId) {
-          url.searchParams.set('client_reference_id', userId);
+        console.log(`Initiating checkout for price: ${priceId}`);
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            priceId,
+            userId,
+            userEmail,
+            tierName,
+          }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'Failed to create checkout session');
         }
-        if (userEmail) {
-          url.searchParams.set('prefilled_email', userEmail);
-        }
-        window.location.href = url.toString();
-      } catch (err) {
-        console.error("Invalid Stripe payment link URL", err);
-        // fallback
-        let price = '$50';
-        if (mappedTier === 'starter') price = '$20';
-        if (mappedTier === 'lifetime') price = '$100';
-        setCheckoutTier({ name: tierName, price });
+      } catch (err: any) {
+        console.error("Stripe checkout redirect error:", err);
+        alert(`Checkout failed: ${err.message || 'Please try again later.'}`);
       }
     } else {
       // Fallback to simulated checkout modal
@@ -197,7 +208,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 CLOVER
               </span>
               <span className="text-xs block text-neutral-400 font-medium tracking-widest uppercase">
-                B2B Video Engine
+                Home Seller Video Engine
               </span>
             </div>
           </div>
@@ -240,13 +251,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               <div className="relative z-10 max-w-2xl">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-6">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Next-Gen Portfolio Software
+                  Showcase Your Home Like a Pro
                 </div>
                 <h1 className="text-4xl md:text-6xl font-bold font-heading text-white tracking-tight mb-6 leading-tight">
-                  Automate Cinematic Real Estate Showcases.
+                  Create a Stunning Video Tour of Your Home.
                 </h1>
                 <p className="text-neutral-400 text-lg leading-relaxed mb-10">
-                  Clover is the premier B2B SaaS platform for real estate agencies. Instantly transform your static property images into sweeping, AI-narrated video presentations with local, zero-latency WebM encoding.
+                  Clover makes it easy for homeowners to sell their homes faster. Instantly transform your listing photos into a cinematic, AI-narrated video tour that catches buyers' eyes on Zillow, Redfin, and MLS.
                 </p>
                 <div className="flex gap-4">
                   <button 
@@ -254,7 +265,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                     className="px-6 py-3 bg-white text-black hover:bg-neutral-200 font-bold rounded-xl transition-colors flex items-center gap-2"
                   >
                     <PlayCircle className="w-5 h-5" />
-                    View Example Videos
+                    View Example Tours
                   </button>
                   <button 
                     onClick={() => setActiveTab('pricing')}
@@ -268,9 +279,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { icon: Video, title: 'Canvas Render Engine', desc: 'Hardware-accelerated Ken Burns transitions and seamless crossfades built purely in the browser.' },
-                { icon: Sparkles, title: 'AI Copy & TTS', desc: 'Auto-generate listing copy and synthesize premium photorealistic voices via ElevenLabs integration.' },
-                { icon: Zap, title: 'Instant Local Export', desc: 'Bypass server queues. Render true 1080p video blobs directly on the client machine using MediaRecorder.' },
+                { icon: Video, title: 'Cinematic Ken Burns Tours', desc: 'Smooth, dynamic camera transitions that showcase every room and backyard feature beautifully.' },
+                { icon: Sparkles, title: 'AI Narrated Tours', desc: 'Auto-generate professional scripts of your home features and voice them with photorealistic AI narration.' },
+                { icon: Zap, title: 'Instant HD Downloads', desc: 'Export your 1080p video tour in seconds, ready to upload directly to Zillow, MLS, or social media.' },
               ].map((feature, i) => (
                 <div key={i} className="p-8 rounded-2xl bg-neutral-900 border border-neutral-850">
                   <div className="w-12 h-12 bg-emerald-950/30 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-6">
@@ -288,8 +299,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
         {activeTab === 'examples' && (
           <div>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold font-heading text-white mb-2">Example Videos</h2>
-              <p className="text-neutral-400">Curated showcase templates from top-tier agencies.</p>
+              <h2 className="text-3xl font-bold font-heading text-white mb-2">Example Tours</h2>
+              <p className="text-neutral-400">Example home tours created by homeowners who sold fast.</p>
             </div>
             {renderPropertyGrid(mockProperties, "No examples found.")}
           </div>
@@ -304,10 +315,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 <p className="text-neutral-400">Your personal workspace of generated presentations.</p>
               </div>
               <span className="text-sm font-semibold text-emerald-500 bg-emerald-950/30 px-3 py-1 rounded-lg border border-emerald-500/20">
-                {userProperties.length} Projects
+                {userProperties.length} Tours
               </span>
             </div>
-            {renderPropertyGrid(userProperties, "You haven't created any video presentations yet. Click 'Create Presentation' to build your first cinematic showcase.")}
+            {renderPropertyGrid(userProperties, "You haven't created any video tours yet. Click 'Create Presentation' to build your first cinematic home tour.")}
           </div>
         )}
 
@@ -315,15 +326,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
         {activeTab === 'pricing' && (
           <div className="max-w-5xl mx-auto py-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold font-heading text-white mb-4">Transparent Pricing for Agencies</h2>
-              <p className="text-neutral-400 max-w-xl mx-auto">Scale your real estate marketing with unlimited HD exports and premium photorealistic AI voices.</p>
+              <h2 className="text-4xl font-bold font-heading text-white mb-4">Simple, Transparent Pricing</h2>
+              <p className="text-neutral-400 max-w-xl mx-auto">Choose the package that fits your home listing needs. No hidden agency fees.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: 'Starter pack', price: '$20', billing: 'one-time', desc: 'Buy credits when you need them.', features: ['10 HD Exports included', 'Premium ElevenLabs AI Voices', 'Standard Browser TTS fallback', 'No expiry date', 'Email Support'] },
-                { name: 'Unlimited Monthly', price: '$50', billing: '/mo', desc: 'Best for active agents.', features: ['Unlimited HD Exports', 'Premium ElevenLabs AI Voices', 'Unlimited Properties', 'White-label Export', 'Priority Support'], popular: true },
-                { name: 'Lifetime Access', price: '$100', billing: 'one-time', desc: 'The ultimate real estate tool.', features: ['Unlimited HD Exports forever', 'Premium ElevenLabs AI Voices', 'Unlimited Properties', 'White-label Export', 'API & Custom Branding', 'Lifetime Dedicated Support'] }
+                { name: 'Single Listing Tour', price: '$20', billing: 'one-time', desc: 'Perfect for individual sellers.', features: ['10 HD Exports included', 'Premium AI Voice Narration', 'Zillow & MLS Compatible format', 'Standard Email Support'] },
+                { name: 'Active Seller Pass', price: '$50', billing: '/mo', desc: 'Best for multiple listings.', features: ['Unlimited HD Exports', 'Premium AI Voice Narration', 'Unlimited Listings/Properties', 'Zillow & MLS Compatible format', 'Priority Support'], popular: true },
+                { name: 'Lifetime Seller Pack', price: '$100', billing: 'one-time', desc: 'For serial renovators & FSBO.', features: ['Unlimited HD Exports forever', 'Premium AI Voice Narration', 'Unlimited Properties', 'Zillow & MLS Compatible format', 'Lifetime Support'] }
               ].map((tier, i) => (
                 <div key={i} className={`relative p-8 rounded-3xl bg-neutral-900 border ${tier.popular ? 'border-emerald-500' : 'border-neutral-800'} flex flex-col`}>
                   {tier.popular && (

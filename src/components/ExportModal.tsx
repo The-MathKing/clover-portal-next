@@ -102,7 +102,7 @@ export const ExportModal: React.FC = () => {
             <div>
               <h4 className="text-xl font-bold text-white mb-2">Your Video is Ready!</h4>
               <p className="text-sm text-neutral-400 max-w-sm mx-auto">
-                The property presentation has been fully stitched and encoded to video, ready for playback.
+                The home video tour has been fully stitched and encoded to video, ready for playback.
               </p>
             </div>
 
