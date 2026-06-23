@@ -26,54 +26,85 @@ export default function App() {
     
     // Function to load profile subscription tier
     const loadProfile = async (userId: string) => {
+      console.log('🔍 [loadProfile] Fetching profile for:', userId);
       try {
         const { data, error } = await supabase
           .from('profiles')
           .select('subscription_tier')
           .eq('id', userId)
           .single();
+        if (error) {
+          console.warn('⚠️ [loadProfile] query error (profiles table may not exist yet):', error.message);
+          setSubscriptionTier('free');
+          return;
+        }
         if (data && data.subscription_tier) {
+          console.log('🔍 [loadProfile] Profile loaded successfully:', data.subscription_tier);
           setSubscriptionTier(data.subscription_tier as any);
         } else {
           setSubscriptionTier('free');
         }
       } catch (err) {
-        console.error('Error fetching profile:', err);
+        console.error('❌ [loadProfile] Critical error fetching profile:', err);
         setSubscriptionTier('free');
       }
     };
 
     // Check current session
     const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUserId(session.user.id);
-        setUserEmail(session.user.email ?? '');
-        setAuthenticated(true);
-        await loadProfile(session.user.id);
-      } else {
+      console.log('🔍 [Auth Init] Starting auth initialization...');
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('❌ [Auth Init] getSession returned error:', error);
+        }
+        const session = data?.session;
+        console.log('🔍 [Auth Init] Session status:', session ? 'Active' : 'None');
+
+        if (session) {
+          setUserId(session.user.id);
+          setUserEmail(session.user.email ?? '');
+          setAuthenticated(true);
+          await loadProfile(session.user.id);
+        } else {
+          setUserId(null);
+          setUserEmail(null);
+          setAuthenticated(false);
+          setSubscriptionTier('free');
+        }
+      } catch (err) {
+        console.error('❌ [Auth Init] Critical error during session restore:', err);
         setUserId(null);
         setUserEmail(null);
         setAuthenticated(false);
         setSubscriptionTier('free');
+      } finally {
+        console.log('🔍 [Auth Init] Auth initialization completed.');
+        setIsInitializing(false);
       }
-      setIsInitializing(false);
     };
 
     initAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        setUserId(session.user.id);
-        setUserEmail(session.user.email ?? '');
-        setAuthenticated(true);
-        await loadProfile(session.user.id);
-      } else {
-        setUserId(null);
-        setUserEmail(null);
-        setAuthenticated(false);
-        setSubscriptionTier('free');
+      console.log('🔄 [Auth Change] Event detected:', event);
+      try {
+        if (session) {
+          setUserId(session.user.id);
+          setUserEmail(session.user.email ?? '');
+          await loadProfile(session.user.id);
+          setAuthenticated(true);
+        } else {
+          setUserId(null);
+          setUserEmail(null);
+          setAuthenticated(false);
+          setSubscriptionTier('free');
+        }
+      } catch (err) {
+        console.error('❌ [Auth Change] Error handling state change:', err);
+      } finally {
+        setIsInitializing(false);
       }
     });
 
