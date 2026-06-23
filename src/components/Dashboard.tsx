@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Plus, Clock, AlertCircle, CheckCircle, Layers, Video, PlayCircle, Star, Sparkles, Check, Zap } from 'lucide-react';
+import { Plus, Clock, AlertCircle, CheckCircle, Layers, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X } from 'lucide-react';
 import { mockProperties } from '../mockData';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
@@ -10,7 +10,15 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
-  const { setWizardOpen, activeTab, setActiveTab, userProperties } = useStore();
+  const { setWizardOpen, activeTab, setActiveTab, userProperties, subscriptionTier, setSubscriptionTier } = useStore();
+  const [checkoutTier, setCheckoutTier] = React.useState<{name: string, price: string} | null>(null);
+
+  const handlePurchase = () => {
+    // Simulated Stripe checkout success
+    setSubscriptionTier('unlimited');
+    setCheckoutTier(null);
+    alert('Payment Successful! You are now upgraded and watermark-free.');
+  };
 
   const getStatusBadge = (status: Property['status']) => {
     switch (status) {
@@ -284,7 +292,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                       </li>
                     ))}
                   </ul>
-                  <button className={`w-full py-3 rounded-xl font-bold transition-all ${tier.popular ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}>
+                  <button 
+                    onClick={() => setCheckoutTier({ name: tier.name, price: tier.price })}
+                    className={`w-full py-3 rounded-xl font-bold transition-all ${tier.popular ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}
+                  >
                     Choose {tier.name}
                   </button>
                 </div>
@@ -293,6 +304,43 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
           </div>
         )}
       </main>
+
+      {/* Simulated Checkout Modal */}
+      {checkoutTier && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h3 className="text-xl font-bold font-heading text-white">Secure Checkout</h3>
+                <p className="text-sm text-neutral-450">Complete your purchase for {checkoutTier.name}</p>
+              </div>
+              <button
+                onClick={() => setCheckoutTier(null)}
+                className="p-1 rounded-lg hover:bg-neutral-800 text-neutral-500 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-neutral-950 rounded-xl p-6 border border-neutral-850 mb-6 flex justify-between items-center">
+              <span className="text-neutral-300 font-medium">{checkoutTier.name}</span>
+              <span className="text-2xl font-black text-white">{checkoutTier.price}</span>
+            </div>
+
+            <p className="text-xs text-neutral-500 mb-6 text-center">
+              This is a simulated payment gateway. Clicking "Pay Now" will upgrade your account immediately without charging you.
+            </p>
+
+            <button
+              onClick={handlePurchase}
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-950/20 transition-all active:scale-[0.98]"
+            >
+              <Lock className="w-4 h-4" />
+              Pay Now (Simulated)
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

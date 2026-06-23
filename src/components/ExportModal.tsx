@@ -4,7 +4,7 @@ import { X, CheckCircle, Download, Link, Film } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export const ExportModal: React.FC = () => {
-  const { isExporting, setExporting, exportProgress, videoBlobUrl, setVideoBlobUrl, setExportProgress } = useStore();
+  const { isExporting, setExporting, exportProgress, videoBlobUrl, setVideoBlobUrl, setExportProgress, subscriptionTier, setActiveTab } = useStore();
   const [copied, setCopied] = useState(false);
 
   if (!isExporting) return null;
@@ -107,13 +107,25 @@ export const ExportModal: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <button
-                onClick={handleDownload}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow-lg shadow-emerald-950/20 transition-all active:scale-[0.98]"
-              >
-                <Download className="w-4 h-4" />
-                Download Video
-              </button>
+              {subscriptionTier === 'free' ? (
+                <button
+                  onClick={() => {
+                    handleClose();
+                    setActiveTab('pricing');
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-lg shadow-lg transition-all active:scale-[0.98]"
+                >
+                  Upgrade to Download
+                </button>
+              ) : (
+                <button
+                  onClick={handleDownload}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow-lg shadow-emerald-950/20 transition-all active:scale-[0.98]"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Video
+                </button>
+              )}
               <button
                 onClick={handleCopyLink}
                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-neutral-800 hover:bg-neutral-750 text-neutral-200 font-semibold rounded-lg border border-neutral-700/50 transition-all active:scale-[0.98]"

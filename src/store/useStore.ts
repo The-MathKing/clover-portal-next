@@ -47,6 +47,8 @@ export interface CloverState {
   setVideoBlobUrl: (url: string | null) => void;
   isAuthenticated: boolean;
   setAuthenticated: (auth: boolean) => void;
+  subscriptionTier: 'free' | 'starter' | 'unlimited' | 'lifetime';
+  setSubscriptionTier: (tier: 'free' | 'starter' | 'unlimited' | 'lifetime') => void;
   activeTab: 'demo' | 'examples' | 'my-videos' | 'pricing';
   setActiveTab: (tab: 'demo' | 'examples' | 'my-videos' | 'pricing') => void;
   userProperties: any[];
@@ -108,6 +110,9 @@ export const useStore = create<CloverState>((set) => ({
     if (typeof window !== 'undefined') localStorage.setItem('cloverAuth', auth.toString());
     set({ isAuthenticated: auth });
   },
+
+  subscriptionTier: 'free',
+  setSubscriptionTier: (tier) => set({ subscriptionTier: tier }),
 
   activeTab: 'demo',
   setActiveTab: (tab) => set({ activeTab: tab }),

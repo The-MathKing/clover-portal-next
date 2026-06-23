@@ -78,7 +78,7 @@ class AmbientSynthesizer {
 }
 
 export const VideoPlayer: React.FC = () => {
-  const { images, propertyDetails, isExporting, setExportProgress, setVideoBlobUrl } = useStore();
+  const { images, propertyDetails, isExporting, setExportProgress, setVideoBlobUrl, subscriptionTier } = useStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const synthRef = useRef<AmbientSynthesizer | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -278,6 +278,19 @@ export const VideoPlayer: React.FC = () => {
       // Draw AI Generated Badge on the Canvas if Generated Video mode is on
       if (isGenerativeMode) {
         drawAIBadge(ctx);
+      }
+
+      // Draw Free Tier Watermark
+      if (subscriptionTier === 'free') {
+        ctx.save();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = 'bold 28px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 4;
+        ctx.fillText('Clover Portal - Free Version', canvas.width - 30, canvas.height - 30);
+        ctx.restore();
       }
     };
 
