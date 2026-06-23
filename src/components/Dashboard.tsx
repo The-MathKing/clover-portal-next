@@ -10,14 +10,69 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
-  const { setWizardOpen, activeTab, setActiveTab, userProperties, subscriptionTier, setSubscriptionTier } = useStore();
+  const { 
+    setWizardOpen, 
+    activeTab, 
+    setActiveTab, 
+    userProperties, 
+    subscriptionTier, 
+    setSubscriptionTier,
+    userId,
+    userEmail
+  } = useStore();
   const [checkoutTier, setCheckoutTier] = React.useState<{name: string, price: string} | null>(null);
+
+  const handleChooseTier = (tierName: string) => {
+    let paymentLink = '';
+    let mappedTier: 'starter' | 'unlimited' | 'lifetime' = 'unlimited';
+    
+    if (tierName.toLowerCase().includes('starter')) {
+      paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_STARTER || '';
+      mappedTier = 'starter';
+    } else if (tierName.toLowerCase().includes('unlimited')) {
+      paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_UNLIMITED || '';
+      mappedTier = 'unlimited';
+    } else if (tierName.toLowerCase().includes('lifetime')) {
+      paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_LIFETIME || '';
+      mappedTier = 'lifetime';
+    }
+
+    if (paymentLink) {
+      try {
+        const url = new URL(paymentLink);
+        if (userId) {
+          url.searchParams.set('client_reference_id', userId);
+        }
+        if (userEmail) {
+          url.searchParams.set('prefilled_email', userEmail);
+        }
+        window.location.href = url.toString();
+      } catch (err) {
+        console.error("Invalid Stripe payment link URL", err);
+        // fallback
+        let price = '$50';
+        if (mappedTier === 'starter') price = '$20';
+        if (mappedTier === 'lifetime') price = '$100';
+        setCheckoutTier({ name: tierName, price });
+      }
+    } else {
+      // Fallback to simulated checkout modal
+      let price = '$50';
+      if (mappedTier === 'starter') price = '$20';
+      if (mappedTier === 'lifetime') price = '$100';
+      setCheckoutTier({ name: tierName, price });
+    }
+  };
 
   const handlePurchase = () => {
     // Simulated Stripe checkout success
-    setSubscriptionTier('unlimited');
+    let mappedTier: 'starter' | 'unlimited' | 'lifetime' = 'unlimited';
+    if (checkoutTier?.name.toLowerCase().includes('starter')) mappedTier = 'starter';
+    if (checkoutTier?.name.toLowerCase().includes('lifetime')) mappedTier = 'lifetime';
+
+    setSubscriptionTier(mappedTier);
     setCheckoutTier(null);
-    alert('Payment Successful! You are now upgraded and watermark-free.');
+    alert(`Payment Successful! You are now upgraded to "${mappedTier}" tier and watermark-free.`);
   };
 
   const getStatusBadge = (status: Property['status']) => {
@@ -293,7 +348,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                     ))}
                   </ul>
                   <button 
-                    onClick={() => setCheckoutTier({ name: tier.name, price: tier.price })}
+                    onClick={() => handleChooseTier(tier.name)}
                     className={`w-full py-3 rounded-xl font-bold transition-all ${tier.popular ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}
                   >
                     Choose {tier.name}

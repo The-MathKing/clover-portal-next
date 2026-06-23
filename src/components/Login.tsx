@@ -5,7 +5,6 @@ import { useStore } from '../store/useStore';
 import { createClient } from '@/utils/supabase/client';
 
 export const Login: React.FC = () => {
-  const { setAuthenticated } = useStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -34,11 +33,13 @@ export const Login: React.FC = () => {
         email,
         password,
       });
-      if (error) setErrorMsg(error.message);
-      else setAuthenticated(true);
+      if (error) {
+        setErrorMsg(error.message);
+        setIsLoading(false);
+      }
+      // No setAuthenticated(true) here; page.tsx's onAuthStateChange will 
+      // detect the login, load the user's profile/tier, and then set authenticated.
     }
-    
-    setIsLoading(false);
   };
 
   return (
