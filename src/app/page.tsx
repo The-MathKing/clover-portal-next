@@ -23,93 +23,101 @@ export default function App() {
 
   useEffect(() => {
     const supabase = createClient();
-    
-    // Function to load profile subscription tier
+    let isMounted = true;
+    let hasInitialized = false;
+
+    // Function to load profile subscription tier with a 3-second safety timeout
     const loadProfile = async (userId: string) => {
       console.log('🔍 [loadProfile] Fetching profile for:', userId);
+      
+      const timeoutPromise = new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('Profile query timeout')), 3000)
+      );
+
       try {
-        const { data, error } = await supabase
+        const queryPromise = supabase
           .from('profiles')
           .select('subscription_tier')
           .eq('id', userId)
           .single();
-        if (error) {
-          console.warn('⚠️ [loadProfile] query error (profiles table may not exist yet):', error.message);
-          setSubscriptionTier('free');
+
+        // Race the query against the 3-second timeout
+        const result = await Promise.race([queryPromise, timeoutPromise]) as any;
+
+        if (result && result.error) {
+          console.warn('⚠️ [loadProfile] query error (profiles table may not exist yet):', result.error.message);
+          if (isMounted) setSubscriptionTier('free');
           return;
         }
-        if (data && data.subscription_tier) {
-          console.log('🔍 [loadProfile] Profile loaded successfully:', data.subscription_tier);
-          setSubscriptionTier(data.subscription_tier as any);
+
+        if (result && result.data && result.data.subscription_tier) {
+          console.log('🔍 [loadProfile] Profile loaded successfully:', result.data.subscription_tier);
+          if (isMounted) setSubscriptionTier(result.data.subscription_tier as any);
         } else {
-          setSubscriptionTier('free');
+          if (isMounted) setSubscriptionTier('free');
         }
-      } catch (err) {
-        console.error('❌ [loadProfile] Critical error fetching profile:', err);
-        setSubscriptionTier('free');
+      } catch (err: any) {
+        console.error('❌ [loadProfile] Error or timeout fetching profile:', err.message || err);
+        if (isMounted) setSubscriptionTier('free');
       }
     };
 
-    // Check current session
-    const initAuth = async () => {
-      console.log('🔍 [Auth Init] Starting auth initialization...');
+    const handleAuthEvent = async (session: any) => {
+      if (hasInitialized) return;
+      hasInitialized = true;
+
       try {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('❌ [Auth Init] getSession returned error:', error);
-        }
-        const session = data?.session;
-        console.log('🔍 [Auth Init] Session status:', session ? 'Active' : 'None');
-
         if (session) {
-          setUserId(session.user.id);
-          setUserEmail(session.user.email ?? '');
-          setAuthenticated(true);
+          if (isMounted) {
+            setUserId(session.user.id);
+            setUserEmail(session.user.email ?? '');
+          }
           await loadProfile(session.user.id);
+          if (isMounted) {
+            setAuthenticated(true);
+          }
         } else {
-          setUserId(null);
-          setUserEmail(null);
-          setAuthenticated(false);
-          setSubscriptionTier('free');
+          if (isMounted) {
+            setUserId(null);
+            setUserEmail(null);
+            setAuthenticated(false);
+            setSubscriptionTier('free');
+          }
         }
       } catch (err) {
-        console.error('❌ [Auth Init] Critical error during session restore:', err);
-        setUserId(null);
-        setUserEmail(null);
-        setAuthenticated(false);
-        setSubscriptionTier('free');
+        console.error('❌ [Auth] Error in auth flow:', err);
       } finally {
-        console.log('🔍 [Auth Init] Auth initialization completed.');
-        setIsInitializing(false);
+        if (isMounted) {
+          setIsInitializing(false);
+        }
       }
     };
 
-    initAuth();
-
-    // Listen for auth changes
+    // Listen for auth changes (which will also fire initially on load)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 [Auth Change] Event detected:', event);
-      try {
-        if (session) {
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        await handleAuthEvent(session);
+      } else {
+        if (session && isMounted) {
           setUserId(session.user.id);
           setUserEmail(session.user.email ?? '');
-          await loadProfile(session.user.id);
-          setAuthenticated(true);
-        } else {
-          setUserId(null);
-          setUserEmail(null);
-          setAuthenticated(false);
-          setSubscriptionTier('free');
         }
-      } catch (err) {
-        console.error('❌ [Auth Change] Error handling state change:', err);
-      } finally {
-        setIsInitializing(false);
       }
     });
 
+    // Fallback timer: if auth has not initialized in 5 seconds, force loading to false
+    const fallbackTimer = setTimeout(() => {
+      if (isMounted) {
+        console.warn('⚠️ [Auth] Init took too long. Forcing isInitializing to false.');
+        setIsInitializing(false);
+      }
+    }, 5000);
+
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
+      clearTimeout(fallbackTimer);
     };
   }, [setAuthenticated, setUserId, setUserEmail, setSubscriptionTier]);
 
