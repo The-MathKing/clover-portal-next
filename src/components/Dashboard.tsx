@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Plus, Clock, AlertCircle, CheckCircle, Layers, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X, TrendingUp, User, LogOut, Image as ImageIcon, ArrowRight } from 'lucide-react';
+import { Plus, Clock, AlertCircle, CheckCircle, Clover, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X, TrendingUp, User, LogOut, Image as ImageIcon, ArrowRight } from 'lucide-react';
 import { mockProperties } from '../mockData';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
@@ -220,7 +220,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-650/10 rounded-xl border border-emerald-500/20">
-              <Layers className="w-6 h-6 text-emerald-500" />
+              <Clover className="w-6 h-6 text-emerald-500" />
             </div>
             <div>
               <span className="text-xl font-bold font-heading tracking-wide">
