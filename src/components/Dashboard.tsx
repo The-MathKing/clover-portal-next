@@ -33,6 +33,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
       priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ONE_TIME || '';
       mappedTier = 'one_time';
     } else if (
+      tierName.toLowerCase().includes('5-pack') || 
       tierName.toLowerCase().includes('5 per month') || 
       tierName.toLowerCase().includes('pro 5')
     ) {
@@ -481,8 +482,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 { name: 'One Time Pass', price: '$30', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'] },
-                { name: '5 per Month', price: '$45', billing: '/mo', desc: 'Best for standard listings.', features: ['5 HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true },
-                { name: 'Unlimited', price: '$75', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'] }
+                { name: '5-Pack', price: '$75', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true },
+                { name: 'Unlimited', price: '$150', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'] }
               ].map((tier, i) => (
                 <div key={i} className={`relative p-8 rounded-3xl bg-neutral-900 border ${tier.popular ? 'border-emerald-500' : 'border-neutral-800'} flex flex-col`}>
                   {tier.popular && (
