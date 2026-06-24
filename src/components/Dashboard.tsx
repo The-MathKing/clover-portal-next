@@ -28,6 +28,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
   const supabase = createClient();
 
+  const handleCreatePresentation = () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+    if (subscriptionTier === 'free') {
+      alert("Please purchase a package to create a presentation.");
+      setActiveTab('pricing');
+      return;
+    }
+    setWizardOpen(true);
+  };
+
   const handleChooseTier = async (tierName: string) => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
@@ -122,11 +135,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
           </div>
           <h3 className="text-xl font-bold text-white mb-2">No Videos Yet</h3>
           <p className="text-neutral-500 mb-6 max-w-md">{emptyMessage}</p>
-          <button
-            onClick={() => setWizardOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-750 text-white font-medium border border-neutral-700/50 transition-all"
+          <button 
+            onClick={handleCreatePresentation}
+            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-950/30 transition-colors mt-4"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
             Create Presentation
           </button>
         </div>
@@ -239,13 +252,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
           <div className="flex items-center gap-4">
             <button
-              onClick={() => {
-                if (!isAuthenticated) {
-                  setShowAuthModal(true);
-                } else {
-                  setWizardOpen(true);
-                }
-              }}
+              onClick={handleCreatePresentation}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4" />
@@ -343,13 +350,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 mb-16">
                   <button 
-                    onClick={() => {
-                      if (!isAuthenticated) {
-                        setShowAuthModal(true);
-                      } else {
-                        setWizardOpen(true);
-                      }
-                    }}
+                    onClick={handleCreatePresentation}
                     className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold shadow-xl shadow-emerald-900/40 transition-all hover:-translate-y-1"
                   >
                     <Plus className="w-5 h-5" />
@@ -528,13 +529,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 <h3 className="text-xl font-bold text-white mb-2">No Videos Yet</h3>
                 <p className="text-neutral-500 mb-6 max-w-md">You haven't created any video tours yet. Click 'Create Presentation' to build your first cinematic home tour.</p>
                 <button
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      setShowAuthModal(true);
-                    } else {
-                      setWizardOpen(true);
-                    }
-                  }}
+                  onClick={handleCreatePresentation}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-750 text-white font-medium border border-neutral-700/50 transition-all"
                 >
                   <Plus className="w-4 h-4" />
