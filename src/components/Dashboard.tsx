@@ -23,20 +23,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
   const handleChooseTier = async (tierName: string) => {
     let priceId = '';
-    let mappedTier: 'demo' | 'pro_5' | 'pro_15' = 'demo';
+    let mappedTier: 'one_time' | 'pro_5' | 'unlimited' = 'one_time';
     
-    if (tierName.toLowerCase().includes('demo') || tierName.toLowerCase().includes('3 generations')) {
-      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_DEMO || '';
-      mappedTier = 'demo';
+    if (tierName.toLowerCase().includes('one time') || tierName.toLowerCase().includes('demo')) {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ONE_TIME || '';
+      mappedTier = 'one_time';
     } else if (
-      tierName.toLowerCase().includes('5 generations') || 
+      tierName.toLowerCase().includes('5 per month') || 
       tierName.toLowerCase().includes('pro 5')
     ) {
       priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_5 || '';
       mappedTier = 'pro_5';
-    } else if (tierName.toLowerCase().includes('15 generations') || tierName.toLowerCase().includes('pro 15')) {
-      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_15 || '';
-      mappedTier = 'pro_15';
+    } else if (tierName.toLowerCase().includes('unlimited') || tierName.toLowerCase().includes('pro 15')) {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_UNLIMITED || '';
+      mappedTier = 'unlimited';
     }
 
     if (priceId) {
@@ -416,9 +416,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: 'Demo Pass', price: '$10', billing: 'one-time', desc: 'Perfect to try it out.', features: ['3 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'] },
-                { name: 'Pro 5', price: '$15', billing: '/mo', desc: 'Best for standard listings.', features: ['5 HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true },
-                { name: 'Pro 15', price: '$30', billing: '/mo', desc: 'For active agents and flippers.', features: ['15 HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'] }
+                { name: 'One Time Pass', price: '$30', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'] },
+                { name: '5 per Month', price: '$45', billing: '/mo', desc: 'Best for standard listings.', features: ['5 HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true },
+                { name: 'Unlimited', price: '$75', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'] }
               ].map((tier, i) => (
                 <div key={i} className={`relative p-8 rounded-3xl bg-neutral-900 border ${tier.popular ? 'border-emerald-500' : 'border-neutral-800'} flex flex-col`}>
                   {tier.popular && (
