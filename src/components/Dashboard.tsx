@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Plus, Clock, AlertCircle, CheckCircle, Clover, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X, TrendingUp, User, LogOut, Image as ImageIcon, ArrowRight } from 'lucide-react';
+import { Plus, Clock, AlertCircle, CheckCircle, Clover, Video, PlayCircle, Sparkles, Check, Zap, Lock, X, TrendingUp, User, LogOut, Image as ImageIcon, ArrowRight, Star, MessageSquare, Send } from 'lucide-react';
 import { mockProperties } from '../mockData';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
@@ -11,108 +11,106 @@ interface DashboardProps {
   onSelectProperty: (property: Property) => void;
 }
 
-// ─── Countdown Timer for Pricing ────────────────────────────────────────────
-const CountdownTimer: React.FC = () => {
-  const [timeLeft, setTimeLeft] = React.useState({ hours: 2, minutes: 0, seconds: 0 });
+// ─── Review Submission Section ──────────────────────────────────────────────
+const ReviewSection: React.FC = () => {
+  const [rating, setRating] = React.useState(0);
+  const [hoverRating, setHoverRating] = React.useState(0);
+  const [reviewText, setReviewText] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [submitted, setSubmitted] = React.useState(false);
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft(prev => {
-        let { hours, minutes, seconds } = prev;
-        if (seconds > 0) {
-          seconds--;
-        } else if (minutes > 0) {
-          minutes--;
-          seconds = 59;
-        } else if (hours > 0) {
-          hours--;
-          minutes = 59;
-          seconds = 59;
-        }
-        return { hours, minutes, seconds };
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (rating === 0 || !reviewText.trim()) return;
+    // In production, this would POST to an API
+    console.log('Review submitted:', { name, rating, reviewText });
+    setSubmitted(true);
+  };
 
-  const pad = (n: number) => n.toString().padStart(2, '0');
-
-  return (
-    <div className="flex items-center gap-1">
-      {[
-        { value: timeLeft.hours, label: 'h' },
-        { value: timeLeft.minutes, label: 'm' },
-        { value: timeLeft.seconds, label: 's' },
-      ].map((unit, i) => (
-        <React.Fragment key={i}>
-          <div className="bg-black/40 rounded-lg px-2 py-1 min-w-[36px] text-center">
-            <span className="text-sm font-black text-white tabular-nums">{pad(unit.value)}</span>
-            <span className="text-[9px] text-amber-400 font-bold uppercase ml-0.5">{unit.label}</span>
-          </div>
-          {i < 2 && <span className="text-amber-500 font-bold">:</span>}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-};
-
-// ─── Testimonial Slider for Pricing ─────────────────────────────────────────
-const testimonials = [
-  { name: 'Sarah M.', role: 'Home Seller, Austin TX', text: 'My listing went viral on Zillow within 24 hours of posting the Clover video. Had 3 offers in 2 days!', rating: 5 },
-  { name: 'James K.', role: 'Real Estate Agent, Miami FL', text: 'I use Clover for all my listings now. My clients are blown away by the quality, and it takes me 2 minutes.', rating: 5 },
-  { name: 'Linda P.', role: 'FSBO Seller, Denver CO', text: 'As a first-time seller without an agent, Clover gave my listing a professional edge. Sold above asking price!', rating: 5 },
-];
-
-const TestimonialSlider: React.FC = () => {
-  const [activeIdx, setActiveIdx] = React.useState(0);
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIdx(prev => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  if (submitted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="mt-12 bg-neutral-900/50 border border-neutral-800/50 rounded-2xl p-8 text-center"
+      >
+        <div className="w-14 h-14 bg-emerald-950/40 border border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-7 h-7 text-emerald-500" />
+        </div>
+        <h3 className="text-lg font-bold text-white mb-2">Thank You for Your Review!</h3>
+        <p className="text-sm text-neutral-400">Your feedback helps us improve Clover for everyone.</p>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="mt-12 bg-neutral-900/50 border border-neutral-800/50 rounded-2xl p-8 relative overflow-hidden">
       <div className="text-center mb-6">
-        <h3 className="text-lg font-bold text-white mb-1">What Sellers Are Saying</h3>
-        <p className="text-xs text-neutral-500">Real results from real home sellers</p>
+        <div className="w-12 h-12 bg-emerald-950/30 border border-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+          <MessageSquare className="w-6 h-6 text-emerald-500" />
+        </div>
+        <h3 className="text-lg font-bold text-white mb-1">Share Your Experience</h3>
+        <p className="text-xs text-neutral-500">Used Clover for your listing? Let us know how it went.</p>
       </div>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeIdx}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="text-center"
-        >
-          <div className="flex justify-center gap-0.5 mb-4">
-            {Array(testimonials[activeIdx].rating).fill(0).map((_, i) => (
-              <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+
+      <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-5">
+        {/* Star Rating */}
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Your Rating</span>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                className="p-1 transition-transform hover:scale-110"
+              >
+                <Star
+                  className={`w-6 h-6 transition-colors ${
+                    star <= (hoverRating || rating)
+                      ? 'text-amber-400 fill-amber-400'
+                      : 'text-neutral-700'
+                  }`}
+                />
+              </button>
             ))}
           </div>
-          <p className="text-neutral-300 text-sm leading-relaxed italic max-w-lg mx-auto mb-4">
-            &ldquo;{testimonials[activeIdx].text}&rdquo;
-          </p>
-          <p className="text-sm font-bold text-white">{testimonials[activeIdx].name}</p>
-          <p className="text-xs text-neutral-500">{testimonials[activeIdx].role}</p>
-        </motion.div>
-      </AnimatePresence>
-      
-      {/* Dots */}
-      <div className="flex justify-center gap-2 mt-6">
-        {testimonials.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setActiveIdx(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === activeIdx ? 'bg-emerald-500 w-4' : 'bg-neutral-700'
-            }`}
+        </div>
+
+        {/* Name */}
+        <div>
+          <input
+            type="text"
+            placeholder="Your name (optional)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
           />
-        ))}
-      </div>
+        </div>
+
+        {/* Review Text */}
+        <div>
+          <textarea
+            placeholder="Tell us about your experience with Clover..."
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            rows={3}
+            className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all resize-none"
+          />
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={rating === 0 || !reviewText.trim()}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-emerald-600 shadow-lg shadow-emerald-900/20"
+        >
+          <Send className="w-4 h-4" />
+          Submit Review
+        </button>
+      </form>
     </div>
   );
 };
@@ -144,7 +142,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
   };
 
   const handlePropertyClick = (property: any) => {
-    if (subscriptionTier === 'free') {
+    // Allow viewing examples for all users (including free tier)
+    // Only block editing/generating for non-paid users on their own videos
+    if (activeTab === 'my-videos' && subscriptionTier === 'free') {
       alert("Please upgrade to a paid tier to generate or edit your draft presentation.");
       setActiveTab('pricing');
       return;
@@ -669,26 +669,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               <p className="text-neutral-400 max-w-xl mx-auto">Choose the package that fits your home listing needs. No hidden agency fees.</p>
             </div>
 
-            {/* ✨ Animated Countdown Banner (NEW) */}
+            {/* ✨ Opening Discount Banner */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-10 bg-gradient-to-r from-amber-950/40 via-amber-900/20 to-amber-950/40 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-center"
+              className="mb-10 bg-gradient-to-r from-emerald-950/40 via-emerald-900/20 to-emerald-950/40 border border-emerald-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-center"
             >
               <div className="flex items-center gap-2">
-                <span className="text-lg">🔥</span>
-                <span className="text-sm font-bold text-amber-300">Limited Time: Save 50% on 5-Pack</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <CountdownTimer />
+                <span className="text-lg">🎉</span>
+                <span className="text-sm font-bold text-emerald-300">Opening Discount — All plans discounted while we launch!</span>
               </div>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: 'One Time Pass', price: '$30', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'], savings: '' },
-                { name: '5-Pack', price: '$75', originalPrice: '$150', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true, savings: 'Save $75' },
-                { name: 'Unlimited', price: '$150', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], savings: '' }
+                { name: 'One Time Pass', price: '$20', originalPrice: '$30', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'], savings: 'Opening Discount' },
+                { name: '5-Pack', price: '$50', originalPrice: '$100', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true, savings: 'Opening Discount' },
+                { name: 'Unlimited', price: '$99', originalPrice: '$150', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], savings: 'Opening Discount' }
               ].map((tier, i) => (
                 <motion.div
                   key={i}
@@ -737,12 +734,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               ))}
             </div>
 
-            {/* ✨ Trust Elements Row (NEW) */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* ✨ Trust Elements Row */}
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { icon: '🛡️', title: '30-Day Money-Back Guarantee', desc: 'Not satisfied? Full refund, no questions asked.' },
                 { icon: '🔒', title: 'Secure Stripe Checkout', desc: 'Bank-level encryption. Your data is always safe.' },
-                { icon: '⭐', title: '500+ Home Sellers Trust Us', desc: 'Join sellers who sold faster with Clover videos.' },
+                { icon: '🎉', title: 'Opening Launch Pricing', desc: 'Lock in discounted rates during our launch period.' },
               ].map((badge, i) => (
                 <motion.div
                   key={i}
@@ -760,8 +756,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               ))}
             </div>
 
-            {/* ✨ Animated Testimonials (NEW) */}
-            <TestimonialSlider />
+            {/* ✨ User Review Submission */}
+            <ReviewSection />
 
             </motion.div>
           )}
