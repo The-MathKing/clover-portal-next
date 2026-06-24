@@ -25,14 +25,14 @@ export default function App() {
   useEffect(() => {
     const supabase = createClient();
     let isMounted = true;
-    let hasInitialized = false;
+    let lastProcessedUserId: string | null = null;
 
-    // Function to load profile subscription tier with a 3-second safety timeout
+    // Function to load profile subscription tier with a 10-second safety timeout
     const loadProfile = async (userId: string) => {
       console.log('🔍 [loadProfile] Fetching profile for:', userId);
       
       const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error('Profile query timeout')), 3000)
+        setTimeout(() => reject(new Error('Profile query timeout')), 10000)
       );
 
       try {
@@ -48,7 +48,7 @@ export default function App() {
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
 
-        // Race the query against the 3-second timeout
+        // Race the query against the timeout
         const result = await Promise.race([
           Promise.all([profilePromise, propertiesPromise]),
           timeoutPromise
@@ -82,10 +82,13 @@ export default function App() {
     };
 
     const handleAuthEvent = async (session: any, event: string) => {
-      // We only want to block double-initialization on INITIAL_SESSION/SIGNED_IN,
-      // but we MUST allow SIGNED_OUT to process fully.
-      if (hasInitialized && event !== 'SIGNED_OUT') return;
-      hasInitialized = true;
+      const newUserId = session?.user?.id || null;
+      
+      // Prevent redundant fetches for the same user if they are already fully loaded
+      if (newUserId === lastProcessedUserId && event !== 'SIGNED_OUT') {
+        return;
+      }
+      lastProcessedUserId = newUserId;
 
       try {
         if (session) {
