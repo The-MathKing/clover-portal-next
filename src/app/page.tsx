@@ -18,6 +18,7 @@ export default function App() {
     setAuthenticated, 
     setUserId, 
     setUserEmail, 
+    setSubscriptionTier,
     setProperties,
     showAuthModal,
     setShowAuthModal

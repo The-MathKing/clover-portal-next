@@ -340,19 +340,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                     <Video className="w-6 h-6 text-white mb-1" />
                     <span className="text-[9px] font-bold text-white uppercase tracking-wider">Video Tour</span>
                   </div>
-                <div className="flex gap-4">
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 mb-16">
+                  <button 
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        setShowAuthModal(true);
+                      } else {
+                        setWizardOpen(true);
+                      }
+                    }}
+                    className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold shadow-xl shadow-emerald-900/40 transition-all hover:-translate-y-1"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Create Presentation
+                  </button>
                   <button 
                     onClick={() => setActiveTab('examples')}
-                    className="px-6 py-3 bg-white text-black hover:bg-neutral-200 font-bold rounded-xl transition-colors flex items-center gap-2"
+                    className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-white font-bold transition-all hover:-translate-y-1"
                   >
                     <PlayCircle className="w-5 h-5" />
                     View Example Tours
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('pricing')}
-                    className="px-6 py-3 bg-neutral-800 text-white hover:bg-neutral-750 border border-neutral-700 font-bold rounded-xl transition-colors"
-                  >
-                    View Pricing
                   </button>
                 </div>
               </div>
