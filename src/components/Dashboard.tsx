@@ -33,12 +33,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
       setShowAuthModal(true);
       return;
     }
+    setWizardOpen(true);
+  };
+
+  const handlePropertyClick = (property: any) => {
     if (subscriptionTier === 'free') {
-      alert("Please purchase a package to create a presentation.");
+      alert("Please upgrade to a paid tier to generate or edit your draft presentation.");
       setActiveTab('pricing');
       return;
     }
-    setWizardOpen(true);
+    // In a real app this would open an editor/viewer
+    console.log('Opening property:', property.id);
   };
 
   const handleChooseTier = async (tierName: string) => {
@@ -195,7 +200,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
               {/* Actions */}
               <button
-                onClick={() => onSelectProperty(property)}
+                onClick={() => handlePropertyClick(property)}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold border border-neutral-850 hover:bg-neutral-850 hover:border-neutral-700 transition-all text-neutral-200"
               >
                 <Video className="w-4 h-4 text-emerald-500" />

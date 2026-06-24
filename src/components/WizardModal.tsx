@@ -121,7 +121,7 @@ export const WizardModal: React.FC = () => {
         sqft: propertyDetails.sqft || '',
         description: propertyDetails.description || '',
         features: propertyDetails.features || [],
-        status: 'Ready',
+        status: useStore.getState().subscriptionTier === 'free' ? 'Draft' : 'Ready',
         cover_image: coverImage,
         images: uploadedImages,
       };
