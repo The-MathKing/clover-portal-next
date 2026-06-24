@@ -223,8 +223,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             ))}
           </nav>
 
-          </nav>
-
           <div className="flex items-center gap-4">
             <button
               onClick={() => setWizardOpen(true)}
