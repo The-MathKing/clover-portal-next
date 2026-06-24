@@ -1,9 +1,10 @@
 'use client';
 import React from 'react';
-import { Plus, Clock, AlertCircle, CheckCircle, Layers, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X, TrendingUp } from 'lucide-react';
+import { Plus, Clock, AlertCircle, CheckCircle, Layers, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X, TrendingUp, User, LogOut, Image as ImageIcon, ArrowRight } from 'lucide-react';
 import { mockProperties } from '../mockData';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
+import { createClient } from '@/utils/supabase/client';
 
 interface DashboardProps {
   onSelectProperty: (property: Property) => void;
@@ -20,6 +21,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
     userId,
     userEmail
   } = useStore();
+
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+  const supabase = createClient();
 
   const handleChooseTier = async (tierName: string) => {
     let priceId = '';
@@ -67,6 +71,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
     } else {
       alert(`Stripe is not configured. Missing Price ID for tier: ${tierName}. Please add the NEXT_PUBLIC_STRIPE_PRICE_... variables to your .env.local file to enable checkout.`);
     }
+  };
+
+  const handleSignOut = async () => {
+    setIsProfileOpen(false);
+    await supabase.auth.signOut();
   };
 
   const getStatusBadge = (status: Property['status']) => {
@@ -213,13 +222,47 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             ))}
           </nav>
 
-          <button
-            onClick={() => setWizardOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
-          >
-            <Plus className="w-4 h-4" />
-            Create Presentation
-          </button>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setWizardOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Create Presentation</span>
+            </button>
+            
+            {/* Profile Menu */}
+            <div className="relative">
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+              >
+                <User className="w-5 h-5 text-neutral-300" />
+              </button>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="p-4 border-b border-neutral-800">
+                    <p className="text-sm font-medium text-white truncate">{userEmail}</p>
+                    <p className="text-xs text-emerald-400 mt-1 capitalize font-semibold tracking-wider">
+                      Tier: {subscriptionTier.replace('_', ' ')}
+                    </p>
+                  </div>
+                  <div className="p-2">
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 
@@ -242,6 +285,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 <p className="text-neutral-400 text-lg leading-relaxed mb-10">
                   Clover makes it easy for homeowners to sell their homes faster. Instantly transform your listing photos into a cinematic, AI-narrated video tour that catches buyers' eyes on Zillow, Redfin, and MLS.
                 </p>
+
+                {/* IMAGES TO VIDEO GRAPHIC */}
+                <div className="flex items-center gap-4 mb-10 p-4 bg-neutral-950/50 rounded-2xl border border-neutral-800/50 w-max max-w-full overflow-x-auto">
+                  <div className="flex -space-x-4">
+                    <div className="w-12 h-12 rounded-lg bg-neutral-800 border-2 border-neutral-900 flex items-center justify-center rotate-[-10deg] shadow-lg"><ImageIcon className="w-5 h-5 text-neutral-400"/></div>
+                    <div className="w-12 h-12 rounded-lg bg-neutral-800 border-2 border-neutral-900 flex items-center justify-center -translate-y-2 shadow-lg z-10"><ImageIcon className="w-5 h-5 text-neutral-400"/></div>
+                    <div className="w-12 h-12 rounded-lg bg-neutral-800 border-2 border-neutral-900 flex items-center justify-center rotate-[10deg] shadow-lg z-20"><ImageIcon className="w-5 h-5 text-neutral-400"/></div>
+                  </div>
+                  <div className="flex items-center justify-center px-4">
+                    <div className="flex flex-col items-center">
+                      <ArrowRight className="w-5 h-5 text-emerald-500 mb-1 animate-pulse" />
+                      <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">AI Engine</span>
+                    </div>
+                  </div>
+                  <div className="w-24 h-16 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 border-2 border-emerald-500/50 flex flex-col items-center justify-center shadow-lg shadow-emerald-900/40 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <Video className="w-6 h-6 text-white mb-1" />
+                    <span className="text-[9px] font-bold text-white uppercase tracking-wider">Video Tour</span>
+                  </div>
+                </div>
+
                 <div className="flex gap-4">
                   <button 
                     onClick={() => setActiveTab('examples')}
