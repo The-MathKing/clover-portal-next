@@ -51,15 +51,12 @@ export const ProductTour: React.FC = () => {
   const [highlightRect, setHighlightRect] = useState({ top: 0, left: 0, width: 0, height: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  // Auto-start the tour if user hasn't seen it
+  // Auto-start is disabled based on user request. Tour is now started manually via a button in the header.
   useEffect(() => {
     if (!hasSeenTour) {
-      const timer = setTimeout(() => {
-        setTourActive(true);
-      }, 1500); // slight delay to let the editor render
-      return () => clearTimeout(timer);
+      setHasSeenTour(true);
     }
-  }, [hasSeenTour, setTourActive]);
+  }, [hasSeenTour, setHasSeenTour]);
 
   // Position tooltip near the target element
   useEffect(() => {

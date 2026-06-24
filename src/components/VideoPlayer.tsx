@@ -215,7 +215,7 @@ const AudioVisualizer: React.FC<{ synthRef: React.RefObject<AmbientSynthesizer |
 // ─── Main Video Player Component ────────────────────────────────────────────
 export const VideoPlayer: React.FC = () => {
   const { 
-    images, propertyDetails, isExporting, setExportProgress, setVideoBlobUrl, subscriptionTier,
+    images, propertyDetails, isExporting, setExporting, setExportProgress, setVideoBlobUrl, subscriptionTier,
     transitionStyle, setTransitionStyle, slideDuration, setSlideDuration, crossfadeDuration, setCrossfadeDuration,
     renderingStep, setRenderingStep
   } = useStore();
@@ -298,7 +298,22 @@ export const VideoPlayer: React.FC = () => {
       synthRef.current?.stop();
 
       const canvas = canvasRef.current;
-      const canvasStream = canvas.captureStream(30);
+      let canvasStream: MediaStream;
+      
+      try {
+        if ((canvas as any).captureStream) {
+          canvasStream = (canvas as any).captureStream(30);
+        } else if ((canvas as any).mozCaptureStream) {
+          canvasStream = (canvas as any).mozCaptureStream(30);
+        } else {
+          throw new Error('captureStream is not supported in this browser.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Video export is not supported in this browser (captureStream API missing). Please use Google Chrome or Microsoft Edge desktop browsers for full support.");
+        setExporting(false);
+        return;
+      }
 
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const dest = audioCtx.createMediaStreamDestination();
@@ -345,12 +360,18 @@ export const VideoPlayer: React.FC = () => {
         audioCtx.close();
       };
 
-      mediaRecorder.start();
-      mediaRecorderRef.current = mediaRecorder;
+      try {
+        mediaRecorder.start();
+        mediaRecorderRef.current = mediaRecorder;
 
-      // Start the export loop
-      lastTimeRef.current = performance.now();
-      setPlaying(true);
+        // Start the export loop
+        lastTimeRef.current = performance.now();
+        setPlaying(true);
+      } catch (err) {
+        console.error("Failed to start MediaRecorder:", err);
+        alert("Failed to start video rendering. Please try using a different browser.");
+        setExporting(false);
+      }
     }
   }, [isExporting, audioTrack]);
 
@@ -467,17 +488,7 @@ export const VideoPlayer: React.FC = () => {
       setCurrentTime((prev) => {
         const nextTime = prev + elapsed;
         
-        if (isExporting) {
-          setExportProgress((nextTime / totalDuration) * 100);
-          if (nextTime >= totalDuration) {
-            // Export finished!
-            if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-              mediaRecorderRef.current.stop();
-            }
-            setPlaying(false);
-            return totalDuration;
-          }
-        } else if (nextTime >= totalDuration) {
+        if (!isExporting && nextTime >= totalDuration) {
           return 0; // Loop presentation in normal mode
         }
         
@@ -500,6 +511,19 @@ export const VideoPlayer: React.FC = () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [playing, totalDuration, isExporting]);
+
+  // Handle export progress tracking (decoupled from the animation loop setter to avoid anti-patterns)
+  useEffect(() => {
+    if (isExporting && totalDuration > 0) {
+      setExportProgress((currentTime / totalDuration) * 100);
+      if (currentTime >= totalDuration) {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          mediaRecorderRef.current.stop();
+        }
+        setPlaying(false);
+      }
+    }
+  }, [currentTime, isExporting, totalDuration, setExportProgress]);
 
   // Helper: Draw image with Ken Burns scale and pan (respects transition style)
   const drawKenBurnsImage = (

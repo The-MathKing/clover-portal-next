@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import { ArrowLeft, Film, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Film, HelpCircle, Info } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
 import { ScriptPanel } from './ScriptPanel';
 import { ExportModal } from './ExportModal';
@@ -14,7 +14,7 @@ interface PresentationEditorProps {
 }
 
 export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property, onBack }) => {
-  const { setPropertyDetails, setImages, setGeneratedScript, setExporting, setActivePropertyId, subscriptionTier } = useStore();
+  const { setPropertyDetails, setImages, setGeneratedScript, setExporting, setActivePropertyId, subscriptionTier, setTourActive } = useStore();
 
   useEffect(() => {
     setActivePropertyId(property.id);
@@ -73,8 +73,16 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
             </div>
           </div>
           
-          <button
-            onClick={() => {
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setTourActive(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-neutral-300 hover:text-white font-medium transition-all"
+            >
+              <Info className="w-4 h-4" />
+              <span className="hidden sm:inline">Tour Studio</span>
+            </button>
+            <button
+              onClick={() => {
               if (subscriptionTier === 'free') {
                 alert('Exporting presentations requires a paid plan. Please upgrade to use this feature.');
                 return;
@@ -85,8 +93,9 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
           >
             <Film className="w-4 h-4" />
-            Export Presentation
+            <span className="hidden sm:inline">Export Presentation</span>
           </button>
+          </div>
         </div>
       </header>
 
