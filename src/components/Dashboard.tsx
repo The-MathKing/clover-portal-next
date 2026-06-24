@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Plus, Clock, AlertCircle, CheckCircle, Layers, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X } from 'lucide-react';
+import { Plus, Clock, AlertCircle, CheckCircle, Layers, Video, PlayCircle, Star, Sparkles, Check, Zap, Lock, X, TrendingUp } from 'lucide-react';
 import { mockProperties } from '../mockData';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
@@ -274,6 +274,107 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                   <p className="text-neutral-400 leading-relaxed text-sm">{feature.desc}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Zillow Marketing Stats Section */}
+            <div className="mt-16 bg-neutral-900 border border-neutral-850 rounded-3xl p-10 md:p-16 relative overflow-hidden">
+              <div className="absolute left-0 bottom-0 w-[400px] h-[400px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none" />
+              <div className="relative z-10">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold font-heading text-white mb-4">Why Real Estate Video Works</h2>
+                  <p className="text-neutral-400 max-w-2xl mx-auto">
+                    Listings with video walkthroughs are prioritized by Zillow's algorithm, getting pushed to the top of search results and driving massive engagement.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                  {/* Stats Text */}
+                  <div className="space-y-8">
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-emerald-950/40 rounded-xl flex items-center justify-center shrink-0 border border-emerald-500/20">
+                        <TrendingUp className="w-6 h-6 text-emerald-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white mb-2">400% More Inquiries</h3>
+                        <p className="text-neutral-400 leading-relaxed text-sm">
+                          According to industry data, real estate listings with video receive four times as many inquiries as those with just photos.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-emerald-950/40 rounded-xl flex items-center justify-center shrink-0 border border-emerald-500/20">
+                        <Clock className="w-6 h-6 text-emerald-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white mb-2">30% Faster Sales</h3>
+                        <p className="text-neutral-400 leading-relaxed text-sm">
+                          Homes with video tours spend significantly fewer days on the market, helping you close deals and move on faster.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Visual Graphs */}
+                  <div className="space-y-8 bg-neutral-950 p-8 rounded-2xl border border-neutral-850 shadow-2xl">
+                    {/* Graph 1: Views */}
+                    <div>
+                      <div className="flex justify-between text-sm mb-3">
+                        <span className="text-neutral-300 font-semibold uppercase tracking-wider text-xs">Listing Views (First 7 Days)</span>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between text-xs text-neutral-500 mb-1.5">
+                            <span>Photos Only</span>
+                            <span>~250 views</span>
+                          </div>
+                          <div className="w-full bg-neutral-900 rounded-full h-2.5 overflow-hidden">
+                            <div className="bg-neutral-600 h-full rounded-full transition-all duration-1000" style={{ width: '25%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-xs font-bold text-emerald-400 mb-1.5">
+                            <span>With Clover Video Tour</span>
+                            <span>~1,000+ views</span>
+                          </div>
+                          <div className="w-full bg-neutral-900 rounded-full h-2.5 overflow-hidden">
+                            <div className="bg-gradient-to-r from-emerald-600 to-teal-400 h-full rounded-full transition-all duration-1000" style={{ width: '100%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full h-px bg-neutral-800"></div>
+
+                    {/* Graph 2: Days on Market */}
+                    <div>
+                      <div className="flex justify-between text-sm mb-3">
+                        <span className="text-neutral-300 font-semibold uppercase tracking-wider text-xs">Average Days on Market</span>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between text-xs text-neutral-500 mb-1.5">
+                            <span>Photos Only</span>
+                            <span>45 Days</span>
+                          </div>
+                          <div className="w-full bg-neutral-900 rounded-full h-2.5 overflow-hidden">
+                            <div className="bg-neutral-600 h-full rounded-full transition-all duration-1000" style={{ width: '100%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-xs font-bold text-emerald-400 mb-1.5">
+                            <span>With Clover Video Tour</span>
+                            <span>31 Days</span>
+                          </div>
+                          <div className="w-full bg-neutral-900 rounded-full h-2.5 overflow-hidden">
+                            <div className="bg-gradient-to-r from-emerald-600 to-teal-400 h-full rounded-full transition-all duration-1000" style={{ width: '70%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
