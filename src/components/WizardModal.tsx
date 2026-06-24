@@ -45,15 +45,21 @@ export const WizardModal: React.FC = () => {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      filesArray.forEach((file) => {
-        const url = URL.createObjectURL(file);
-        addImage({
-          id: `img-${Date.now()}-${Math.random()}`,
-          url,
-          file
-        });
-      });
+      const currentCount = images.length;
+      let filesArray = Array.from(e.target.files);
+      
+      if (currentCount + filesArray.length > 20) {
+        alert("You can only upload up to 20 images per presentation.");
+        filesArray = filesArray.slice(0, 20 - currentCount);
+      }
+
+      const newImages = filesArray.map((file) => ({
+        id: `img-${Date.now()}-${Math.random()}`,
+        url: URL.createObjectURL(file),
+        file
+      }));
+      
+      setImages([...images, ...newImages]);
     }
   };
 

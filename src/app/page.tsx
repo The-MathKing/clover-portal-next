@@ -18,8 +18,9 @@ export default function App() {
     setAuthenticated, 
     setUserId, 
     setUserEmail, 
-    setSubscriptionTier,
-    setProperties
+    setProperties,
+    showAuthModal,
+    setShowAuthModal
   } = useStore();
 
   useEffect(() => {
@@ -99,6 +100,7 @@ export default function App() {
           await loadProfile(session.user.id);
           if (isMounted) {
             setAuthenticated(true);
+            setShowAuthModal(false); // Close modal on successful auth
           }
         } else {
           if (isMounted) {
@@ -155,10 +157,6 @@ export default function App() {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Login />;
-  }
-
   return (
     <>
       {selectedProperty ? (
@@ -172,6 +170,15 @@ export default function App() {
       
       {/* Global Wizard Modal */}
       <WizardModal />
+
+      {/* Global Auth Modal */}
+      {(!isAuthenticated && showAuthModal) && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
+            <Login />
+          </div>
+        </div>
+      )}
     </>
   );
 }

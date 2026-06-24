@@ -37,6 +37,8 @@ export interface CloverState {
   setElevenLabsApiKey: (key: string) => void;
 
   // UI State
+  showAuthModal: boolean;
+  setShowAuthModal: (show: boolean) => void;
   isWizardOpen: boolean;
   setWizardOpen: (isOpen: boolean) => void;
   isExporting: boolean;
@@ -102,6 +104,9 @@ export const useStore = create<CloverState>((set) => ({
     if (typeof window !== 'undefined') localStorage.setItem('elevenLabsApiKey', key);
     set({ elevenLabsApiKey: key });
   },
+
+  showAuthModal: false,
+  setShowAuthModal: (show) => set({ showAuthModal: show }),
 
   isWizardOpen: false,
   setWizardOpen: (isOpen) => set({ isWizardOpen: isOpen }),

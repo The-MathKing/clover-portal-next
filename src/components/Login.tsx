@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Clover, Lock, ArrowRight, Video } from 'lucide-react';
+import { Clover, Lock, ArrowRight, Video, X } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { createClient } from '@/utils/supabase/client';
 
@@ -10,6 +10,7 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const { setShowAuthModal } = useStore();
   const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -55,13 +56,21 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+    <div className="w-full relative z-10">
       {/* Background Ornaments */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[500px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
       
-      <div className="w-full max-w-md relative z-10">
+      {/* Login Card */}
+      <div className="bg-neutral-900/90 backdrop-blur-xl border border-neutral-800 rounded-2xl shadow-2xl p-8 relative">
+        <button 
+          onClick={() => setShowAuthModal(false)}
+          className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white bg-neutral-800/50 hover:bg-neutral-800 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         {/* Logo Section */}
-        <div className="flex flex-col items-center mb-10">
+        <div className="flex flex-col items-center mb-10 mt-2">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/50">
               <Clover className="w-8 h-8 text-white" />
@@ -71,10 +80,8 @@ export const Login: React.FC = () => {
           <h2 className="text-lg text-neutral-400 font-medium">Cinematic Home Tour Generator</h2>
         </div>
 
-        {/* Login Card */}
-        <div className="bg-neutral-900/80 backdrop-blur-xl border border-neutral-800 rounded-2xl shadow-2xl p-8">
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-bold text-white mb-2">{isSignUp ? 'Create Account' : 'Welcome Back'}</h1>
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-white mb-2">{isSignUp ? 'Create Account' : 'Welcome Back'}</h1>
             <p className="text-sm text-neutral-500">Sign in to create beautiful video tours and sell your home faster.</p>
           </div>
 
@@ -172,7 +179,6 @@ export const Login: React.FC = () => {
           <div className="flex items-center gap-2">
             <Video className="w-4 h-4" />
             <span>Cinematic Render Engine</span>
-          </div>
         </div>
       </div>
     </div>

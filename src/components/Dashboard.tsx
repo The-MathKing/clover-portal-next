@@ -20,13 +20,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
     subscriptionTier, 
     setSubscriptionTier,
     userId,
-    userEmail
+    userEmail,
+    isAuthenticated,
+    setShowAuthModal
   } = useStore();
 
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
   const supabase = createClient();
 
   const handleChooseTier = async (tierName: string) => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+
     let priceId = '';
     let mappedTier: 'one_time' | 'pro_5' | 'unlimited' = 'one_time';
     
@@ -212,7 +219,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             {(['demo', 'examples', 'my-videos', 'pricing'] as const).map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  if (tab === 'my-videos' && !isAuthenticated) {
+                    setShowAuthModal(true);
+                  } else {
+                    setActiveTab(tab);
+                  }
+                }}
                 className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-all capitalize ${
                   activeTab === tab 
                     ? 'bg-neutral-800 text-white shadow-sm' 
@@ -226,7 +239,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setWizardOpen(true)}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  setShowAuthModal(true);
+                } else {
+                  setWizardOpen(true);
+                }
+              }}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4" />
@@ -234,34 +253,43 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             </button>
             
             {/* Profile Menu */}
-            <div className="relative">
-              <button 
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center hover:bg-neutral-700 transition-colors"
-              >
-                <User className="w-5 h-5 text-neutral-300" />
-              </button>
+            {isAuthenticated ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+                >
+                  <User className="w-5 h-5 text-neutral-300" />
+                </button>
 
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="p-4 border-b border-neutral-800">
-                    <p className="text-sm font-medium text-white truncate">{userEmail}</p>
-                    <p className="text-xs text-emerald-400 mt-1 capitalize font-semibold tracking-wider">
-                      Tier: {subscriptionTier.replace('_', ' ')}
-                    </p>
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="p-4 border-b border-neutral-800">
+                      <p className="text-sm font-medium text-white truncate">{userEmail}</p>
+                      <p className="text-xs text-emerald-400 mt-1 capitalize font-semibold tracking-wider">
+                        Tier: {subscriptionTier.replace('_', ' ')}
+                      </p>
+                    </div>
+                    <div className="p-2">
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
-                  <div className="p-2">
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            ) : (
+              <button 
+                onClick={() => setShowAuthModal(true)}
+                className="px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium transition-colors"
+              >
+                Log In
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -312,8 +340,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                     <Video className="w-6 h-6 text-white mb-1" />
                     <span className="text-[9px] font-bold text-white uppercase tracking-wider">Video Tour</span>
                   </div>
-                </div>
-
                 <div className="flex gap-4">
                   <button 
                     onClick={() => setActiveTab('examples')}
@@ -486,8 +512,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 {userProperties.length} Tours
               </span>
             </div>
-              {renderPropertyGrid(userProperties, "You haven't created any video tours yet. Click 'Create Presentation' to build your first cinematic home tour.")}
-            </motion.div>
+            {userProperties.length === 0 ? (
+              <div className="py-20 text-center flex flex-col items-center">
+                <div className="w-16 h-16 bg-neutral-900 border border-neutral-800 rounded-2xl flex items-center justify-center mb-4">
+                  <Video className="w-8 h-8 text-neutral-600" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">No Videos Yet</h3>
+                <p className="text-neutral-500 mb-6 max-w-md">You haven't created any video tours yet. Click 'Create Presentation' to build your first cinematic home tour.</p>
+                <button
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      setShowAuthModal(true);
+                    } else {
+                      setWizardOpen(true);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-750 text-white font-medium border border-neutral-700/50 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Presentation
+                </button>
+              </div>
+            ) : (
+              renderPropertyGrid(userProperties, "")
+            )}
+          </motion.div>
           )}
 
           {/* PRICING TAB */}
