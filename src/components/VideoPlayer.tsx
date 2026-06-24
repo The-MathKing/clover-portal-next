@@ -1,7 +1,9 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { Play, Pause, RotateCcw, Volume2, VolumeX, Music } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX, Music, Sliders, Check, Loader2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import type { TransitionStyle, RenderingStep } from '../store/useStore';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Web Audio API ambient music synthesizer
 class AmbientSynthesizer {
@@ -9,6 +11,7 @@ class AmbientSynthesizer {
   private oscillators: OscillatorNode[] = [];
   private gainNode: GainNode | null = null;
   private destNode: MediaStreamAudioDestinationNode | null = null;
+  private analyserNode: AnalyserNode | null = null;
   private isPlaying = false;
   private volume = 0.3;
 
@@ -16,17 +19,21 @@ class AmbientSynthesizer {
     if (this.isPlaying) return;
     this.ctx = audioCtx || new (window.AudioContext || (window as any).webkitAudioContext)();
     this.gainNode = this.ctx.createGain();
+    this.analyserNode = this.ctx.createAnalyser();
+    this.analyserNode.fftSize = 64;
     
     this.gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 2);
     
     // Connect to speaker
     if (!dest) {
-      this.gainNode.connect(this.ctx.destination);
+      this.gainNode.connect(this.analyserNode);
+      this.analyserNode.connect(this.ctx.destination);
     } else {
       // Connect to media stream export destination only
       this.destNode = dest;
-      this.gainNode.connect(this.destNode);
+      this.gainNode.connect(this.analyserNode);
+      this.analyserNode.connect(this.destNode);
     }
 
     // Create a beautiful, warm ambient chord pad (E Maj7 or similar)
@@ -75,10 +82,143 @@ class AmbientSynthesizer {
       this.gainNode.gain.linearRampToValueAtTime(vol, this.ctx.currentTime + 0.1);
     }
   }
+
+  getFrequencyData(): Uint8Array | null {
+    if (!this.analyserNode) return null;
+    const data = new Uint8Array(this.analyserNode.frequencyBinCount);
+    this.analyserNode.getByteFrequencyData(data);
+    return data;
+  }
 }
 
+// ─── Rendering Progress Tracker ─────────────────────────────────────────────
+const renderingSteps: { key: RenderingStep; label: string; icon: string }[] = [
+  { key: 'analyzing', label: 'Analyzing listing details', icon: '🔍' },
+  { key: 'generating-script', label: 'Generating script with AI', icon: '✍️' },
+  { key: 'synthesizing-voice', label: 'Synthesizing voiceover', icon: '🎙️' },
+  { key: 'rendering-video', label: 'Rendering HD video stream', icon: '🎬' },
+  { key: 'complete', label: 'Export complete!', icon: '✅' },
+];
+
+const RenderingProgress: React.FC<{ currentStep: RenderingStep | null; progress: number }> = ({ currentStep, progress }) => {
+  if (!currentStep) return null;
+
+  const currentIdx = renderingSteps.findIndex(s => s.key === currentStep);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="absolute inset-0 z-20 bg-neutral-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-8"
+    >
+      <div className="w-full max-w-sm space-y-4">
+        <div className="text-center mb-6">
+          <div className="text-2xl mb-2">🎬</div>
+          <h3 className="text-lg font-bold text-white">Creating Your Video Tour</h3>
+          <p className="text-xs text-neutral-400 mt-1">{Math.round(progress)}% complete</p>
+        </div>
+
+        {/* Progress bar */}
+        <div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden mb-6">
+          <motion.div
+            className="h-full bg-gradient-to-r from-emerald-600 to-teal-400 rounded-full"
+            initial={{ width: '0%' }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+
+        {/* Step-by-step progress */}
+        <div className="space-y-3">
+          {renderingSteps.map((step, i) => {
+            const isComplete = i < currentIdx;
+            const isCurrent = i === currentIdx;
+            const isPending = i > currentIdx;
+
+            return (
+              <motion.div
+                key={step.key}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
+                  isCurrent ? 'bg-emerald-950/30 border border-emerald-500/30' : 
+                  isComplete ? 'bg-neutral-900/50' : 'opacity-40'
+                }`}
+              >
+                <div className="w-6 h-6 flex items-center justify-center">
+                  {isComplete ? (
+                    <Check className="w-4 h-4 text-emerald-500" />
+                  ) : isCurrent ? (
+                    <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+                  ) : (
+                    <span className="text-sm">{step.icon}</span>
+                  )}
+                </div>
+                <span className={`text-sm font-medium ${
+                  isCurrent ? 'text-emerald-400' : isComplete ? 'text-neutral-400' : 'text-neutral-500'
+                }`}>
+                  {step.label}
+                </span>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ─── Audio Visualizer / Waveform Component ──────────────────────────────────
+const AudioVisualizer: React.FC<{ synthRef: React.RefObject<AmbientSynthesizer | null>; isActive: boolean }> = ({ synthRef, isActive }) => {
+  const [bars, setBars] = useState<number[]>(Array(16).fill(0));
+  const frameRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (!isActive) {
+      setBars(Array(16).fill(0));
+      return;
+    }
+
+    const animate = () => {
+      const data = synthRef.current?.getFrequencyData();
+      if (data) {
+        const newBars = Array(16).fill(0).map((_, i) => {
+          const idx = Math.floor((i / 16) * data.length);
+          return (data[idx] / 255) * 100;
+        });
+        setBars(newBars);
+      } else {
+        // Simulated waveform when real data isn't available
+        setBars(prev => prev.map((_, i) => Math.max(5, Math.sin(Date.now() / 200 + i * 0.6) * 40 + 40)));
+      }
+      frameRef.current = requestAnimationFrame(animate);
+    };
+    frameRef.current = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [isActive, synthRef]);
+
+  return (
+    <div className="flex items-end gap-[2px] h-6">
+      {bars.map((height, i) => (
+        <div
+          key={i}
+          className="w-1 rounded-full bg-emerald-500/70 transition-[height] duration-75"
+          style={{ height: `${Math.max(8, height)}%`, minHeight: '2px' }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// ─── Main Video Player Component ────────────────────────────────────────────
 export const VideoPlayer: React.FC = () => {
-  const { images, propertyDetails, isExporting, setExportProgress, setVideoBlobUrl, subscriptionTier } = useStore();
+  const { 
+    images, propertyDetails, isExporting, setExportProgress, setVideoBlobUrl, subscriptionTier,
+    transitionStyle, setTransitionStyle, slideDuration, setSlideDuration, crossfadeDuration, setCrossfadeDuration,
+    renderingStep, setRenderingStep
+  } = useStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const synthRef = useRef<AmbientSynthesizer | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -87,6 +227,7 @@ export const VideoPlayer: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0); // in ms
   const [muted, setMuted] = useState(true);
   const [audioTrack, setAudioTrack] = useState('luxury-ambient');
+  const [showTransitionControls, setShowTransitionControls] = useState(false);
 
   // AI Video Blending States
   const [engineMode, setEngineMode] = useState<'slideshow' | 'ai-video'>('ai-video');
@@ -95,8 +236,8 @@ export const VideoPlayer: React.FC = () => {
   const lastTimeRef = useRef<number | null>(null);
   const loadedImagesRef = useRef<{ [url: string]: HTMLImageElement }>({});
 
-  const SLIDE_DURATION = 5000; // 5 seconds total slot per image
-  const CROSSFADE_DURATION = 1500; // 1.5 second cross-fade
+  const SLIDE_DURATION = slideDuration * 1000;
+  const CROSSFADE_DURATION = crossfadeDuration * 1000;
   const totalDuration = images.length * SLIDE_DURATION;
 
   // Preload all images
@@ -130,6 +271,24 @@ export const VideoPlayer: React.FC = () => {
       synthRef.current?.stop();
     }
   }, [playing, muted, audioTrack, isExporting]);
+
+  // Simulate rendering progress steps during export
+  useEffect(() => {
+    if (!isExporting) {
+      setRenderingStep(null);
+      return;
+    }
+
+    // Simulate step-by-step rendering progress
+    setRenderingStep('analyzing');
+    const timers = [
+      setTimeout(() => setRenderingStep('generating-script'), 800),
+      setTimeout(() => setRenderingStep('synthesizing-voice'), 2000),
+      setTimeout(() => setRenderingStep('rendering-video'), 3500),
+    ];
+
+    return () => timers.forEach(clearTimeout);
+  }, [isExporting, setRenderingStep]);
 
   // Handle Export Initialization
   useEffect(() => {
@@ -182,6 +341,7 @@ export const VideoPlayer: React.FC = () => {
         const blob = new Blob(chunks, { type: finalMimeType });
         const url = URL.createObjectURL(blob);
         setVideoBlobUrl(url);
+        setRenderingStep('complete');
         audioCtx.close();
       };
 
@@ -295,7 +455,7 @@ export const VideoPlayer: React.FC = () => {
     };
 
     render();
-  }, [currentTime, images, propertyDetails, engineMode]);
+  }, [currentTime, images, propertyDetails, engineMode, SLIDE_DURATION, CROSSFADE_DURATION]);
 
   // Handle requestAnimationFrame
   useEffect(() => {
@@ -341,7 +501,7 @@ export const VideoPlayer: React.FC = () => {
     };
   }, [playing, totalDuration, isExporting]);
 
-  // Helper: Draw image with Ken Burns scale and pan
+  // Helper: Draw image with Ken Burns scale and pan (respects transition style)
   const drawKenBurnsImage = (
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
@@ -352,7 +512,30 @@ export const VideoPlayer: React.FC = () => {
     isGenerativeMode = false
   ) => {
     const progress = time / duration;
-    const zoomIn = index % 2 === 0;
+    
+    // Determine zoom/pan direction based on transitionStyle
+    let zoomIn = index % 2 === 0;
+    let panDirection: 'none' | 'left' | 'right' = 'none';
+
+    switch (transitionStyle) {
+      case 'ken-burns-in':
+        zoomIn = true;
+        break;
+      case 'ken-burns-out':
+        zoomIn = false;
+        break;
+      case 'pan-left':
+        panDirection = 'left';
+        break;
+      case 'pan-right':
+        panDirection = 'right';
+        break;
+      case 'crossfade':
+      default:
+        // Use alternating zoom for crossfade
+        break;
+    }
+    
     const startScale = zoomIn ? 1.05 : 1.2;
     const endScale = zoomIn ? 1.2 : 1.05;
     
@@ -371,6 +554,13 @@ export const VideoPlayer: React.FC = () => {
       // Extra slow horizontal/vertical drift
       extraX = Math.sin((currentTime / 1000) * 0.25) * 12;
       extraY = Math.cos((currentTime / 1000) * 0.18) * 8;
+    }
+
+    // Apply pan direction
+    if (panDirection === 'left') {
+      extraX = -progress * 60;
+    } else if (panDirection === 'right') {
+      extraX = progress * 60;
     }
 
     const startX = zoomIn ? 0 : -35;
@@ -486,8 +676,10 @@ export const VideoPlayer: React.FC = () => {
     setCurrentTime((nextPercentage / 100) * totalDuration);
   };
 
+  const isAudioActive = playing && !muted && audioTrack !== 'none';
+
   return (
-    <div className="flex flex-col bg-neutral-900 border border-neutral-800 rounded-2xl p-6 overflow-hidden">
+    <div className="flex flex-col bg-neutral-900 border border-neutral-800 rounded-2xl p-6 overflow-hidden" data-tour="video-player">
       {/* Hidden SVG for displacement filter */}
       <svg style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }} width="0" height="0">
         <defs>
@@ -522,11 +714,30 @@ export const VideoPlayer: React.FC = () => {
         />
         
         {isExporting && (
-          <div className="absolute top-4 right-4 px-3 py-1 bg-red-500/20 backdrop-blur rounded-full text-xs font-semibold tracking-wider text-red-400 border border-red-500/30 flex items-center gap-2 uppercase z-10">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            Exporting...
-          </div>
+          <>
+            <div className="absolute top-4 right-4 px-3 py-1 bg-red-500/20 backdrop-blur rounded-full text-xs font-semibold tracking-wider text-red-400 border border-red-500/30 flex items-center gap-2 uppercase z-10">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              Exporting...
+            </div>
+            {/* Rendering Progress Overlay */}
+            <RenderingProgress currentStep={renderingStep} progress={useStore.getState().exportProgress} />
+          </>
         )}
+
+        {/* Audio Visualizer overlay (bottom right corner) */}
+        <AnimatePresence>
+          {isAudioActive && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              className="absolute bottom-4 right-4 z-10 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-2 border border-emerald-500/20 flex items-center gap-2"
+            >
+              <Volume2 className="w-3 h-3 text-emerald-500" />
+              <AudioVisualizer synthRef={synthRef} isActive={isAudioActive} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className={`mt-6 space-y-4 ${isExporting ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -579,6 +790,102 @@ export const VideoPlayer: React.FC = () => {
               AI Blended Video
             </button>
           </div>
+        </div>
+
+        {/* ✨ Custom Transition & Speed Controls (NEW) */}
+        <div data-tour="transition-controls">
+          <button
+            onClick={() => setShowTransitionControls(!showTransitionControls)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-neutral-950/60 border border-neutral-850 rounded-xl hover:bg-neutral-950 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-violet-400" />
+              <span className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">Transition & Speed Controls</span>
+            </div>
+            <span className={`text-xs text-neutral-500 transition-transform ${showTransitionControls ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+          
+          <AnimatePresence>
+            {showTransitionControls && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="px-4 py-4 bg-neutral-950/40 border border-t-0 border-neutral-850 rounded-b-xl space-y-5">
+                  {/* Transition Style */}
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Transition Style</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { value: 'crossfade' as TransitionStyle, label: 'Crossfade' },
+                        { value: 'ken-burns-in' as TransitionStyle, label: 'Ken Burns (Zoom In)' },
+                        { value: 'ken-burns-out' as TransitionStyle, label: 'Ken Burns (Zoom Out)' },
+                        { value: 'pan-left' as TransitionStyle, label: 'Pan Left' },
+                        { value: 'pan-right' as TransitionStyle, label: 'Pan Right' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setTransitionStyle(opt.value)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            transitionStyle === opt.value
+                              ? 'bg-violet-600 text-white shadow-md'
+                              : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:border-neutral-700'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Slide Duration */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Slide Duration</label>
+                      <span className="text-xs font-bold text-white">{slideDuration}s</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="2"
+                      max="10"
+                      step="0.5"
+                      value={slideDuration}
+                      onChange={(e) => setSlideDuration(parseFloat(e.target.value))}
+                      className="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-violet-500"
+                    />
+                    <div className="flex justify-between text-[10px] text-neutral-600 mt-1">
+                      <span>2s (Fast)</span>
+                      <span>10s (Slow)</span>
+                    </div>
+                  </div>
+
+                  {/* Crossfade Duration */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Crossfade Duration</label>
+                      <span className="text-xs font-bold text-white">{crossfadeDuration}s</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="3"
+                      step="0.25"
+                      value={crossfadeDuration}
+                      onChange={(e) => setCrossfadeDuration(parseFloat(e.target.value))}
+                      className="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-violet-500"
+                    />
+                    <div className="flex justify-between text-[10px] text-neutral-600 mt-1">
+                      <span>0.5s (Quick)</span>
+                      <span>3s (Smooth)</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div className="flex justify-between items-center pt-2">

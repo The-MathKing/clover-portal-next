@@ -17,6 +17,15 @@ export interface PropertyDetails {
   features: string[];
 }
 
+export type TransitionStyle = 'crossfade' | 'ken-burns-in' | 'ken-burns-out' | 'pan-left' | 'pan-right';
+
+export type RenderingStep = 
+  | 'analyzing'
+  | 'generating-script'
+  | 'synthesizing-voice'
+  | 'rendering-video'
+  | 'complete';
+
 export interface CloverState {
   // Property Data
   propertyDetails: PropertyDetails;
@@ -35,6 +44,24 @@ export interface CloverState {
   setVoiceProfile: (profile: string) => void;
   elevenLabsApiKey: string;
   setElevenLabsApiKey: (key: string) => void;
+
+  // Transition & Speed Controls (NEW)
+  transitionStyle: TransitionStyle;
+  setTransitionStyle: (style: TransitionStyle) => void;
+  slideDuration: number; // in seconds
+  setSlideDuration: (duration: number) => void;
+  crossfadeDuration: number; // in seconds
+  setCrossfadeDuration: (duration: number) => void;
+
+  // Rendering Progress (NEW)
+  renderingStep: RenderingStep | null;
+  setRenderingStep: (step: RenderingStep | null) => void;
+
+  // Product Tour (NEW)
+  hasSeenTour: boolean;
+  setHasSeenTour: (seen: boolean) => void;
+  isTourActive: boolean;
+  setTourActive: (active: boolean) => void;
 
   // UI State
   showAuthModal: boolean;
@@ -104,6 +131,27 @@ export const useStore = create<CloverState>((set) => ({
     if (typeof window !== 'undefined') localStorage.setItem('elevenLabsApiKey', key);
     set({ elevenLabsApiKey: key });
   },
+
+  // Transition & Speed Controls (NEW)
+  transitionStyle: 'crossfade',
+  setTransitionStyle: (style) => set({ transitionStyle: style }),
+  slideDuration: 5,
+  setSlideDuration: (duration) => set({ slideDuration: duration }),
+  crossfadeDuration: 1.5,
+  setCrossfadeDuration: (duration) => set({ crossfadeDuration: duration }),
+
+  // Rendering Progress (NEW)
+  renderingStep: null,
+  setRenderingStep: (step) => set({ renderingStep: step }),
+
+  // Product Tour (NEW)
+  hasSeenTour: typeof window !== 'undefined' ? localStorage.getItem('cloverTourSeen') === 'true' : false,
+  setHasSeenTour: (seen) => {
+    if (typeof window !== 'undefined') localStorage.setItem('cloverTourSeen', seen.toString());
+    set({ hasSeenTour: seen });
+  },
+  isTourActive: false,
+  setTourActive: (active) => set({ isTourActive: active }),
 
   showAuthModal: false,
   setShowAuthModal: (show) => set({ showAuthModal: show }),

@@ -6,6 +6,7 @@ import { Dashboard } from '@/components/Dashboard';
 import { PresentationEditor } from '@/components/PresentationEditor';
 import { WizardModal } from '@/components/WizardModal';
 import { Login } from '@/components/Login';
+import { LandingPage } from '@/components/LandingPage';
 import { createClient } from '@/utils/supabase/client';
 import type { Property } from '@/mockData';
 
@@ -160,7 +161,10 @@ export default function App() {
 
   return (
     <>
-      {selectedProperty ? (
+      {/* Show Landing Page for unauthenticated users when not in editor */}
+      {!isAuthenticated && !selectedProperty ? (
+        <LandingPage />
+      ) : selectedProperty ? (
         <PresentationEditor 
           property={selectedProperty} 
           onBack={() => setSelectedProperty(null)} 

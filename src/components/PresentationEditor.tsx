@@ -4,6 +4,7 @@ import { ArrowLeft, Film, HelpCircle } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
 import { ScriptPanel } from './ScriptPanel';
 import { ExportModal } from './ExportModal';
+import { ProductTour } from './ProductTour';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
 
@@ -74,6 +75,7 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
           
           <button
             onClick={() => setExporting(true)}
+            data-tour="export-button"
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
           >
             <Film className="w-4 h-4" />
@@ -104,6 +106,9 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
 
       {/* Export Overlay Modal */}
       <ExportModal />
+
+      {/* Interactive Product Tour (NEW) */}
+      <ProductTour />
     </div>
   );
 };

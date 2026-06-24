@@ -11,6 +11,113 @@ interface DashboardProps {
   onSelectProperty: (property: Property) => void;
 }
 
+// ─── Countdown Timer for Pricing ────────────────────────────────────────────
+const CountdownTimer: React.FC = () => {
+  const [timeLeft, setTimeLeft] = React.useState({ hours: 2, minutes: 0, seconds: 0 });
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        let { hours, minutes, seconds } = prev;
+        if (seconds > 0) {
+          seconds--;
+        } else if (minutes > 0) {
+          minutes--;
+          seconds = 59;
+        } else if (hours > 0) {
+          hours--;
+          minutes = 59;
+          seconds = 59;
+        }
+        return { hours, minutes, seconds };
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  return (
+    <div className="flex items-center gap-1">
+      {[
+        { value: timeLeft.hours, label: 'h' },
+        { value: timeLeft.minutes, label: 'm' },
+        { value: timeLeft.seconds, label: 's' },
+      ].map((unit, i) => (
+        <React.Fragment key={i}>
+          <div className="bg-black/40 rounded-lg px-2 py-1 min-w-[36px] text-center">
+            <span className="text-sm font-black text-white tabular-nums">{pad(unit.value)}</span>
+            <span className="text-[9px] text-amber-400 font-bold uppercase ml-0.5">{unit.label}</span>
+          </div>
+          {i < 2 && <span className="text-amber-500 font-bold">:</span>}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+};
+
+// ─── Testimonial Slider for Pricing ─────────────────────────────────────────
+const testimonials = [
+  { name: 'Sarah M.', role: 'Home Seller, Austin TX', text: 'My listing went viral on Zillow within 24 hours of posting the Clover video. Had 3 offers in 2 days!', rating: 5 },
+  { name: 'James K.', role: 'Real Estate Agent, Miami FL', text: 'I use Clover for all my listings now. My clients are blown away by the quality, and it takes me 2 minutes.', rating: 5 },
+  { name: 'Linda P.', role: 'FSBO Seller, Denver CO', text: 'As a first-time seller without an agent, Clover gave my listing a professional edge. Sold above asking price!', rating: 5 },
+];
+
+const TestimonialSlider: React.FC = () => {
+  const [activeIdx, setActiveIdx] = React.useState(0);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="mt-12 bg-neutral-900/50 border border-neutral-800/50 rounded-2xl p-8 relative overflow-hidden">
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-bold text-white mb-1">What Sellers Are Saying</h3>
+        <p className="text-xs text-neutral-500">Real results from real home sellers</p>
+      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIdx}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+          className="text-center"
+        >
+          <div className="flex justify-center gap-0.5 mb-4">
+            {Array(testimonials[activeIdx].rating).fill(0).map((_, i) => (
+              <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+            ))}
+          </div>
+          <p className="text-neutral-300 text-sm leading-relaxed italic max-w-lg mx-auto mb-4">
+            &ldquo;{testimonials[activeIdx].text}&rdquo;
+          </p>
+          <p className="text-sm font-bold text-white">{testimonials[activeIdx].name}</p>
+          <p className="text-xs text-neutral-500">{testimonials[activeIdx].role}</p>
+        </motion.div>
+      </AnimatePresence>
+      
+      {/* Dots */}
+      <div className="flex justify-center gap-2 mt-6">
+        {testimonials.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveIdx(i)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              i === activeIdx ? 'bg-emerald-500 w-4' : 'bg-neutral-700'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
   const { 
     setWizardOpen, 
@@ -557,27 +664,57 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               transition={{ duration: 0.3 }}
               className="max-w-5xl mx-auto py-8"
             >
-            <div className="text-center mb-16">
+            <div className="text-center mb-10">
               <h2 className="text-4xl font-bold font-heading text-white mb-4">Simple, Transparent Pricing</h2>
               <p className="text-neutral-400 max-w-xl mx-auto">Choose the package that fits your home listing needs. No hidden agency fees.</p>
             </div>
 
+            {/* ✨ Animated Countdown Banner (NEW) */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-10 bg-gradient-to-r from-amber-950/40 via-amber-900/20 to-amber-950/40 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-center"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🔥</span>
+                <span className="text-sm font-bold text-amber-300">Limited Time: Save 50% on 5-Pack</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <CountdownTimer />
+              </div>
+            </motion.div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: 'One Time Pass', price: '$30', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'] },
-                { name: '5-Pack', price: '$75', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true },
-                { name: 'Unlimited', price: '$150', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'] }
+                { name: 'One Time Pass', price: '$30', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'], savings: '' },
+                { name: '5-Pack', price: '$75', originalPrice: '$150', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true, savings: 'Save $75' },
+                { name: 'Unlimited', price: '$150', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], savings: '' }
               ].map((tier, i) => (
-                <div key={i} className={`relative p-8 rounded-3xl bg-neutral-900 border ${tier.popular ? 'border-emerald-500' : 'border-neutral-800'} flex flex-col`}>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.3 }}
+                  whileHover={{ y: -4 }}
+                  className={`relative p-8 rounded-3xl bg-neutral-900 border ${tier.popular ? 'border-emerald-500 shadow-lg shadow-emerald-900/20' : 'border-neutral-800'} flex flex-col transition-shadow`}
+                >
                   {tier.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-black px-4 py-1 text-xs font-bold uppercase tracking-wider rounded-full flex items-center gap-1.5">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-black px-4 py-1 text-xs font-bold uppercase tracking-wider rounded-full flex items-center gap-1.5 shadow-lg shadow-emerald-900/30">
                       <Star className="w-3.5 h-3.5" /> Most Popular
+                    </div>
+                  )}
+                  {tier.savings && (
+                    <div className="absolute top-4 right-4 bg-rose-500/20 text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-rose-500/20">
+                      {tier.savings}
                     </div>
                   )}
                   <h3 className="text-xl font-bold text-white mb-2">{tier.name}</h3>
                   <p className="text-sm text-neutral-400 mb-6">{tier.desc}</p>
-                  <div className="mb-8 flex items-baseline gap-1">
+                  <div className="mb-8 flex items-baseline gap-2">
                     <span className="text-4xl font-black text-white">{tier.price}</span>
+                    {(tier as any).originalPrice && (
+                      <span className="text-lg text-neutral-600 line-through">{(tier as any).originalPrice}</span>
+                    )}
                     <span className="text-neutral-500 font-semibold text-xs uppercase tracking-wider">
                       {tier.billing === 'one-time' ? 'one-time' : '/mo'}
                     </span>
@@ -592,13 +729,40 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                   </ul>
                   <button 
                     onClick={() => handleChooseTier(tier.name)}
-                    className={`w-full py-3 rounded-xl font-bold transition-all ${tier.popular ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}
+                    className={`w-full py-3 rounded-xl font-bold transition-all active:scale-[0.98] ${tier.popular ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}
                   >
                     Choose {tier.name}
                   </button>
-                </div>
+                </motion.div>
               ))}
             </div>
+
+            {/* ✨ Trust Elements Row (NEW) */}
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { icon: '🛡️', title: '30-Day Money-Back Guarantee', desc: 'Not satisfied? Full refund, no questions asked.' },
+                { icon: '🔒', title: 'Secure Stripe Checkout', desc: 'Bank-level encryption. Your data is always safe.' },
+                { icon: '⭐', title: '500+ Home Sellers Trust Us', desc: 'Join sellers who sold faster with Clover videos.' },
+              ].map((badge, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
+                  className="flex items-start gap-3 p-4 bg-neutral-900/50 border border-neutral-800/50 rounded-xl"
+                >
+                  <span className="text-xl mt-0.5">{badge.icon}</span>
+                  <div>
+                    <p className="text-sm font-bold text-white">{badge.title}</p>
+                    <p className="text-xs text-neutral-500">{badge.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* ✨ Animated Testimonials (NEW) */}
+            <TestimonialSlider />
+
             </motion.div>
           )}
         </AnimatePresence>
