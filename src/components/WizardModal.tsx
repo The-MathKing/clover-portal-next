@@ -4,6 +4,7 @@ import { X, Upload, Plus, Trash2, GripVertical, Check } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { useStore } from '../store/useStore';
+import { createClient } from '../utils/supabase/client';
 
 export const WizardModal: React.FC = () => {
   const { 
@@ -18,6 +19,7 @@ export const WizardModal: React.FC = () => {
 
   const [step, setStep] = useState<1 | 2>(1);
   const [featureInput, setFeatureInput] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isWizardOpen) return null;
 
@@ -69,32 +71,78 @@ export const WizardModal: React.FC = () => {
     setImages(items);
   };
 
-  const handleComplete = () => {
-    const newProperty = {
-      id: `prop-${Date.now()}`,
-      address: propertyDetails.address || 'New Presentation',
-      price: propertyDetails.price || '',
-      beds: propertyDetails.beds || '',
-      baths: propertyDetails.baths || '',
-      sqft: propertyDetails.sqft || '',
-      coverImage: images.length > 0 ? images[0].url : 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
-      status: 'Ready' as const,
-      description: propertyDetails.description || '',
-      features: propertyDetails.features || [],
-      images: images.map(img => ({ id: img.id, url: img.url }))
-    };
+  const handleComplete = async () => {
+    setIsSubmitting(true);
+    try {
+      const supabase = createClient();
+      const userId = useStore.getState().userId;
 
-    useStore.getState().addPropertyToList(newProperty);
-    useStore.getState().setActiveTab('my-videos');
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
 
-    setWizardOpen(false);
-    setStep(1);
-    
-    // Reset wizard fields
-    setPropertyDetails({
-      address: '', price: '', beds: '', baths: '', sqft: '', description: '', features: []
-    });
-    setImages([]);
+      // Upload images
+      const uploadedImages = [];
+      for (const img of images) {
+        if (img.file) {
+          const fileExt = img.file.name.split('.').pop();
+          const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('media')
+            .upload(fileName, img.file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('media')
+            .getPublicUrl(fileName);
+
+          uploadedImages.push({ id: img.id, url: publicUrl });
+        } else {
+          uploadedImages.push({ id: img.id, url: img.url });
+        }
+      }
+
+      const coverImage = uploadedImages.length > 0 ? uploadedImages[0].url : 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80';
+
+      const newProperty = {
+        user_id: userId,
+        address: propertyDetails.address || 'New Presentation',
+        price: propertyDetails.price || '',
+        beds: propertyDetails.beds || '',
+        baths: propertyDetails.baths || '',
+        sqft: propertyDetails.sqft || '',
+        description: propertyDetails.description || '',
+        features: propertyDetails.features || [],
+        status: 'Ready',
+        cover_image: coverImage,
+        images: uploadedImages,
+      };
+
+      const { data, error } = await supabase
+        .from('properties')
+        .insert([newProperty])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      useStore.getState().addPropertyToList(data);
+      useStore.getState().setActiveTab('my-videos');
+
+      setWizardOpen(false);
+      setStep(1);
+      setPropertyDetails({
+        address: '', price: '', beds: '', baths: '', sqft: '', description: '', features: []
+      });
+      setImages([]);
+    } catch (err: any) {
+      console.error('Error saving presentation:', err);
+      alert('Failed to save presentation: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -335,11 +383,15 @@ export const WizardModal: React.FC = () => {
             ) : (
               <button
                 onClick={handleComplete}
-                disabled={images.length === 0}
+                disabled={images.length === 0 || isSubmitting}
                 className="flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-medium text-sm transition-all"
               >
-                <Check className="w-4 h-4" />
-                Finish Setup
+                {isSubmitting ? (
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                {isSubmitting ? 'Saving...' : 'Finish Setup'}
               </button>
             )}
           </div>

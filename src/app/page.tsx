@@ -18,7 +18,8 @@ export default function App() {
     setAuthenticated, 
     setUserId, 
     setUserEmail, 
-    setSubscriptionTier 
+    setSubscriptionTier,
+    setProperties
   } = useStore();
 
   useEffect(() => {
@@ -35,25 +36,43 @@ export default function App() {
       );
 
       try {
-        const queryPromise = supabase
+        const profilePromise = supabase
           .from('profiles')
           .select('subscription_tier')
           .eq('id', userId)
           .single();
 
+        const propertiesPromise = supabase
+          .from('properties')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
         // Race the query against the 3-second timeout
-        const result = await Promise.race([queryPromise, timeoutPromise]) as any;
+        const result = await Promise.race([
+          Promise.all([profilePromise, propertiesPromise]),
+          timeoutPromise
+        ]) as any;
 
-        if (result && result.error) {
-          console.warn('⚠️ [loadProfile] query error (profiles table may not exist yet):', result.error.message);
-          if (isMounted) setSubscriptionTier('free');
-          return;
-        }
+        if (result) {
+          const [profileRes, propertiesRes] = result;
+          
+          if (profileRes.error) {
+            console.warn('⚠️ [loadProfile] query error (profiles table may not exist yet):', profileRes.error.message);
+            if (isMounted) setSubscriptionTier('free');
+          } else if (profileRes.data && profileRes.data.subscription_tier) {
+            console.log('🔍 [loadProfile] Profile loaded successfully:', profileRes.data.subscription_tier);
+            if (isMounted) setSubscriptionTier(profileRes.data.subscription_tier as any);
+          } else {
+            if (isMounted) setSubscriptionTier('free');
+          }
 
-        if (result && result.data && result.data.subscription_tier) {
-          console.log('🔍 [loadProfile] Profile loaded successfully:', result.data.subscription_tier);
-          if (isMounted) setSubscriptionTier(result.data.subscription_tier as any);
+          if (propertiesRes && !propertiesRes.error && propertiesRes.data) {
+            console.log(`🔍 [loadProfile] Loaded ${propertiesRes.data.length} properties for user.`);
+            if (isMounted) setProperties(propertiesRes.data);
+          }
         } else {
+          // Timeout occurred
           if (isMounted) setSubscriptionTier('free');
         }
       } catch (err: any) {
@@ -82,6 +101,7 @@ export default function App() {
             setUserEmail(null);
             setAuthenticated(false);
             setSubscriptionTier('free');
+            setProperties([]);
           }
         }
       } catch (err) {
@@ -119,7 +139,7 @@ export default function App() {
       subscription.unsubscribe();
       clearTimeout(fallbackTimer);
     };
-  }, [setAuthenticated, setUserId, setUserEmail, setSubscriptionTier]);
+  }, [setAuthenticated, setUserId, setUserEmail, setSubscriptionTier, setProperties]);
 
   if (isInitializing) {
     return (

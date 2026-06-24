@@ -2,14 +2,63 @@
 import React, { useState } from 'react';
 import { X, CheckCircle, Download, Link, Film } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { createClient } from '../utils/supabase/client';
+import { useEffect } from 'react';
 
 export const ExportModal: React.FC = () => {
-  const { isExporting, setExporting, exportProgress, videoBlobUrl, setVideoBlobUrl, setExportProgress, subscriptionTier, setActiveTab } = useStore();
+  const { 
+    isExporting, setExporting, exportProgress, videoBlobUrl, setVideoBlobUrl, 
+    setExportProgress, subscriptionTier, setActiveTab, activePropertyId, userId, updateProperty 
+  } = useStore();
   const [copied, setCopied] = useState(false);
+  const [hasUploaded, setHasUploaded] = useState(false);
 
-  if (!isExporting) return null;
+  useEffect(() => {
+    if (!isExporting) {
+      setHasUploaded(false);
+    }
+  }, [isExporting]);
 
   const isFinished = exportProgress >= 100 && videoBlobUrl !== null;
+
+  useEffect(() => {
+    if (isFinished && !hasUploaded && videoBlobUrl && activePropertyId && userId) {
+      const uploadVideo = async () => {
+        setHasUploaded(true);
+        try {
+          const supabase = createClient();
+          const response = await fetch(videoBlobUrl);
+          const blob = await response.blob();
+          
+          const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+          const extension = isSafari ? 'mp4' : 'webm';
+          const fileName = `${userId}/video-${activePropertyId}-${Date.now()}.${extension}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('media')
+            .upload(fileName, blob, { contentType: `video/${extension}` });
+            
+          if (uploadError) throw uploadError;
+          
+          const { data: { publicUrl } } = supabase.storage
+            .from('media')
+            .getPublicUrl(fileName);
+            
+          await supabase
+            .from('properties')
+            .update({ video_url: publicUrl })
+            .eq('id', activePropertyId);
+            
+          updateProperty(activePropertyId, { video_url: publicUrl });
+          console.log("Video uploaded successfully:", publicUrl);
+        } catch (err) {
+          console.error("Failed to upload video to Supabase:", err);
+        }
+      };
+      
+      uploadVideo();
+    }
+  }, [isFinished, hasUploaded, videoBlobUrl, activePropertyId, userId, updateProperty]);
 
   const handleDownload = () => {
     if (!videoBlobUrl) return;

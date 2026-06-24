@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clover Portal - Financial & Budget Projection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+</head>
+<body class="bg-neutral-950 text-neutral-200 p-8 font-sans min-h-screen">
+    <div class="max-w-5xl mx-auto" x-data="budgetCalculator()">
+        <div class="flex justify-between items-center mb-8 border-b border-neutral-800 pb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Clover Portal Financial Projections</h1>
+                <p class="text-neutral-400">Interactive budget sheet for revenue and expenses.</p>
+            </div>
+            <button @click="exportCSV" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export as CSV
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- INPUTS COLUMN -->
+            <div class="space-y-6">
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span class="text-emerald-500">📈</span> Revenue Assumptions
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Single Tour Customers / Month</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" x-model.number="sales.single.count" class="w-24 bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-emerald-500">
+                                <span class="text-sm text-neutral-500">x $20</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Active Seller Pass (Subs)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" x-model.number="sales.monthly.count" class="w-24 bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-emerald-500">
+                                <span class="text-sm text-neutral-500">x $50/mo</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Lifetime Customers / Month</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" x-model.number="sales.lifetime.count" class="w-24 bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-emerald-500">
+                                <span class="text-sm text-neutral-500">x $100</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span class="text-rose-400">📉</span> Variable Expenses
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Avg Video Gens per User</label>
+                            <input type="number" x-model.number="costs.gensPerUser" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-rose-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">ElevenLabs Cost per Gen ($)</label>
+                            <input type="number" step="0.01" x-model.number="costs.elevenLabsPerGen" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-rose-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Stripe Fee %</label>
+                            <input type="number" step="0.1" x-model.number="costs.stripePercent" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-rose-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Stripe Fixed Fee ($)</label>
+                            <input type="number" step="0.01" x-model.number="costs.stripeFixed" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-rose-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span class="text-amber-400">🏢</span> Fixed Monthly Overheads
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Supabase Plan ($)</label>
+                            <input type="number" x-model.number="costs.supabase" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Vercel Hosting ($)</label>
+                            <input type="number" x-model.number="costs.vercel" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Marketing / Ads ($)</label>
+                            <input type="number" x-model.number="costs.marketing" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Misc Domains/Tools ($)</label>
+                            <input type="number" x-model.number="costs.misc" class="w-full bg-neutral-950 border border-neutral-700 rounded p-2 text-white outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD OUTPUT -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Summary KPI Cards -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+                        <div class="text-sm text-neutral-400 font-semibold uppercase tracking-wider mb-2">Total Monthly Revenue</div>
+                        <div class="text-4xl font-black text-emerald-400" x-text="format(totalRevenue)"></div>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+                        <div class="text-sm text-neutral-400 font-semibold uppercase tracking-wider mb-2">Total Monthly Expenses</div>
+                        <div class="text-4xl font-black text-rose-400" x-text="format(totalExpenses)"></div>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 col-span-2">
+                        <div class="text-sm text-neutral-400 font-semibold uppercase tracking-wider mb-2">Estimated Monthly Net Profit</div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-5xl font-black" :class="netProfit >= 0 ? 'text-white' : 'text-rose-500'" x-text="format(netProfit)"></div>
+                            <div class="px-3 py-1 rounded-full text-sm font-bold" :class="netProfit >= 0 ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950 text-rose-400'" x-text="marginPercent + '% Margin'"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown Table -->
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-neutral-800 bg-neutral-800/50">
+                        <h3 class="font-bold text-white">Line Item Breakdown</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-neutral-400 uppercase tracking-wider bg-neutral-950/50">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold">Category</th>
+                                    <th class="px-6 py-3 font-semibold">Item</th>
+                                    <th class="px-6 py-3 font-semibold text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-800">
+                                <!-- Revenue -->
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-emerald-400 font-medium">Revenue</td>
+                                    <td class="px-6 py-3">Single Tour Sales</td>
+                                    <td class="px-6 py-3 text-right font-mono" x-text="format(revSingle)"></td>
+                                </tr>
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-emerald-400 font-medium">Revenue</td>
+                                    <td class="px-6 py-3">Active Seller Subs</td>
+                                    <td class="px-6 py-3 text-right font-mono" x-text="format(revMonthly)"></td>
+                                </tr>
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-emerald-400 font-medium">Revenue</td>
+                                    <td class="px-6 py-3">Lifetime Packages</td>
+                                    <td class="px-6 py-3 text-right font-mono" x-text="format(revLifetime)"></td>
+                                </tr>
+
+                                <!-- Expenses (Variable) -->
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-rose-400 font-medium">Expense (Var)</td>
+                                    <td class="px-6 py-3">Stripe Processing Fees</td>
+                                    <td class="px-6 py-3 text-right font-mono text-rose-300" x-text="'-' + format(expStripe)"></td>
+                                </tr>
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-rose-400 font-medium">Expense (Var)</td>
+                                    <td class="px-6 py-3">ElevenLabs API Usage</td>
+                                    <td class="px-6 py-3 text-right font-mono text-rose-300" x-text="'-' + format(expElevenLabs)"></td>
+                                </tr>
+
+                                <!-- Expenses (Fixed) -->
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-amber-400 font-medium">Expense (Fixed)</td>
+                                    <td class="px-6 py-3">Supabase</td>
+                                    <td class="px-6 py-3 text-right font-mono text-amber-200" x-text="'-' + format(costs.supabase)"></td>
+                                </tr>
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-amber-400 font-medium">Expense (Fixed)</td>
+                                    <td class="px-6 py-3">Vercel</td>
+                                    <td class="px-6 py-3 text-right font-mono text-amber-200" x-text="'-' + format(costs.vercel)"></td>
+                                </tr>
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-amber-400 font-medium">Expense (Fixed)</td>
+                                    <td class="px-6 py-3">Marketing & Ads</td>
+                                    <td class="px-6 py-3 text-right font-mono text-amber-200" x-text="'-' + format(costs.marketing)"></td>
+                                </tr>
+                                <tr class="hover:bg-neutral-800/30">
+                                    <td class="px-6 py-3 text-amber-400 font-medium">Expense (Fixed)</td>
+                                    <td class="px-6 py-3">Misc (Domains/Tools)</td>
+                                    <td class="px-6 py-3 text-right font-mono text-amber-200" x-text="'-' + format(costs.misc)"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('budgetCalculator', () => ({
+                sales: {
+                    single: { count: 15, price: 20 },
+                    monthly: { count: 10, price: 50 },
+                    lifetime: { count: 2, price: 100 }
+                },
+                costs: {
+                    gensPerUser: 4,
+                    elevenLabsPerGen: 0.15,
+                    stripePercent: 2.9,
+                    stripeFixed: 0.30,
+                    supabase: 25,
+                    vercel: 20,
+                    marketing: 150,
+                    misc: 20
+                },
+
+                // Getters for Revenue
+                get revSingle() { return this.sales.single.count * this.sales.single.price; },
+                get revMonthly() { return this.sales.monthly.count * this.sales.monthly.price; },
+                get revLifetime() { return this.sales.lifetime.count * this.sales.lifetime.price; },
+                get totalRevenue() { return this.revSingle + this.revMonthly + this.revLifetime; },
+                get totalTransactions() { return this.sales.single.count + this.sales.monthly.count + this.sales.lifetime.count; },
+                get totalUsers() { return this.totalTransactions; },
+
+                // Getters for Expenses
+                get expStripe() { 
+                    const variableFee = this.totalRevenue * (this.costs.stripePercent / 100);
+                    const fixedFee = this.totalTransactions * this.costs.stripeFixed;
+                    return variableFee + fixedFee; 
+                },
+                get expElevenLabs() { return this.totalUsers * this.costs.gensPerUser * this.costs.elevenLabsPerGen; },
+                get fixedCosts() { return this.costs.supabase + this.costs.vercel + this.costs.marketing + this.costs.misc; },
+                get totalExpenses() { return this.expStripe + this.expElevenLabs + this.fixedCosts; },
+
+                get netProfit() { return this.totalRevenue - this.totalExpenses; },
+                get marginPercent() { 
+                    if (this.totalRevenue === 0) return 0;
+                    return ((this.netProfit / this.totalRevenue) * 100).toFixed(1); 
+                },
+
+                format(val) {
+                    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+                },
+
+                exportCSV() {
+                    const rows = [
+                        ["Category", "Item", "Type", "Amount (USD)"],
+                        ["Revenue", "Single Tour Sales", "Variable", this.revSingle.toFixed(2)],
+                        ["Revenue", "Active Seller Subs", "Variable", this.revMonthly.toFixed(2)],
+                        ["Revenue", "Lifetime Packages", "Variable", this.revLifetime.toFixed(2)],
+                        ["Expense", "Stripe Processing Fees", "Variable", "-" + this.expStripe.toFixed(2)],
+                        ["Expense", "ElevenLabs API Usage", "Variable", "-" + this.expElevenLabs.toFixed(2)],
+                        ["Expense", "Supabase", "Fixed", "-" + this.costs.supabase.toFixed(2)],
+                        ["Expense", "Vercel", "Fixed", "-" + this.costs.vercel.toFixed(2)],
+                        ["Expense", "Marketing & Ads", "Fixed", "-" + this.costs.marketing.toFixed(2)],
+                        ["Expense", "Misc (Domains/Tools)", "Fixed", "-" + this.costs.misc.toFixed(2)],
+                        ["", "", "", ""],
+                        ["Summary", "Total Monthly Revenue", "", this.totalRevenue.toFixed(2)],
+                        ["Summary", "Total Monthly Expenses", "", "-" + this.totalExpenses.toFixed(2)],
+                        ["Summary", "Estimated Monthly Net Profit", "", this.netProfit.toFixed(2)],
+                        ["Summary", "Margin %", "", this.marginPercent + "%"]
+                    ];
+
+                    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", "clover-financial-budget.csv");
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }));
+        });
+    </script>
+</body>
+</html>

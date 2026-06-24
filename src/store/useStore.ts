@@ -56,7 +56,11 @@ export interface CloverState {
   activeTab: 'demo' | 'examples' | 'my-videos' | 'pricing';
   setActiveTab: (tab: 'demo' | 'examples' | 'my-videos' | 'pricing') => void;
   userProperties: any[];
+  setProperties: (properties: any[]) => void;
   addPropertyToList: (property: any) => void;
+  updateProperty: (id: string, updates: any) => void;
+  activePropertyId: string | null;
+  setActivePropertyId: (id: string | null) => void;
 }
 
 const defaultProperty: PropertyDetails = {
@@ -128,7 +132,14 @@ export const useStore = create<CloverState>((set) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   userProperties: [],
+  setProperties: (properties) => set({ userProperties: properties }),
   addPropertyToList: (property) => set((state) => ({ 
     userProperties: [property, ...state.userProperties] 
   })),
+  updateProperty: (id, updates) => set((state) => ({
+    userProperties: state.userProperties.map(p => p.id === id ? { ...p, ...updates } : p)
+  })),
+
+  activePropertyId: null,
+  setActivePropertyId: (id) => set({ activePropertyId: id }),
 }));

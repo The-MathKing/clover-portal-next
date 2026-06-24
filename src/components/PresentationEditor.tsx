@@ -13,9 +13,11 @@ interface PresentationEditorProps {
 }
 
 export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property, onBack }) => {
-  const { setPropertyDetails, setImages, setGeneratedScript, setExporting } = useStore();
+  const { setPropertyDetails, setImages, setGeneratedScript, setExporting, setActivePropertyId } = useStore();
 
   useEffect(() => {
+    setActivePropertyId(property.id);
+
     // Populate store with the selected property details
     setPropertyDetails({
       address: property.address,

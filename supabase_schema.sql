@@ -37,3 +37,59 @@ insert into public.profiles (id, email, subscription_tier)
 select id, email, 'free'
 from auth.users
 on conflict (id) do nothing;
+
+-- Create a table for user properties (videos)
+create table if not exists public.properties (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  address text,
+  price text,
+  beds text,
+  baths text,
+  sqft text,
+  description text,
+  features jsonb default '[]'::jsonb,
+  status text default 'Ready',
+  cover_image text,
+  images jsonb default '[]'::jsonb,
+  video_url text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS for properties
+alter table public.properties enable row level security;
+
+-- Policies for properties
+create policy "Users can view their own properties" 
+  on public.properties for select using (auth.uid() = user_id);
+
+create policy "Users can insert their own properties" 
+  on public.properties for insert with check (auth.uid() = user_id);
+
+create policy "Users can update their own properties" 
+  on public.properties for update using (auth.uid() = user_id);
+
+create policy "Users can delete their own properties" 
+  on public.properties for delete using (auth.uid() = user_id);
+
+-- Create a storage bucket for media (images and exported videos)
+insert into storage.buckets (id, name, public) 
+values ('media', 'media', true)
+on conflict (id) do nothing;
+
+-- Enable RLS for the storage bucket
+create policy "Public Access"
+  on storage.objects for select
+  using ( bucket_id = 'media' );
+
+create policy "Users can upload media"
+  on storage.objects for insert
+  with check ( bucket_id = 'media' and auth.uid() = owner );
+
+create policy "Users can update own media"
+  on storage.objects for update
+  using ( bucket_id = 'media' and auth.uid() = owner );
+
+create policy "Users can delete own media"
+  on storage.objects for delete
+  using ( bucket_id = 'media' and auth.uid() = owner );
