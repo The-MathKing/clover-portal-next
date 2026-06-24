@@ -23,21 +23,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
   const handleChooseTier = async (tierName: string) => {
     let priceId = '';
-    let mappedTier: 'starter' | 'unlimited' | 'lifetime' = 'unlimited';
+    let mappedTier: 'demo' | 'pro_5' | 'pro_15' = 'demo';
     
-    if (tierName.toLowerCase().includes('starter') || tierName.toLowerCase().includes('single')) {
-      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || '';
-      mappedTier = 'starter';
+    if (tierName.toLowerCase().includes('demo') || tierName.toLowerCase().includes('3 generations')) {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_DEMO || '';
+      mappedTier = 'demo';
     } else if (
-      tierName.toLowerCase().includes('unlimited') || 
-      tierName.toLowerCase().includes('pass') || 
-      tierName.toLowerCase().includes('active')
+      tierName.toLowerCase().includes('5 generations') || 
+      tierName.toLowerCase().includes('pro 5')
     ) {
-      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_UNLIMITED || '';
-      mappedTier = 'unlimited';
-    } else if (tierName.toLowerCase().includes('lifetime')) {
-      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_LIFETIME || '';
-      mappedTier = 'lifetime';
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_5 || '';
+      mappedTier = 'pro_5';
+    } else if (tierName.toLowerCase().includes('15 generations') || tierName.toLowerCase().includes('pro 15')) {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_15 || '';
+      mappedTier = 'pro_15';
     }
 
     if (priceId) {
@@ -316,9 +315,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: 'Single Listing Tour', price: '$20', billing: 'one-time', desc: 'Perfect for individual sellers.', features: ['10 HD Exports included', 'Premium AI Voice Narration', 'Zillow & MLS Compatible format', 'Standard Email Support'] },
-                { name: 'Active Seller Pass', price: '$50', billing: '/mo', desc: 'Best for multiple listings.', features: ['Unlimited HD Exports', 'Premium AI Voice Narration', 'Unlimited Listings/Properties', 'Zillow & MLS Compatible format', 'Priority Support'], popular: true },
-                { name: 'Lifetime Seller Pack', price: '$100', billing: 'one-time', desc: 'For serial renovators & FSBO.', features: ['Unlimited HD Exports forever', 'Premium AI Voice Narration', 'Unlimited Properties', 'Zillow & MLS Compatible format', 'Lifetime Support'] }
+                { name: 'Demo Pass', price: '$10', billing: 'one-time', desc: 'Perfect to try it out.', features: ['3 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'] },
+                { name: 'Pro 5', price: '$15', billing: '/mo', desc: 'Best for standard listings.', features: ['5 HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true },
+                { name: 'Pro 15', price: '$30', billing: '/mo', desc: 'For active agents and flippers.', features: ['15 HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'] }
               ].map((tier, i) => (
                 <div key={i} className={`relative p-8 rounded-3xl bg-neutral-900 border ${tier.popular ? 'border-emerald-500' : 'border-neutral-800'} flex flex-col`}>
                   {tier.popular && (
