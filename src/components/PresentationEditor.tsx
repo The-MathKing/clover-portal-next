@@ -14,7 +14,7 @@ interface PresentationEditorProps {
 }
 
 export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property, onBack }) => {
-  const { setPropertyDetails, setImages, setGeneratedScript, setExporting, setActivePropertyId } = useStore();
+  const { setPropertyDetails, setImages, setGeneratedScript, setExporting, setActivePropertyId, subscriptionTier } = useStore();
 
   useEffect(() => {
     setActivePropertyId(property.id);
@@ -74,7 +74,13 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
           </div>
           
           <button
-            onClick={() => setExporting(true)}
+            onClick={() => {
+              if (subscriptionTier === 'free') {
+                alert('Exporting presentations requires a paid plan. Please upgrade to use this feature.');
+                return;
+              }
+              setExporting(true);
+            }}
             data-tour="export-button"
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
           >

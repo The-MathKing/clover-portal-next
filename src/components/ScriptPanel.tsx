@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Square, Volume2, Key, Wand2, Crown, Zap, GraduationCap, TreePine, Compass } from 'lucide-react';
+import { Sparkles, Square, Volume2, Key, Wand2, Crown, Zap, GraduationCap, TreePine, Compass, Lock } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,7 +14,7 @@ const scriptPresets = [
 ];
 
 export const ScriptPanel: React.FC = () => {
-  const { propertyDetails, generatedScript, setGeneratedScript, voiceProfile, setVoiceProfile } = useStore();
+  const { propertyDetails, generatedScript, setGeneratedScript, voiceProfile, setVoiceProfile, subscriptionTier, setActiveTab } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlayingTTS, setIsPlayingTTS] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -72,12 +72,22 @@ export const ScriptPanel: React.FC = () => {
     }, 1500);
   };
 
+  const isFreeUser = subscriptionTier === 'free';
+
   const handleGenerateScript = () => {
+    if (isFreeUser) {
+      alert('AI Script Generation requires a paid plan. Please upgrade to use this feature.');
+      return;
+    }
     setActivePreset(null);
     generateScriptWithModifier();
   };
 
   const handleApplyPreset = (preset: typeof scriptPresets[0]) => {
+    if (isFreeUser) {
+      alert('Magic Enhancers require a paid plan. Please upgrade to use this feature.');
+      return;
+    }
     if (!generatedScript && !propertyDetails.address) {
       // Generate fresh script with the modifier
       setActivePreset(preset.id);
@@ -169,6 +179,11 @@ export const ScriptPanel: React.FC = () => {
   const handlePreviewVoiceover = async () => {
     if (!generatedScript) return;
 
+    if (isFreeUser) {
+      alert('AI Voiceover Preview requires a paid plan. Please upgrade to use this feature.');
+      return;
+    }
+
     if (isPlayingTTS) {
       stopTTS();
       return;
@@ -194,6 +209,16 @@ export const ScriptPanel: React.FC = () => {
   return (
     <div className="flex flex-col bg-neutral-900 border border-neutral-800 rounded-2xl p-6 h-full justify-between" data-tour="script-panel">
       <div className="space-y-6">
+        {/* Free User Upgrade Banner */}
+        {isFreeUser && (
+          <div className="bg-amber-950/30 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3">
+            <Lock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-bold text-amber-300">Free Preview Mode</p>
+              <p className="text-[11px] text-amber-400/70 mt-0.5">You can explore the editor, but AI features require a paid plan.</p>
+            </div>
+          </div>
+        )}
         {/* Title */}
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-bold font-heading text-white flex items-center gap-2">

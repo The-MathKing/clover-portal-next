@@ -142,15 +142,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
   };
 
   const handlePropertyClick = (property: any) => {
-    // Allow viewing examples for all users (including free tier)
-    // Only block editing/generating for non-paid users on their own videos
-    if (activeTab === 'my-videos' && subscriptionTier === 'free') {
-      alert("Please upgrade to a paid tier to generate or edit your draft presentation.");
-      setActiveTab('pricing');
-      return;
-    }
-    // In a real app this would open an editor/viewer
-    console.log('Opening property:', property.id);
+    // Allow all users to open any property in the editor (examples or their own)
+    // Paywalls are enforced inside the editor for specific actions (AI script, voice, export)
+    onSelectProperty(property);
   };
 
   const handleChooseTier = async (tierName: string) => {
@@ -683,9 +677,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: 'One Time Pass', price: '$20', originalPrice: '$30', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'], savings: 'Opening Discount' },
-                { name: '5-Pack', price: '$50', originalPrice: '$100', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true, savings: 'Opening Discount' },
-                { name: 'Unlimited', price: '$99', originalPrice: '$150', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], savings: 'Opening Discount' }
+                { name: 'One Time Pass', price: '$30', originalPrice: '$50', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'], savings: 'Opening Discount' },
+                { name: '5-Pack', price: '$75', originalPrice: '$125', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true, savings: 'Opening Discount' },
+                { name: 'Unlimited', price: '$150', originalPrice: '$200', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], savings: 'Opening Discount' }
               ].map((tier, i) => (
                 <motion.div
                   key={i}
