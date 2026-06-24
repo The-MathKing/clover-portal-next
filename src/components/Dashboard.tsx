@@ -5,6 +5,7 @@ import { mockProperties } from '../mockData';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
 import { createClient } from '@/utils/supabase/client';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DashboardProps {
   onSelectProperty: (property: Property) => void;
@@ -267,9 +268,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10">
-        {/* DEMO TAB */}
-        {activeTab === 'demo' && (
-          <div className="space-y-12">
+        <AnimatePresence mode="wait">
+          {/* DEMO TAB */}
+          {activeTab === 'demo' && (
+            <motion.div 
+              key="demo"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-12"
+            >
             <div className="relative overflow-hidden rounded-3xl border border-neutral-800 bg-gradient-to-br from-neutral-900 to-neutral-950 p-10 md:p-16">
               <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
               
@@ -439,23 +448,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+            </motion.div>
+          )}
 
-        {/* EXAMPLES TAB */}
-        {activeTab === 'examples' && (
-          <div>
+          {/* EXAMPLES TAB */}
+          {activeTab === 'examples' && (
+            <motion.div
+              key="examples"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
             <div className="mb-8">
               <h2 className="text-3xl font-bold font-heading text-white mb-2">Example Tours</h2>
               <p className="text-neutral-400">Example home tours created by homeowners who sold fast.</p>
             </div>
-            {renderPropertyGrid(mockProperties, "No examples found.")}
-          </div>
-        )}
+              {renderPropertyGrid(mockProperties, "No examples found.")}
+            </motion.div>
+          )}
 
-        {/* MY VIDEOS TAB */}
-        {activeTab === 'my-videos' && (
-          <div>
+          {/* MY VIDEOS TAB */}
+          {activeTab === 'my-videos' && (
+            <motion.div
+              key="my-videos"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
             <div className="mb-8 flex justify-between items-end">
               <div>
                 <h2 className="text-3xl font-bold font-heading text-white mb-2">My Videos</h2>
@@ -465,13 +486,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 {userProperties.length} Tours
               </span>
             </div>
-            {renderPropertyGrid(userProperties, "You haven't created any video tours yet. Click 'Create Presentation' to build your first cinematic home tour.")}
-          </div>
-        )}
+              {renderPropertyGrid(userProperties, "You haven't created any video tours yet. Click 'Create Presentation' to build your first cinematic home tour.")}
+            </motion.div>
+          )}
 
-        {/* PRICING TAB */}
-        {activeTab === 'pricing' && (
-          <div className="max-w-5xl mx-auto py-8">
+          {/* PRICING TAB */}
+          {activeTab === 'pricing' && (
+            <motion.div 
+              key="pricing"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="max-w-5xl mx-auto py-8"
+            >
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold font-heading text-white mb-4">Simple, Transparent Pricing</h2>
               <p className="text-neutral-400 max-w-xl mx-auto">Choose the package that fits your home listing needs. No hidden agency fees.</p>
@@ -514,8 +542,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

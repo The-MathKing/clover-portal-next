@@ -81,8 +81,10 @@ export default function App() {
       }
     };
 
-    const handleAuthEvent = async (session: any) => {
-      if (hasInitialized) return;
+    const handleAuthEvent = async (session: any, event: string) => {
+      // We only want to block double-initialization on INITIAL_SESSION/SIGNED_IN,
+      // but we MUST allow SIGNED_OUT to process fully.
+      if (hasInitialized && event !== 'SIGNED_OUT') return;
       hasInitialized = true;
 
       try {
@@ -117,7 +119,7 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 [Auth Change] Event detected:', event);
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        await handleAuthEvent(session);
+        await handleAuthEvent(session, event);
       } else {
         if (session && isMounted) {
           setUserId(session.user.id);
