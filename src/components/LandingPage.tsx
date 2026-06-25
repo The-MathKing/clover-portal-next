@@ -538,7 +538,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Quick stats row */}
-          <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-20">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto mb-20">
             {[
               { stat: '4x', label: 'More inquiries' },
               { stat: '30%', label: 'Faster sales' },

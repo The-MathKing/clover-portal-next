@@ -912,7 +912,7 @@ export const VideoPlayer: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        <div className="flex justify-between items-center pt-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setPlaying(!playing)}
@@ -928,13 +928,13 @@ export const VideoPlayer: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-850 px-3 py-2 rounded-lg text-sm text-neutral-450">
-              <Music className="w-4 h-4 text-emerald-500" />
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-850 px-3 py-2 rounded-lg text-sm text-neutral-450 flex-1 sm:flex-none overflow-hidden">
+              <Music className="w-4 h-4 shrink-0 text-emerald-500" />
               <select
                 value={audioTrack}
                 onChange={(e) => setAudioTrack(e.target.value)}
-                className="bg-transparent border-none text-neutral-300 font-medium focus:outline-none cursor-pointer"
+                className="bg-transparent border-none text-neutral-300 font-medium focus:outline-none cursor-pointer truncate w-full"
               >
                 <option value="luxury-ambient" className="bg-neutral-900">Luxury Chord Pad (Web Audio)</option>
                 <option value="none" className="bg-neutral-900">No Music</option>

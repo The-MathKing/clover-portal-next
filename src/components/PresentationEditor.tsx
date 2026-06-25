@@ -55,19 +55,19 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans">
       {/* Editor Header */}
       <header className="border-b border-neutral-900 bg-neutral-950/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-4 max-w-full">
             <button
               onClick={onBack}
               className="p-2 bg-neutral-900 border border-neutral-850 hover:bg-neutral-800 text-neutral-350 hover:text-white rounded-lg transition-all"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div>
-              <span className="text-xs font-semibold block text-neutral-500 tracking-wider uppercase">
+            <div className="min-w-0">
+              <span className="text-[10px] sm:text-xs font-semibold block text-neutral-500 tracking-wider uppercase truncate">
                 Presentation Studio
               </span>
-              <h2 className="text-lg font-bold font-heading text-white">
+              <h2 className="text-base sm:text-lg font-bold font-heading text-white truncate">
                 {property.address}
               </h2>
             </div>
@@ -92,15 +92,15 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
             data-tour="export-button"
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
           >
-            <Film className="w-4 h-4" />
-            <span className="hidden sm:inline">Export Presentation</span>
+            <Film className="w-4 h-4 shrink-0" />
+            <span className="hidden sm:inline">Export</span>
           </button>
           </div>
         </div>
       </header>
 
       {/* Editor Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8 grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Canvas Player HUD (Takes 2 columns on large screen) */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-center">

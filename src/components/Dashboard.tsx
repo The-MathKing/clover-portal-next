@@ -498,6 +498,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                   <p className="text-neutral-400 max-w-2xl mx-auto">
                     Listings with video walkthroughs are prioritized by Zillow's algorithm, getting pushed to the top of search results and driving massive engagement.
                   </p>
+                  <p className="text-neutral-400 text-sm mt-2">
+                    Statistics are sourced from Zillow.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

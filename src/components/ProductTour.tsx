@@ -82,7 +82,7 @@ export const ProductTour: React.FC = () => {
 
     let top = 0;
     let left = 0;
-    const tooltipWidth = 350;
+    const tooltipWidth = Math.min(350, window.innerWidth - 32);
     const tooltipHeight = 200;
 
     switch (step.position) {
@@ -167,7 +167,7 @@ export const ProductTour: React.FC = () => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 10 }}
         transition={{ duration: 0.25 }}
-        className="absolute z-[202] w-[350px] bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden"
+        className="absolute z-[202] w-[350px] max-w-[calc(100vw-32px)] bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden"
         style={{ top: tooltipPos.top, left: tooltipPos.left }}
       >
         {/* Header */}
