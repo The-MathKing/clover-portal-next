@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 
-// Force Node.js runtime — prevents Next.js from intercepting fetch,
-// which breaks Stripe SDK v22's outbound network calls on Vercel.
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -11,50 +8,63 @@ export async function POST(req: Request) {
     const { priceId, userId, userEmail, tierName } = await req.json();
 
     if (!priceId || !userId) {
-      console.error('❌ Missing priceId or userId in checkout request.');
       return NextResponse.json({ error: 'Missing priceId or userId' }, { status: 400 });
     }
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey) {
-      console.error('❌ STRIPE_SECRET_KEY environment variable is not defined.');
       return NextResponse.json({ error: 'Stripe configuration missing' }, { status: 500 });
     }
 
-    // Initialize Stripe client
-    const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2026-05-27.dahlia',
-    });
-
-    // Determine payment mode (subscription vs one-time payment)
+    // Determine payment mode
     const isSubscription =
-      tierName.toLowerCase().includes('pass') ||
+      tierName.toLowerCase().includes('unlimited') ||
       tierName.toLowerCase().includes('monthly') ||
       tierName.toLowerCase().includes('/mo');
 
     const mode = isSubscription ? 'subscription' : 'payment';
+    const origin = req.headers.get('origin') || 'https://clovrr.net';
 
-    console.log(`🛒 Creating checkout for "${tierName}" | mode: ${mode}`);
-    console.log(`🔑 Key prefix in use: ${stripeSecretKey.slice(0, 12)}...`);
-    console.log(`💰 Price ID: ${priceId}`);
+    console.log(`🛒 Checkout: "${tierName}" | mode: ${mode} | key: ${stripeSecretKey.slice(0, 12)}... | price: ${priceId}`);
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: mode,
-      client_reference_id: userId,
-      customer_email: userEmail || undefined,
-      metadata: { tier: tierName },
-      success_url: `${req.headers.get('origin')}/?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/?payment=cancelled`,
+    // Build form-encoded body for Stripe REST API
+    const params = new URLSearchParams();
+    params.append('payment_method_types[]', 'card');
+    params.append('line_items[0][price]', priceId);
+    params.append('line_items[0][quantity]', '1');
+    params.append('mode', mode);
+    params.append('client_reference_id', userId);
+    params.append('metadata[tier]', tierName);
+    params.append('success_url', `${origin}/?payment=success&session_id={CHECKOUT_SESSION_ID}`);
+    params.append('cancel_url', `${origin}/?payment=cancelled`);
+    if (userEmail) {
+      params.append('customer_email', userEmail);
+    }
+
+    // Call Stripe REST API directly (bypasses SDK entirely)
+    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
     });
 
-    console.log(`✅ Session created: ${session.id}`);
-    return NextResponse.json({ url: session.url });
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ Stripe API error:', JSON.stringify(data));
+      return NextResponse.json(
+        { error: data?.error?.message || 'Stripe error' },
+        { status: response.status }
+      );
+    }
+
+    console.log(`✅ Session created: ${data.id}`);
+    return NextResponse.json({ url: data.url });
   } catch (err: any) {
-    console.error('❌ Stripe error type   :', err?.type);
-    console.error('❌ Stripe error code   :', err?.code);
-    console.error('❌ Stripe error message:', err?.message);
+    console.error('❌ Checkout error:', err?.message);
     return NextResponse.json(
       { error: err.message || 'Internal Server Error' },
       { status: 500 }
