@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     // Initialize Stripe client
     const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2025-05-28.basil',
+      apiVersion: '2026-05-27.dahlia',
     });
 
     // Determine payment mode (subscription vs one-time payment)
