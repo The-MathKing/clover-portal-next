@@ -12,6 +12,7 @@ export interface Property {
   script?: string;
   images?: { id: string, url: string }[];
   video_url?: string;
+  cover_image?: string;
 }
 
 export const mockProperties: Property[] = [

@@ -39,7 +39,7 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
       setImages(property.images);
     } else {
       const sampleImages = [
-        { id: '1', url: property.coverImage },
+        { id: '1', url: property.coverImage || property.cover_image || '' },
         { id: '2', url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80' },
         { id: '3', url: 'https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&fit=crop&w=800&q=80' },
         { id: '4', url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80' },

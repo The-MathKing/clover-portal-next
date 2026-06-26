@@ -104,8 +104,8 @@ export interface CloverState {
   setSubscriptionTier: (tier: 'free' | 'starter' | 'unlimited' | 'lifetime') => void;
   generationsRemaining: number;
   setGenerationsRemaining: (count: number) => void;
-  activeTab: 'demo' | 'examples' | 'my-videos' | 'pricing' | 'walkthrough';
-  setActiveTab: (tab: 'demo' | 'examples' | 'my-videos' | 'pricing' | 'walkthrough') => void;
+  activeTab: 'home' | 'examples' | 'my-videos' | 'pricing' | 'walkthrough';
+  setActiveTab: (tab: 'home' | 'examples' | 'my-videos' | 'pricing' | 'walkthrough') => void;
   userProperties: any[];
   setProperties: (properties: any[]) => void;
   addPropertyToList: (property: any) => void;
@@ -210,7 +210,7 @@ export const useStore = create<CloverState>((set) => ({
   generationsRemaining: 0,
   setGenerationsRemaining: (count) => set({ generationsRemaining: count }),
 
-  activeTab: 'demo',
+  activeTab: 'home',
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   userProperties: [],

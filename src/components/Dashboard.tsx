@@ -262,7 +262,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             {/* Image Container */}
             <div className="relative aspect-[16/10] overflow-hidden bg-neutral-950">
               <img
-                src={property.coverImage}
+                src={property.coverImage || property.cover_image}
                 alt={property.address}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
@@ -348,7 +348,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
           
           {/* Top Navigation Tabs */}
           <nav className="hidden md:flex items-center bg-neutral-900/50 border border-neutral-800 p-1 rounded-xl">
-            {(['demo', 'examples', 'my-videos', 'pricing'] as const).map((tab) => (
+            {(['home', 'examples', 'my-videos', 'pricing'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => {
@@ -423,10 +423,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10">
         <AnimatePresence mode="wait">
-          {/* DEMO TAB */}
-          {activeTab === 'demo' && (
+          {/* HOME TAB */}
+          {activeTab === 'home' && (
             <motion.div 
-              key="demo"
+              key="home"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
