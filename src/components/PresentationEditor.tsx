@@ -2,8 +2,8 @@
 import React, { useEffect } from 'react';
 import { ArrowLeft, Film, HelpCircle, Info } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
-import { ScriptPanel } from './ScriptPanel';
 import { ExportModal } from './ExportModal';
+import { WalkthroughJobStatus } from './WalkthroughJobStatus';
 import { ProductTour } from './ProductTour';
 import type { Property } from '../mockData';
 import { useStore } from '../store/useStore';
@@ -14,7 +14,11 @@ interface PresentationEditorProps {
 }
 
 export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property, onBack }) => {
-  const { setPropertyDetails, setImages, setGeneratedScript, setExporting, setActivePropertyId, subscriptionTier, setTourActive } = useStore();
+  const { 
+    setPropertyDetails, setImages, setGeneratedScript, setExporting, 
+    setActivePropertyId, subscriptionTier, setTourActive,
+    engineMode, setGenerativeJobId, generativeJobId, images 
+  } = useStore();
 
   useEffect(() => {
     setActivePropertyId(property.id);
@@ -87,7 +91,31 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
                 alert('Exporting presentations requires a paid plan. Please upgrade to use this feature.');
                 return;
               }
-              setExporting(true);
+              if (engineMode === 'ai-video') {
+                const formData = new FormData();
+                formData.append('propertyId', property.id);
+                images.forEach((img) => {
+                  formData.append('images', img.url);
+                });
+                
+                fetch('/api/walkthrough/create', {
+                  method: 'POST',
+                  body: formData,
+                })
+                .then(res => {
+                  if (!res.ok) throw new Error('Failed to start generative job');
+                  return res.json();
+                })
+                .then(data => {
+                  setGenerativeJobId(data.jobId);
+                })
+                .catch(err => {
+                  console.error(err);
+                  alert('Failed to start AI Video export.');
+                });
+              } else {
+                setExporting(true);
+              }
             }}
             data-tour="export-button"
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
@@ -100,9 +128,9 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
       </header>
 
       {/* Editor Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8 grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-        {/* Canvas Player HUD (Takes 2 columns on large screen) */}
-        <div className="lg:col-span-2 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        {/* Canvas Player HUD (Takes full width now) */}
+        <div className="w-full space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold font-heading text-white">Cinematic Preview</h3>
             <div className="flex items-center gap-1.5 text-xs text-neutral-400">
@@ -112,15 +140,21 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
           </div>
           <VideoPlayer />
         </div>
-
-        {/* AI Scriptwriter Side Panel (Takes 1 column) */}
-        <div className="lg:col-span-1 h-full">
-          <ScriptPanel />
-        </div>
       </main>
 
       {/* Export Overlay Modal */}
       <ExportModal />
+
+      {/* Generative AI Video Progress Modal */}
+      {generativeJobId && (
+        <WalkthroughJobStatus 
+          jobId={generativeJobId} 
+          onComplete={(url) => {
+            setGenerativeJobId(null);
+            alert('Your AI video is ready! URL: ' + url);
+          }}
+        />
+      )}
 
       {/* Interactive Product Tour (NEW) */}
       <ProductTour />

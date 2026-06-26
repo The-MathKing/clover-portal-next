@@ -135,7 +135,7 @@ export const VideoPlayer: React.FC = () => {
   const { 
     images, propertyDetails, isExporting, setExporting, setExportProgress, setVideoBlobUrl, subscriptionTier,
     transitionStyle, setTransitionStyle, slideDuration, setSlideDuration, crossfadeDuration, setCrossfadeDuration,
-    renderingStep, setRenderingStep
+    renderingStep, setRenderingStep, engineMode, setEngineMode
   } = useStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const audioElemRef = useRef<HTMLAudioElement | null>(null);
@@ -146,7 +146,6 @@ export const VideoPlayer: React.FC = () => {
   const [muted, setMuted] = useState(true);
   const [audioTrack, setAudioTrack] = useState('luxury-piano');
   const [showTransitionControls, setShowTransitionControls] = useState(false);
-  const [engineMode, setEngineMode] = useState<'slideshow' | 'ai-video'>('ai-video');
 
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);

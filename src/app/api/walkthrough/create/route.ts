@@ -27,20 +27,20 @@ export async function POST(request: NextRequest) {
     // ── 2. Parse multipart form data ──────────────────────────────────────────
     const formData = await request.formData();
     const propertyId = formData.get('propertyId') as string | null;
-    const files = formData.getAll('images') as File[];
+    const rawImages = formData.getAll('images');
 
-    if (!files || files.length === 0) {
+    if (!rawImages || rawImages.length === 0) {
       return NextResponse.json({ error: 'No images provided' }, { status: 400 });
     }
 
-    if (files.length > MAX_IMAGES) {
+    if (rawImages.length > MAX_IMAGES) {
       return NextResponse.json(
         { error: `Maximum ${MAX_IMAGES} images allowed` },
         { status: 400 }
       );
     }
 
-    const totalClips = files.length;
+    const totalClips = rawImages.length;
 
     // ── 3. Create video_jobs row (status: processing) ─────────────────────────
     const { data: job, error: jobError } = await supabase
@@ -62,8 +62,13 @@ export async function POST(request: NextRequest) {
 
     const jobId = job.id;
 
-    // ── 4. Upload each image to Supabase Storage ──────────────────────────────
-    const imageUploadPromises = files.map(async (file, index) => {
+    // ── 4. Upload each image to Supabase Storage (if File) ─────────────────────────
+    const imageUploadPromises = rawImages.map(async (rawImg, index) => {
+      if (typeof rawImg === 'string') {
+        return { index, url: rawImg };
+      }
+
+      const file = rawImg as File;
       const ext = file.name.split('.').pop() || 'jpg';
       const storagePath = `walkthrough/${jobId}/${index}.${ext}`;
       const arrayBuffer = await file.arrayBuffer();

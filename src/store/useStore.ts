@@ -59,6 +59,12 @@ export interface CloverState {
   voiceProfile: string;
   setVoiceProfile: (profile: string) => void;
 
+  // Editor Settings
+  engineMode: 'slideshow' | 'ai-video';
+  setEngineMode: (mode: 'slideshow' | 'ai-video') => void;
+  generativeJobId: string | null;
+  setGenerativeJobId: (id: string | null) => void;
+
   // Transition & Speed Controls
   transitionStyle: TransitionStyle;
   setTransitionStyle: (style: TransitionStyle) => void;
@@ -144,10 +150,13 @@ export const useStore = create<CloverState>((set) => ({
   generatedScript: '',
   setGeneratedScript: (script) => set({ generatedScript: script }),
 
-  // voiceProfile is kept as a UI-only tone selector for script generation
-  // ElevenLabs voice synthesis will be re-added in a future update
   voiceProfile: 'Warm & Inviting',
   setVoiceProfile: (profile) => set({ voiceProfile: profile }),
+
+  engineMode: 'ai-video',
+  setEngineMode: (mode) => set({ engineMode: mode }),
+  generativeJobId: null,
+  setGenerativeJobId: (id) => set({ generativeJobId: id }),
 
   // Transition & Speed Controls
   transitionStyle: 'crossfade',

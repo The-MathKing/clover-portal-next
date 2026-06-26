@@ -28,8 +28,9 @@ interface StatusResponse {
 
 interface WalkthroughJobStatusProps {
   jobId: string;
-  totalClips: number;
-  onReset: () => void;
+  totalClips?: number;
+  onReset?: () => void;
+  onComplete?: (url: string) => void;
 }
 
 // ─── Step definitions ────────────────────────────────────────────────────────
@@ -75,8 +76,9 @@ const POLL_INTERVAL_MS = 3000;
 
 export const WalkthroughJobStatus: React.FC<WalkthroughJobStatusProps> = ({
   jobId,
-  totalClips,
+  totalClips = 0,
   onReset,
+  onComplete,
 }) => {
   const [status, setStatus] = useState<JobStatus>('processing');
   const [clipsReady, setClipsReady] = useState(0);
@@ -101,6 +103,9 @@ export const WalkthroughJobStatus: React.FC<WalkthroughJobStatusProps> = ({
       // Stop polling on terminal states
       if (data.status === 'complete' || data.status === 'failed') {
         if (pollRef.current) clearInterval(pollRef.current);
+        if (data.status === 'complete' && data.finalVideoUrl && onComplete) {
+          onComplete(data.finalVideoUrl);
+        }
       }
     } catch {
       // Silently ignore network errors; polling will retry
