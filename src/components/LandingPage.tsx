@@ -55,7 +55,8 @@ const BeforeAfterVisualizer: React.FC = () => {
           <img
             src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
             alt="Dynamic video tour"
-            className="w-full h-full object-cover transition-transform duration-[3000ms] ease-linear"
+            draggable={false}
+            className="w-full h-full object-cover transition-transform duration-[3000ms] ease-linear pointer-events-none"
             style={{
               transform: `scale(1.15) translateX(${Math.sin(kenBurnsOffset * 0.017) * 2}%) translateY(${Math.cos(kenBurnsOffset * 0.013) * 1.5}%)`,
             }}
@@ -84,7 +85,7 @@ const BeforeAfterVisualizer: React.FC = () => {
             ))}
           </div>
           <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-emerald-500/30">
-            <span className="text-xs font-bold text-white">🎬 WITH CLOVER</span>
+            <span className="text-xs font-bold text-white">🎬 WITH CLOVRR</span>
           </div>
         </div>
 
@@ -96,7 +97,8 @@ const BeforeAfterVisualizer: React.FC = () => {
           <img
             src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
             alt="Static photo listing"
-            className="w-full h-full object-cover grayscale brightness-75"
+            draggable={false}
+            className="w-full h-full object-cover grayscale brightness-75 pointer-events-none"
           />
           <div className="absolute inset-0 bg-neutral-900/30" />
           <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-neutral-600/30">
@@ -117,16 +119,6 @@ const BeforeAfterVisualizer: React.FC = () => {
             </div>
           </div>
         </div>
-        
-        {/* Interactive invisible slider */}
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={sliderPos}
-          onChange={(e) => setSliderPos(Number(e.target.value))}
-          className="absolute inset-0 z-20 w-full h-full opacity-0 cursor-ew-resize m-0 p-0"
-        />
       </div>
     </div>
   );
