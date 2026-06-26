@@ -44,18 +44,28 @@ export async function POST(request: NextRequest) {
 
     if (isSuccess && finalVideoUrl) {
       // ── Mark job as complete ───────────────────────────────────────────────
-      const { error: updateError } = await supabase
+      const { data: jobData, error: fetchError } = await supabase
         .from('video_jobs')
         .update({
           status: 'complete',
           final_video_url: finalVideoUrl,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', jobId);
+        .eq('id', jobId)
+        .select('property_id')
+        .single();
 
-      if (updateError) {
-        console.error('[Shotstack webhook] Failed to mark job complete:', updateError);
+      if (fetchError) {
+        console.error('[Shotstack webhook] Failed to mark job complete:', fetchError);
         return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
+      }
+
+      // ── Update property ──────────────────────────────────────────────────
+      if (jobData?.property_id) {
+        await supabase
+          .from('properties')
+          .update({ video_url: finalVideoUrl })
+          .eq('id', jobData.property_id);
       }
 
       console.log(`[Shotstack webhook] Job ${jobId} complete ✅ — video: ${finalVideoUrl}`);

@@ -300,13 +300,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               </div>
 
               {/* Actions */}
-              <button
-                onClick={() => handlePropertyClick(property)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold border border-neutral-850 hover:bg-neutral-850 hover:border-neutral-700 transition-all text-neutral-200"
-              >
-                <Video className="w-4 h-4 text-emerald-500" />
-                Open Presentation
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePropertyClick(property)}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold border border-neutral-850 hover:bg-neutral-850 hover:border-neutral-700 transition-all text-neutral-200"
+                >
+                  <Video className="w-4 h-4 text-emerald-500" />
+                  Open Presentation
+                </button>
+                {property.video_url && (
+                  <a
+                    href={property.video_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold bg-emerald-600/20 text-emerald-500 hover:bg-emerald-600/30 transition-all"
+                    title="Watch exported video"
+                  >
+                    <PlayCircle className="w-5 h-5" />
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -325,7 +338,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             </div>
             <div>
               <span className="text-xl font-bold font-heading tracking-wide">
-                CLOVER
+                CLOVRR
               </span>
               <span className="text-xs block text-neutral-400 font-medium tracking-widest uppercase">
                 Home Seller Video Engine

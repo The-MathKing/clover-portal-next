@@ -4,125 +4,7 @@ import { Sparkles, Play, Pause, ChevronRight, TrendingUp, Clock, DollarSign, Eye
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 
-// ─── Before/After Comparison Slider ─────────────────────────────────────────
-const BeforeAfterVisualizer: React.FC = () => {
-  const [sliderPos, setSliderPos] = useState(50);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const [kenBurnsOffset, setKenBurnsOffset] = useState(0);
-
-  useEffect(() => {
-    let frame: number;
-    const animate = () => {
-      setKenBurnsOffset(prev => (prev + 0.15) % 360);
-      frame = requestAnimationFrame(animate);
-    };
-    frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const handleMove = (clientX: number) => {
-    if (!containerRef.current || !isDragging.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    setSliderPos((x / rect.width) * 100);
-  };
-
-  return (
-    <div className="relative">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
-          <Eye className="w-3.5 h-3.5" />
-          Interactive Demo
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">See the Difference</h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">Drag the slider to compare a static listing photo vs. a dynamic Clovrr cinematic video tour.</p>
-      </div>
-
-      <div 
-        ref={containerRef}
-        className="relative w-full aspect-video rounded-2xl overflow-hidden cursor-col-resize border border-neutral-800 shadow-2xl shadow-black/50"
-        onMouseDown={() => isDragging.current = true}
-        onMouseUp={() => isDragging.current = false}
-        onMouseLeave={() => isDragging.current = false}
-        onMouseMove={(e) => handleMove(e.clientX)}
-        onTouchStart={() => isDragging.current = true}
-        onTouchEnd={() => isDragging.current = false}
-        onTouchMove={(e) => handleMove(e.touches[0].clientX)}
-      >
-        {/* "After" - Dynamic Video Side (full behind) */}
-        <div className="absolute inset-0 overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
-            alt="Dynamic video tour"
-            draggable={false}
-            className="w-full h-full object-cover transition-transform duration-[3000ms] ease-linear pointer-events-none"
-            style={{
-              transform: `scale(1.15) translateX(${Math.sin(kenBurnsOffset * 0.017) * 2}%) translateY(${Math.cos(kenBurnsOffset * 0.013) * 1.5}%)`,
-            }}
-          />
-          {/* Cinematic overlay effects */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">AI Generated Video Tour</span>
-            </div>
-            <p className="text-white font-bold text-lg">124 Bellevue Ave, Newport RI</p>
-            <p className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">Exclusive Tour • $2,450,000 • 5 Beds • 4.5 Baths</p>
-          </div>
-          {/* Animated waveform bars */}
-          <div className="absolute top-6 right-6 flex items-end gap-0.5 h-5">
-            {[...Array(12)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 bg-emerald-400/70 rounded-full"
-                style={{
-                  height: `${30 + Math.sin((kenBurnsOffset * 0.05) + i * 0.8) * 70}%`,
-                  transition: 'height 150ms ease',
-                }}
-              />
-            ))}
-          </div>
-          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-emerald-500/30">
-            <span className="text-xs font-bold text-white">🎬 WITH CLOVRR</span>
-          </div>
-        </div>
-
-        {/* "Before" - Static Photo Side (clipped) */}
-        <div 
-          className="absolute inset-0 overflow-hidden"
-          style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-        >
-          <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
-            alt="Static photo listing"
-            draggable={false}
-            className="w-full h-full object-cover grayscale brightness-75 pointer-events-none"
-          />
-          <div className="absolute inset-0 bg-neutral-900/30" />
-          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-neutral-600/30">
-            <span className="text-xs font-bold text-neutral-300">📷 PHOTOS ONLY</span>
-          </div>
-        </div>
-
-        {/* Slider Handle */}
-        <div 
-          className="absolute top-0 bottom-0 z-10"
-          style={{ left: `${sliderPos}%` }}
-        >
-          <div className="absolute inset-y-0 -translate-x-1/2 w-1 bg-white/90 shadow-lg shadow-white/30" />
-          <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl shadow-black/50 flex items-center justify-center border-2 border-white">
-            <div className="flex items-center gap-0.5 text-neutral-800">
-              <ChevronRight className="w-3 h-3 rotate-180" />
-              <ChevronRight className="w-3 h-3" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+// Slider removed by request
 
 
 // ─── Animated Listing Performance Calculator ────────────────────────────────
@@ -262,7 +144,7 @@ export const LandingPage: React.FC = () => {
               <Clover className="w-6 h-6 text-emerald-500" />
             </div>
             <div>
-              <span className="text-xl font-bold tracking-wide">CLOVER</span>
+              <span className="text-xl font-bold tracking-wide">CLOVRR</span>
               <span className="text-xs block text-neutral-400 font-medium tracking-widest uppercase">Home Seller Video Engine</span>
             </div>
           </div>
@@ -351,13 +233,6 @@ export const LandingPage: React.FC = () => {
 
       {/* Interactive Sections */}
       <div className="max-w-6xl mx-auto px-6 space-y-24 pb-24">
-        {/* Section 1: Before/After Visualizer */}
-        <section id="demo">
-          <BeforeAfterVisualizer />
-        </section>
-
-
-
         {/* Section 3: Performance Calculator */}
         <section>
           <PerformanceCalculator />
