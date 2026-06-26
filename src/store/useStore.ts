@@ -19,12 +19,28 @@ export interface PropertyDetails {
 
 export type TransitionStyle = 'crossfade' | 'ken-burns-in' | 'ken-burns-out' | 'pan-left' | 'pan-right';
 
-export type RenderingStep = 
+export type RenderingStep =
   | 'analyzing'
   | 'generating-script'
-  | 'synthesizing-voice'
   | 'rendering-video'
   | 'complete';
+
+// ─── Walkthrough Video Job Types ────────────────────────────────────────────
+export type WalkthroughJobStatus =
+  | 'idle'
+  | 'uploading'
+  | 'processing'
+  | 'stitching'
+  | 'complete'
+  | 'failed';
+
+export interface WalkthroughJob {
+  jobId: string;
+  status: WalkthroughJobStatus;
+  clipsReady: number;
+  totalClips: number;
+  finalVideoUrl: string | null;
+}
 
 export interface CloverState {
   // Property Data
@@ -37,15 +53,13 @@ export interface CloverState {
   addImage: (image: PropertyImage) => void;
   reorderImages: (startIndex: number, endIndex: number) => void;
 
-  // AI Script & Voice
+  // AI Script & Voice Tone (ElevenLabs removed — will be re-added later)
   generatedScript: string;
   setGeneratedScript: (script: string) => void;
   voiceProfile: string;
   setVoiceProfile: (profile: string) => void;
-  elevenLabsApiKey: string;
-  setElevenLabsApiKey: (key: string) => void;
 
-  // Transition & Speed Controls (NEW)
+  // Transition & Speed Controls
   transitionStyle: TransitionStyle;
   setTransitionStyle: (style: TransitionStyle) => void;
   slideDuration: number; // in seconds
@@ -53,11 +67,11 @@ export interface CloverState {
   crossfadeDuration: number; // in seconds
   setCrossfadeDuration: (duration: number) => void;
 
-  // Rendering Progress (NEW)
+  // Rendering Progress
   renderingStep: RenderingStep | null;
   setRenderingStep: (step: RenderingStep | null) => void;
 
-  // Product Tour (NEW)
+  // Product Tour
   hasSeenTour: boolean;
   setHasSeenTour: (seen: boolean) => void;
   isTourActive: boolean;
@@ -82,14 +96,21 @@ export interface CloverState {
   setUserEmail: (email: string | null) => void;
   subscriptionTier: 'free' | 'starter' | 'unlimited' | 'lifetime';
   setSubscriptionTier: (tier: 'free' | 'starter' | 'unlimited' | 'lifetime') => void;
-  activeTab: 'demo' | 'examples' | 'my-videos' | 'pricing';
-  setActiveTab: (tab: 'demo' | 'examples' | 'my-videos' | 'pricing') => void;
+  generationsRemaining: number;
+  setGenerationsRemaining: (count: number) => void;
+  activeTab: 'demo' | 'examples' | 'my-videos' | 'pricing' | 'walkthrough';
+  setActiveTab: (tab: 'demo' | 'examples' | 'my-videos' | 'pricing' | 'walkthrough') => void;
   userProperties: any[];
   setProperties: (properties: any[]) => void;
   addPropertyToList: (property: any) => void;
   updateProperty: (id: string, updates: any) => void;
   activePropertyId: string | null;
   setActivePropertyId: (id: string | null) => void;
+
+  // ─── 3D Walkthrough Video Job State ─────────────────────────────────────
+  walkthroughJob: WalkthroughJob | null;
+  setWalkthroughJob: (job: WalkthroughJob | null) => void;
+  updateWalkthroughJob: (updates: Partial<WalkthroughJob>) => void;
 }
 
 const defaultProperty: PropertyDetails = {
@@ -122,17 +143,13 @@ export const useStore = create<CloverState>((set) => ({
 
   generatedScript: '',
   setGeneratedScript: (script) => set({ generatedScript: script }),
-  
-  voiceProfile: 'Warm & Inviting (Rachel)',
+
+  // voiceProfile is kept as a UI-only tone selector for script generation
+  // ElevenLabs voice synthesis will be re-added in a future update
+  voiceProfile: 'Warm & Inviting',
   setVoiceProfile: (profile) => set({ voiceProfile: profile }),
 
-  elevenLabsApiKey: typeof window !== 'undefined' ? localStorage.getItem('elevenLabsApiKey') || '' : '',
-  setElevenLabsApiKey: (key) => {
-    if (typeof window !== 'undefined') localStorage.setItem('elevenLabsApiKey', key);
-    set({ elevenLabsApiKey: key });
-  },
-
-  // Transition & Speed Controls (NEW)
+  // Transition & Speed Controls
   transitionStyle: 'crossfade',
   setTransitionStyle: (style) => set({ transitionStyle: style }),
   slideDuration: 5,
@@ -140,11 +157,11 @@ export const useStore = create<CloverState>((set) => ({
   crossfadeDuration: 1.5,
   setCrossfadeDuration: (duration) => set({ crossfadeDuration: duration }),
 
-  // Rendering Progress (NEW)
+  // Rendering Progress
   renderingStep: null,
   setRenderingStep: (step) => set({ renderingStep: step }),
 
-  // Product Tour (NEW)
+  // Product Tour
   hasSeenTour: typeof window !== 'undefined' ? localStorage.getItem('cloverTourSeen') === 'true' : false,
   setHasSeenTour: (seen) => {
     if (typeof window !== 'undefined') localStorage.setItem('cloverTourSeen', seen.toString());
@@ -181,13 +198,16 @@ export const useStore = create<CloverState>((set) => ({
   subscriptionTier: 'free',
   setSubscriptionTier: (tier) => set({ subscriptionTier: tier }),
 
+  generationsRemaining: 0,
+  setGenerationsRemaining: (count) => set({ generationsRemaining: count }),
+
   activeTab: 'demo',
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   userProperties: [],
   setProperties: (properties) => set({ userProperties: properties }),
-  addPropertyToList: (property) => set((state) => ({ 
-    userProperties: [property, ...state.userProperties] 
+  addPropertyToList: (property) => set((state) => ({
+    userProperties: [property, ...state.userProperties]
   })),
   updateProperty: (id, updates) => set((state) => ({
     userProperties: state.userProperties.map(p => p.id === id ? { ...p, ...updates } : p)
@@ -195,4 +215,14 @@ export const useStore = create<CloverState>((set) => ({
 
   activePropertyId: null,
   setActivePropertyId: (id) => set({ activePropertyId: id }),
+
+  // ─── 3D Walkthrough Video Job State ─────────────────────────────────────
+  walkthroughJob: null,
+  setWalkthroughJob: (job) => set({ walkthroughJob: job }),
+  updateWalkthroughJob: (updates) =>
+    set((state) => ({
+      walkthroughJob: state.walkthroughJob
+        ? { ...state.walkthroughJob, ...updates }
+        : null,
+    })),
 }));

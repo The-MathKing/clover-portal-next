@@ -20,6 +20,7 @@ export default function App() {
     setUserId, 
     setUserEmail, 
     setSubscriptionTier,
+    setGenerationsRemaining,
     setProperties,
     showAuthModal,
     setShowAuthModal
@@ -41,7 +42,7 @@ export default function App() {
       try {
         const profilePromise = supabase
           .from('profiles')
-          .select('subscription_tier')
+          .select('subscription_tier, generations_remaining')
           .eq('id', userId)
           .single();
 
@@ -62,12 +63,21 @@ export default function App() {
           
           if (profileRes.error) {
             console.warn('⚠️ [loadProfile] query error (profiles table may not exist yet):', profileRes.error.message);
-            if (isMounted) setSubscriptionTier('free');
+            if (isMounted) {
+              setSubscriptionTier('free');
+              setGenerationsRemaining(0);
+            }
           } else if (profileRes.data && profileRes.data.subscription_tier) {
-            console.log('🔍 [loadProfile] Profile loaded successfully:', profileRes.data.subscription_tier);
-            if (isMounted) setSubscriptionTier(profileRes.data.subscription_tier as any);
+            console.log('🔍 [loadProfile] Profile loaded successfully:', profileRes.data.subscription_tier, 'generations:', profileRes.data.generations_remaining);
+            if (isMounted) {
+              setSubscriptionTier(profileRes.data.subscription_tier as any);
+              setGenerationsRemaining(profileRes.data.generations_remaining ?? 0);
+            }
           } else {
-            if (isMounted) setSubscriptionTier('free');
+            if (isMounted) {
+              setSubscriptionTier('free');
+              setGenerationsRemaining(0);
+            }
           }
 
           if (propertiesRes && !propertiesRes.error && propertiesRes.data) {
@@ -148,7 +158,34 @@ export default function App() {
       subscription.unsubscribe();
       clearTimeout(fallbackTimer);
     };
-  }, [setAuthenticated, setUserId, setUserEmail, setSubscriptionTier, setProperties]);
+  }, [setAuthenticated, setUserId, setUserEmail, setSubscriptionTier, setGenerationsRemaining, setProperties]);
+
+  // Handle payment success redirect — refetch profile to pick up new generations
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') === 'success' && isAuthenticated) {
+      const supabase = createClient();
+      const refetchProfile = async () => {
+        const userId = useStore.getState().userId;
+        if (!userId) return;
+        // Small delay to let the webhook process
+        await new Promise(r => setTimeout(r, 2000));
+        const { data } = await supabase
+          .from('profiles')
+          .select('subscription_tier, generations_remaining')
+          .eq('id', userId)
+          .single();
+        if (data) {
+          setSubscriptionTier(data.subscription_tier as any);
+          setGenerationsRemaining(data.generations_remaining ?? 0);
+          console.log('💰 [Payment Success] Profile refreshed:', data);
+        }
+        // Clean URL
+        window.history.replaceState({}, '', '/');
+      };
+      refetchProfile();
+    }
+  }, [isAuthenticated, setSubscriptionTier, setGenerationsRemaining]);
 
   if (isInitializing) {
     return (

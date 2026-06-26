@@ -117,223 +117,21 @@ const BeforeAfterVisualizer: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        {/* Interactive invisible slider */}
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={sliderPos}
+          onChange={(e) => setSliderPos(Number(e.target.value))}
+          className="absolute inset-0 z-20 w-full h-full opacity-0 cursor-ew-resize m-0 p-0"
+        />
       </div>
     </div>
   );
 };
 
-// ─── Live Voice & Style Preview Soundboard ──────────────────────────────────
-const voiceStyles = [
-  { id: 'luxury', name: 'Luxury Warmth', emoji: '🏛️', color: 'from-amber-500 to-orange-600', description: 'Elegant, sophisticated narration for premium estates' },
-  { id: 'energetic', name: 'Energetic Broker', emoji: '⚡', color: 'from-blue-500 to-cyan-500', description: 'High-energy, confident agent-style delivery' },
-  { id: 'modern', name: 'Modern Corporate', emoji: '🏢', color: 'from-violet-500 to-purple-600', description: 'Clean, professional tone for modern listings' },
-];
-
-const rooms = ['Kitchen', 'Living Room', 'Master Suite', 'Backyard'];
-const musicGenres = [
-  { id: 'ambient', name: 'Luxury Ambient', emoji: '🎹' },
-  { id: 'jazz', name: 'Smooth Jazz', emoji: '🎷' },
-  { id: 'acoustic', name: 'Acoustic', emoji: '🎸' },
-];
-
-const sampleScripts: Record<string, Record<string, string>> = {
-  Kitchen: {
-    luxury: "Step into a chef's paradise. Italian marble countertops cascade beneath hand-crafted cabinetry, while the Sub-Zero refrigerator whispers of culinary elegance.",
-    energetic: "Now THIS is a kitchen! We're talking Viking range, double ovens, waterfall island — this is where Sunday brunches become legendary. Your buyers will LOVE this.",
-    modern: "The kitchen features premium integrated appliances, quartz countertops, and a functional island workspace. Smart lighting adjusts to your preferred ambiance.",
-  },
-  'Living Room': {
-    luxury: "The grand salon unfolds before you — twelve-foot coffered ceilings embrace walls of light, while the hand-laid herringbone floors tell stories of timeless craftsmanship.",
-    energetic: "Look at this open concept! Floor to ceiling windows, vaulted ceilings, and the natural light just POURS in. Perfect for entertaining — your guests won't want to leave!",
-    modern: "An expansive open-plan living area featuring floor-to-ceiling glazing, engineered hardwood flooring, and integrated climate control for year-round comfort.",
-  },
-  'Master Suite': {
-    luxury: "Retreat to the sanctum of the master suite. A private terrace overlooks manicured gardens, while the spa-inspired ensuite features heated Carrara marble underfoot.",
-    energetic: "Wait til you see this master! Walk-in closet the size of a bedroom, dual vanity, soaking tub AND a rain shower. This is luxury living at its finest!",
-    modern: "The primary suite includes a generous walk-in wardrobe, dual-sink vanity with LED-lit mirrors, and a private balcony with automated retractable screens.",
-  },
-  Backyard: {
-    luxury: "Beyond the French doors, an oasis awaits. The infinity-edge pool mirrors the horizon, while mature landscaping creates an intimate sanctuary for evening soirées.",
-    energetic: "The backyard is an ENTERTAINER'S DREAM! Heated pool, built-in BBQ, fire pit lounge — this is basically a private resort. Your weekends just got a major upgrade!",
-    modern: "The exterior features a heated pool with automated cover, LED landscape lighting, composite decking, and a professionally designed outdoor kitchen station.",
-  },
-};
-
-const VoiceStylePreview: React.FC = () => {
-  const [selectedRoom, setSelectedRoom] = useState('Kitchen');
-  const [selectedVoice, setSelectedVoice] = useState('luxury');
-  const [selectedMusic, setSelectedMusic] = useState('ambient');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [waveformBars, setWaveformBars] = useState<number[]>(Array(20).fill(10));
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setWaveformBars(prev => prev.map(() => Math.random() * 90 + 10));
-      }, 120);
-    } else {
-      setWaveformBars(Array(20).fill(10));
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying]);
-
-  const handlePlayPreview = () => {
-    if (isPlaying) {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-      setIsPlaying(false);
-      return;
-    }
-
-    setIsPlaying(true);
-    const script = sampleScripts[selectedRoom]?.[selectedVoice] || '';
-    
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(script);
-      const voices = window.speechSynthesis.getVoices();
-      
-      if (selectedVoice === 'luxury') {
-        const voice = voices.find(v => v.name.includes('Serena') || v.name.includes('Karen') || v.name.includes('Google UK English Female'));
-        if (voice) utterance.voice = voice;
-        utterance.rate = 0.85;
-        utterance.pitch = 1.0;
-      } else if (selectedVoice === 'energetic') {
-        const voice = voices.find(v => v.name.includes('Daniel') || v.name.includes('Alex'));
-        if (voice) utterance.voice = voice;
-        utterance.rate = 1.1;
-        utterance.pitch = 1.1;
-      } else {
-        const voice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha'));
-        if (voice) utterance.voice = voice;
-        utterance.rate = 1.0;
-        utterance.pitch = 0.95;
-      }
-
-      utterance.onend = () => setIsPlaying(false);
-      utterance.onerror = () => setIsPlaying(false);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      setTimeout(() => setIsPlaying(false), 3000);
-    }
-  };
-
-  return (
-    <div>
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-950/30 border border-violet-500/20 text-violet-400 text-xs font-bold uppercase tracking-wider mb-4">
-          <Mic className="w-3.5 h-3.5" />
-          Live Preview
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Hear Your Listing Come Alive</h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">Select a room and narrator style to instantly preview how your AI-generated tour will sound.</p>
-      </div>
-
-      <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
-        {/* Room selector */}
-        <div>
-          <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Select Room</label>
-          <div className="flex flex-wrap gap-2">
-            {rooms.map(room => (
-              <button
-                key={room}
-                onClick={() => setSelectedRoom(room)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  selectedRoom === room
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-                    : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-750 hover:text-neutral-200'
-                }`}
-              >
-                {room}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Voice style selector */}
-        <div>
-          <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Narrator Style</label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {voiceStyles.map(voice => (
-              <button
-                key={voice.id}
-                onClick={() => setSelectedVoice(voice.id)}
-                className={`p-4 rounded-xl text-left transition-all border ${
-                  selectedVoice === voice.id
-                    ? 'bg-neutral-800 border-emerald-500/50 shadow-lg'
-                    : 'bg-neutral-950 border-neutral-800 hover:border-neutral-700'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">{voice.emoji}</span>
-                  <span className="text-sm font-bold text-white">{voice.name}</span>
-                </div>
-                <p className="text-xs text-neutral-500">{voice.description}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Music genre */}
-        <div>
-          <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Background Music</label>
-          <div className="flex flex-wrap gap-2">
-            {musicGenres.map(genre => (
-              <button
-                key={genre.id}
-                onClick={() => setSelectedMusic(genre.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                  selectedMusic === genre.id
-                    ? 'bg-neutral-800 text-white border border-neutral-700'
-                    : 'bg-neutral-950 text-neutral-400 border border-neutral-800 hover:text-neutral-200'
-                }`}
-              >
-                <span>{genre.emoji}</span>
-                {genre.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Script preview */}
-        <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-5">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Preview Script</span>
-            <span className="text-xs text-emerald-500 font-medium">{selectedRoom} • {voiceStyles.find(v => v.id === selectedVoice)?.name}</span>
-          </div>
-          <p className="text-sm text-neutral-300 leading-relaxed italic">
-            &ldquo;{sampleScripts[selectedRoom]?.[selectedVoice]}&rdquo;
-          </p>
-        </div>
-
-        {/* Waveform + play button */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handlePlayPreview}
-            className={`shrink-0 w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-lg ${
-              isPlaying
-                ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-900/30'
-                : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/30'
-            }`}
-          >
-            {isPlaying ? <Pause className="w-6 h-6 text-white fill-white" /> : <Play className="w-6 h-6 text-white fill-white" />}
-          </button>
-          
-          <div className="flex-1 flex items-end gap-[3px] h-12 bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2 overflow-hidden">
-            {waveformBars.map((height, i) => (
-              <div
-                key={i}
-                className={`flex-1 rounded-full transition-all duration-100 ${isPlaying ? 'bg-emerald-500' : 'bg-neutral-700'}`}
-                style={{ height: `${height}%`, minHeight: '4px' }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // ─── Animated Listing Performance Calculator ────────────────────────────────
 const AnimatedCounter: React.FC<{ value: number; prefix?: string; suffix?: string; duration?: number }> = ({ value, prefix = '', suffix = '', duration = 1500 }) => {
@@ -369,10 +167,10 @@ const AnimatedCounter: React.FC<{ value: number; prefix?: string; suffix?: strin
 const PerformanceCalculator: React.FC = () => {
   const [listingPrice, setListingPrice] = useState(450000);
   
-  const viewsBoost = Math.round(300 + (listingPrice / 100000) * 25);
-  const daysReduction = Math.round(45 - (Math.min(listingPrice, 2000000) / 2000000) * 18);
-  const extraInquiries = Math.round(8 + (listingPrice / 100000) * 2.5);
-  const potentialValueAdd = Math.round(listingPrice * 0.015);
+  const viewsBoost = Math.round(250 + (listingPrice / 1000000) * 40);
+  const daysReduction = Math.round(45 - (Math.min(listingPrice, 5000000) / 5000000) * 20);
+  const extraInquiries = Math.round(12 + (listingPrice / 1000000) * 15);
+  const potentialValueAdd = Math.round(listingPrice * 0.012);
 
   return (
     <div>
@@ -566,10 +364,7 @@ export const LandingPage: React.FC = () => {
           <BeforeAfterVisualizer />
         </section>
 
-        {/* Section 2: Voice & Style Preview */}
-        <section>
-          <VoiceStylePreview />
-        </section>
+
 
         {/* Section 3: Performance Calculator */}
         <section>
@@ -585,7 +380,7 @@ export const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { icon: Video, title: 'Cinematic Ken Burns Tours', desc: 'Smooth, dynamic camera transitions that showcase every room beautifully.' },
-              { icon: Sparkles, title: 'AI Narrated Tours', desc: 'Auto-generate professional scripts and voice them with photorealistic AI narration.' },
+              { icon: Music, title: 'Royalty-Free Music', desc: 'Select from a curated list of background music tracks to set the perfect mood.' },
               { icon: Zap, title: 'Instant HD Downloads', desc: 'Export your 1080p video tour in seconds, ready for Zillow, MLS, or social media.' },
             ].map((feature, i) => (
               <motion.div

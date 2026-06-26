@@ -127,7 +127,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
     userId,
     userEmail,
     isAuthenticated,
-    setShowAuthModal
+    setShowAuthModal,
   } = useStore();
 
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);

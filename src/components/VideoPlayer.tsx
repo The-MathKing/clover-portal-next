@@ -5,97 +5,57 @@ import { useStore } from '../store/useStore';
 import type { TransitionStyle, RenderingStep } from '../store/useStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Web Audio API ambient music synthesizer
-class AmbientSynthesizer {
-  private ctx: AudioContext | null = null;
-  private oscillators: OscillatorNode[] = [];
-  private gainNode: GainNode | null = null;
-  private destNode: MediaStreamAudioDestinationNode | null = null;
-  private analyserNode: AnalyserNode | null = null;
-  private isPlaying = false;
-  private volume = 0.3;
-
-  start(audioCtx?: AudioContext, dest?: MediaStreamAudioDestinationNode) {
-    if (this.isPlaying) return;
-    this.ctx = audioCtx || new (window.AudioContext || (window as any).webkitAudioContext)();
-    this.gainNode = this.ctx.createGain();
-    this.analyserNode = this.ctx.createAnalyser();
-    this.analyserNode.fftSize = 64;
-    
-    this.gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 2);
-    
-    // Connect to speaker
-    if (!dest) {
-      this.gainNode.connect(this.analyserNode);
-      this.analyserNode.connect(this.ctx.destination);
-    } else {
-      // Connect to media stream export destination only
-      this.destNode = dest;
-      this.gainNode.connect(this.analyserNode);
-      this.analyserNode.connect(this.destNode);
-    }
-
-    // Create a beautiful, warm ambient chord pad (E Maj7 or similar)
-    const freqs = [164.81, 220.00, 246.94, 329.63, 440.00]; // E3, A3, B3, E4, A4
-    freqs.forEach((freq) => {
-      if (!this.ctx || !this.gainNode) return;
-      const osc = this.ctx.createOscillator();
-      const oscGain = this.ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      
-      // Add subtle volume LFO to make it drift
-      oscGain.gain.setValueAtTime(0.15 / freqs.length, this.ctx.currentTime);
-      
-      osc.connect(oscGain);
-      oscGain.connect(this.gainNode);
-      osc.start();
-      this.oscillators.push(osc);
-    });
-
-    this.isPlaying = true;
-  }
-
-  stop() {
-    if (!this.isPlaying) return;
-    if (this.gainNode && this.ctx) {
-      this.gainNode.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.5);
-      setTimeout(() => {
-        this.oscillators.forEach(osc => {
-          try { osc.stop(); } catch(e){}
-        });
-        this.oscillators = [];
-        // Only close if we created it
-        if (!this.destNode) {
-          this.ctx?.close();
-        }
-        this.isPlaying = false;
-      }, 600);
-    }
-  }
-
-  setVolume(vol: number) {
-    this.volume = vol;
-    if (this.gainNode && this.ctx) {
-      this.gainNode.gain.linearRampToValueAtTime(vol, this.ctx.currentTime + 0.1);
-    }
-  }
-
-  getFrequencyData(): Uint8Array | null {
-    if (!this.analyserNode) return null;
-    const data = new Uint8Array(this.analyserNode.frequencyBinCount);
-    this.analyserNode.getByteFrequencyData(data);
-    return data;
-  }
-}
+// ─── Audio Track Library ─────────────────────────────────────────────────────
+// All tracks are royalty-free (Mixkit / Pixabay CC0 licensed)
+export const AUDIO_TRACKS = [
+  {
+    id: 'none',
+    label: 'No Music',
+    description: 'Silent',
+    emoji: '🔇',
+    url: null,
+  },
+  {
+    id: 'luxury-piano',
+    label: 'Luxury Piano',
+    description: 'Elegant & upscale',
+    emoji: '🎹',
+    url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3',
+  },
+  {
+    id: 'warm-acoustic',
+    label: 'Warm Acoustic',
+    description: 'Inviting & homey',
+    emoji: '🎸',
+    url: 'https://assets.mixkit.co/music/preview/mixkit-guitar-reflections-593.mp3',
+  },
+  {
+    id: 'modern-ambient',
+    label: 'Modern Ambient',
+    description: 'Contemporary & clean',
+    emoji: '✨',
+    url: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3',
+  },
+  {
+    id: 'cinematic-strings',
+    label: 'Cinematic Strings',
+    description: 'Dramatic & inspiring',
+    emoji: '🎻',
+    url: 'https://assets.mixkit.co/music/preview/mixkit-cinematic-mystery-suspense-background-433.mp3',
+  },
+  {
+    id: 'upbeat-family',
+    label: 'Upbeat & Bright',
+    description: 'Fun & family-friendly',
+    emoji: '🌟',
+    url: 'https://assets.mixkit.co/music/preview/mixkit-happy-times-167.mp3',
+  },
+];
 
 // ─── Rendering Progress Tracker ─────────────────────────────────────────────
 const renderingSteps: { key: RenderingStep; label: string; icon: string }[] = [
   { key: 'analyzing', label: 'Analyzing listing details', icon: '🔍' },
   { key: 'generating-script', label: 'Generating script with AI', icon: '✍️' },
-  { key: 'synthesizing-voice', label: 'Synthesizing voiceover', icon: '🎙️' },
   { key: 'rendering-video', label: 'Rendering HD video stream', icon: '🎬' },
   { key: 'complete', label: 'Export complete!', icon: '✅' },
 ];
@@ -220,16 +180,14 @@ export const VideoPlayer: React.FC = () => {
     renderingStep, setRenderingStep
   } = useStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const synthRef = useRef<AmbientSynthesizer | null>(null);
+  const audioElemRef = useRef<HTMLAudioElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0); // in ms
   const [muted, setMuted] = useState(true);
-  const [audioTrack, setAudioTrack] = useState('luxury-ambient');
+  const [audioTrack, setAudioTrack] = useState('luxury-piano');
   const [showTransitionControls, setShowTransitionControls] = useState(false);
-
-  // AI Video Blending States
   const [engineMode, setEngineMode] = useState<'slideshow' | 'ai-video'>('ai-video');
 
   const animationRef = useRef<number | null>(null);
@@ -239,6 +197,8 @@ export const VideoPlayer: React.FC = () => {
   const SLIDE_DURATION = slideDuration * 1000;
   const CROSSFADE_DURATION = crossfadeDuration * 1000;
   const totalDuration = images.length * SLIDE_DURATION;
+
+  const selectedTrack = AUDIO_TRACKS.find((t) => t.id === audioTrack) ?? AUDIO_TRACKS[0];
 
   // Preload all images
   useEffect(() => {
@@ -253,24 +213,42 @@ export const VideoPlayer: React.FC = () => {
     });
   }, [images]);
 
-  // Audio synthesizer lifecycle
+  // Initialise / swap audio element when track changes
   useEffect(() => {
-    synthRef.current = new AmbientSynthesizer();
+    // Clean up previous element
+    if (audioElemRef.current) {
+      audioElemRef.current.pause();
+      audioElemRef.current.src = '';
+    }
+    if (!selectedTrack.url) {
+      audioElemRef.current = null;
+      return;
+    }
+    const audio = new Audio(selectedTrack.url);
+    audio.loop = true;
+    audio.volume = 0.25;
+    audio.crossOrigin = 'anonymous';
+    audioElemRef.current = audio;
+  }, [audioTrack]);
+
+  // Play / pause the audio element in sync with the presentation
+  useEffect(() => {
+    if (isExporting) return; // Handled separately during export
+    const audio = audioElemRef.current;
+    if (!audio) return;
+    if (playing && !muted) {
+      audio.play().catch(() => {/* autoplay blocked — user must interact first */});
+    } else {
+      audio.pause();
+    }
+  }, [playing, muted, isExporting]);
+
+  // Stop audio on unmount
+  useEffect(() => {
     return () => {
-      synthRef.current?.stop();
+      audioElemRef.current?.pause();
     };
   }, []);
-
-  // Handle play/pause music for normal viewing
-  useEffect(() => {
-    if (isExporting) return; // Managed separately during export
-    if (playing && !muted && audioTrack !== 'none') {
-      synthRef.current?.start();
-      synthRef.current?.setVolume(0.2);
-    } else {
-      synthRef.current?.stop();
-    }
-  }, [playing, muted, audioTrack, isExporting]);
 
   // Simulate rendering progress steps during export
   useEffect(() => {
@@ -283,8 +261,7 @@ export const VideoPlayer: React.FC = () => {
     setRenderingStep('analyzing');
     const timers = [
       setTimeout(() => setRenderingStep('generating-script'), 800),
-      setTimeout(() => setRenderingStep('synthesizing-voice'), 2000),
-      setTimeout(() => setRenderingStep('rendering-video'), 3500),
+      setTimeout(() => setRenderingStep('rendering-video'), 2500),
     ];
 
     return () => timers.forEach(clearTimeout);
@@ -295,11 +272,15 @@ export const VideoPlayer: React.FC = () => {
     if (isExporting && canvasRef.current) {
       setPlaying(false);
       setCurrentTime(0);
-      synthRef.current?.stop();
+      // Stop preview audio
+      if (audioElemRef.current) {
+        audioElemRef.current.pause();
+        audioElemRef.current.currentTime = 0;
+      }
 
       const canvas = canvasRef.current;
       let canvasStream: MediaStream;
-      
+
       try {
         if ((canvas as any).captureStream) {
           canvasStream = (canvas as any).captureStream(30);
@@ -310,7 +291,7 @@ export const VideoPlayer: React.FC = () => {
         }
       } catch (err) {
         console.error(err);
-        alert("Video export is not supported in this browser (captureStream API missing). Please use Google Chrome or Microsoft Edge desktop browsers for full support.");
+        alert('Video export is not supported in this browser. Please use Chrome or Edge.');
         setExporting(false);
         return;
       }
@@ -318,10 +299,16 @@ export const VideoPlayer: React.FC = () => {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const dest = audioCtx.createMediaStreamDestination();
 
-      if (audioTrack !== 'none') {
-        const exportSynth = new AmbientSynthesizer();
-        exportSynth.start(audioCtx, dest);
-        exportSynth.setVolume(0.5);
+      // Route the selected audio track into the export stream
+      if (selectedTrack.url && audioElemRef.current) {
+        const source = audioCtx.createMediaElementSource(audioElemRef.current);
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.4;
+        source.connect(gainNode);
+        gainNode.connect(dest);
+        // Also connect to speakers so the user hears it during export
+        gainNode.connect(audioCtx.destination);
+        audioElemRef.current.play().catch(() => {});
       }
 
       // Create a unified stream with explicit track merging for cross-browser support
@@ -456,10 +443,7 @@ export const VideoPlayer: React.FC = () => {
       drawTextOverlay(ctx, canvas, propertyDetails, textIdx);
       ctx.restore();
 
-      // Draw AI Generated Badge on the Canvas if Generated Video mode is on
-      if (isGenerativeMode) {
-        drawAIBadge(ctx);
-      }
+
 
       // Draw Free Tier Watermark
       if (subscriptionTier === 'free') {
@@ -749,6 +733,7 @@ export const VideoPlayer: React.FC = () => {
         )}
 
         {/* Audio Visualizer overlay (bottom right corner) */}
+        {/* Audio playing indicator */}
         <AnimatePresence>
           {isAudioActive && (
             <motion.div
@@ -758,7 +743,21 @@ export const VideoPlayer: React.FC = () => {
               className="absolute bottom-4 right-4 z-10 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-2 border border-emerald-500/20 flex items-center gap-2"
             >
               <Volume2 className="w-3 h-3 text-emerald-500" />
-              <AudioVisualizer synthRef={synthRef} isActive={isAudioActive} />
+              <span className="text-[11px] font-semibold text-emerald-400">
+                {selectedTrack.emoji} {selectedTrack.label}
+              </span>
+              <div className="flex items-end gap-[2px] h-4 ml-1">
+                {[40, 70, 50, 90, 60, 80, 45, 65].map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-[3px] rounded-full bg-emerald-500/70"
+                    style={{
+                      height: `${h}%`,
+                      animation: `pulse ${0.6 + i * 0.1}s ease-in-out infinite alternate`,
+                    }}
+                  />
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -929,6 +928,7 @@ export const VideoPlayer: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+            {/* Audio Track Selector */}
             <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-850 px-3 py-2 rounded-lg text-sm text-neutral-450 flex-1 sm:flex-none overflow-hidden">
               <Music className="w-4 h-4 shrink-0 text-emerald-500" />
               <select
@@ -936,8 +936,11 @@ export const VideoPlayer: React.FC = () => {
                 onChange={(e) => setAudioTrack(e.target.value)}
                 className="bg-transparent border-none text-neutral-300 font-medium focus:outline-none cursor-pointer truncate w-full"
               >
-                <option value="luxury-ambient" className="bg-neutral-900">Luxury Chord Pad (Web Audio)</option>
-                <option value="none" className="bg-neutral-900">No Music</option>
+                {AUDIO_TRACKS.map((track) => (
+                  <option key={track.id} value={track.id} className="bg-neutral-900">
+                    {track.emoji} {track.label} — {track.description}
+                  </option>
+                ))}
               </select>
             </div>
 
