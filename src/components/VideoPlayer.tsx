@@ -20,35 +20,35 @@ export const AUDIO_TRACKS = [
     label: 'Luxury Piano',
     description: 'Elegant & upscale',
     emoji: '🎹',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    url: '/sample.mp3',
   },
   {
     id: 'warm-acoustic',
     label: 'Warm Acoustic',
     description: 'Inviting & homey',
     emoji: '🎸',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    url: '/sample.mp3',
   },
   {
     id: 'modern-ambient',
     label: 'Modern Ambient',
     description: 'Contemporary & clean',
     emoji: '✨',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    url: '/sample.mp3',
   },
   {
     id: 'cinematic-strings',
     label: 'Cinematic Strings',
     description: 'Dramatic & inspiring',
     emoji: '🎻',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    url: '/sample.mp3',
   },
   {
     id: 'upbeat-family',
     label: 'Upbeat & Bright',
     description: 'Fun & family-friendly',
     emoji: '🌟',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+    url: '/sample.mp3',
   },
 ];
 
@@ -143,7 +143,7 @@ export const VideoPlayer: React.FC = () => {
 
   const [playing, setPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0); // in ms
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [audioTrack, setAudioTrack] = useState('luxury-piano');
   const [showTransitionControls, setShowTransitionControls] = useState(false);
 
@@ -411,7 +411,7 @@ export const VideoPlayer: React.FC = () => {
         ctx.textBaseline = 'bottom';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         ctx.shadowBlur = 4;
-        ctx.fillText('Made with Clovrr - Sell Your Home Fast', canvas.width - 30, canvas.height - 30);
+        // Watermark removed by user request
         ctx.restore();
       }
     };

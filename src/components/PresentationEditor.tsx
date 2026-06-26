@@ -155,16 +155,27 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
       {/* Editor Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Canvas Player HUD (Takes full width now) */}
-        <div className="w-full space-y-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold font-heading text-white">Cinematic Preview</h3>
-            <div className="flex items-center gap-1.5 text-xs text-neutral-400">
-              <HelpCircle className="w-3.5 h-3.5" />
-              Pan & Zoom renders inside browser canvas
+        {property.status === 'Ready' ? (
+          <div className="w-full space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-bold font-heading text-white">Cinematic Preview</h3>
+              <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                <HelpCircle className="w-3.5 h-3.5" />
+                Pan & Zoom renders inside browser canvas
+              </div>
             </div>
+            <VideoPlayer />
           </div>
-          <VideoPlayer />
-        </div>
+        ) : (
+          !generativeJobId && (
+            <div className="flex items-center justify-center h-64 text-neutral-400">
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
+                <p>Starting video generation...</p>
+              </div>
+            </div>
+          )
+        )}
       </main>
 
       {/* Export Overlay Modal */}
@@ -174,6 +185,7 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
       {generativeJobId && (
         <WalkthroughJobStatus 
           jobId={generativeJobId} 
+          totalClips={images.length}
           onComplete={(url) => {
             setGenerativeJobId(null);
             alert('Your AI video is ready! URL: ' + url);
