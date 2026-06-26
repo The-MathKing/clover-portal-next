@@ -19,24 +19,6 @@ const tourSteps: TourStep[] = [
     position: 'bottom',
   },
   {
-    targetSelector: '[data-tour="transition-controls"]',
-    title: '🎛️ Transition & Speed Controls',
-    description: 'Customize how your photos transition. Choose between crossfade, Ken Burns zoom, or pan directions. Adjust slide duration with the speed slider.',
-    position: 'top',
-  },
-  {
-    targetSelector: '[data-tour="script-panel"]',
-    title: '✍️ AI Scriptwriter',
-    description: 'Generate a professional narration script with one click. Choose your narrator tone, or write your own custom script for the voiceover.',
-    position: 'left',
-  },
-  {
-    targetSelector: '[data-tour="ai-presets"]',
-    title: '✨ Magic Script Enhancers',
-    description: 'Use one-click presets like "Make it luxurious" or "Keep it punchy" to instantly adjust the tone and style of your generated script.',
-    position: 'left',
-  },
-  {
     targetSelector: '[data-tour="export-button"]',
     title: '🎥 Export Your Tour',
     description: 'When you\'re happy with the preview, click here to export a full HD 1080p video file with audio, ready to upload to Zillow, MLS, or social media.',

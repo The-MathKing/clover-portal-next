@@ -87,10 +87,6 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
             </button>
             <button
               onClick={() => {
-              if (subscriptionTier === 'free') {
-                alert('Exporting presentations requires a paid plan. Please upgrade to use this feature.');
-                return;
-              }
               if (engineMode === 'ai-video') {
                 const formData = new FormData();
                 formData.append('propertyId', property.id);

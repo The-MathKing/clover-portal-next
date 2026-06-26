@@ -4,10 +4,127 @@ import { Sparkles, Play, Pause, ChevronRight, TrendingUp, Clock, DollarSign, Eye
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 
-// Slider removed by request
+// ─── Before/After Comparison Slider ─────────────────────────────────────────
+const BeforeAfterVisualizer: React.FC = () => {
+  const [sliderPos, setSliderPos] = useState(50);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const [kenBurnsOffset, setKenBurnsOffset] = useState(0);
 
+  useEffect(() => {
+    let frame: number;
+    const animate = () => {
+      setKenBurnsOffset(prev => (prev + 0.15) % 360);
+      frame = requestAnimationFrame(animate);
+    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
-// ─── Animated Listing Performance Calculator ────────────────────────────────
+  const handleMove = (clientX: number) => {
+    if (!containerRef.current || !isDragging.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    setSliderPos((x / rect.width) * 100);
+  };
+
+  return (
+    <div className="relative">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
+          <Eye className="w-3.5 h-3.5" />
+          Interactive Demo
+        </div>
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">See the Difference</h2>
+        <p className="text-neutral-400 max-w-xl mx-auto">Drag the slider to compare a static listing photo vs. a dynamic Clovrr cinematic video tour.</p>
+      </div>
+
+      <div 
+        ref={containerRef}
+        className="relative w-full aspect-video rounded-2xl overflow-hidden cursor-col-resize border border-neutral-800 shadow-2xl shadow-black/50"
+        onMouseDown={() => isDragging.current = true}
+        onMouseUp={() => isDragging.current = false}
+        onMouseLeave={() => isDragging.current = false}
+        onMouseMove={(e) => handleMove(e.clientX)}
+        onTouchStart={() => isDragging.current = true}
+        onTouchEnd={() => isDragging.current = false}
+        onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+      >
+        {/* "After" - Dynamic Video Side (full behind) */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
+            alt="Dynamic video tour"
+            draggable={false}
+            className="w-full h-full object-cover transition-transform duration-[3000ms] ease-linear pointer-events-none"
+            style={{
+              transform: `scale(1.15) translateX(${Math.sin(kenBurnsOffset * 0.017) * 2}%) translateY(${Math.cos(kenBurnsOffset * 0.013) * 1.5}%)`,
+            }}
+          />
+          {/* Cinematic overlay effects */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+          <div className="absolute bottom-6 left-6 right-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">AI Generated Video Tour</span>
+            </div>
+            <p className="text-white font-bold text-lg">124 Bellevue Ave, Newport RI</p>
+            <p className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">Exclusive Tour • $2,450,000 • 5 Beds • 4.5 Baths</p>
+          </div>
+          {/* Animated waveform bars */}
+          <div className="absolute top-6 right-6 flex items-end gap-0.5 h-5">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="w-1 bg-emerald-400/70 rounded-full"
+                style={{
+                  height: `${30 + Math.sin((kenBurnsOffset * 0.05) + i * 0.8) * 70}%`,
+                  transition: 'height 150ms ease',
+                }}
+              />
+            ))}
+          </div>
+          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-emerald-500/30">
+            <span className="text-xs font-bold text-white">🎬 WITH CLOVRR</span>
+          </div>
+        </div>
+
+        {/* "Before" - Static Photo Side (clipped) */}
+        <div 
+          className="absolute inset-0 overflow-hidden"
+          style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+        >
+          <img
+            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
+            alt="Static photo listing"
+            draggable={false}
+            className="w-full h-full object-cover grayscale brightness-75 pointer-events-none"
+          />
+          <div className="absolute inset-0 bg-neutral-900/30" />
+          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-neutral-600/30">
+            <span className="text-xs font-bold text-neutral-300">📷 PHOTOS ONLY</span>
+          </div>
+        </div>
+
+        {/* Slider Handle */}
+        <div 
+          className="absolute top-0 bottom-0 z-10"
+          style={{ left: `${sliderPos}%` }}
+        >
+          <div className="absolute inset-y-0 -translate-x-1/2 w-1 bg-white/90 shadow-lg shadow-white/30" />
+          <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl shadow-black/50 flex items-center justify-center border-2 border-white">
+            <div className="flex items-center gap-0.5 text-neutral-800">
+              <ChevronRight className="w-3 h-3 rotate-180" />
+              <ChevronRight className="w-3 h-3" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Animated Counter Component ─────────────────────────────────────────────
 const AnimatedCounter: React.FC<{ value: number; prefix?: string; suffix?: string; duration?: number }> = ({ value, prefix = '', suffix = '', duration = 1500 }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -38,85 +155,45 @@ const AnimatedCounter: React.FC<{ value: number; prefix?: string; suffix?: strin
   return <span ref={ref}>{prefix}{displayValue.toLocaleString()}{suffix}</span>;
 };
 
-const PerformanceCalculator: React.FC = () => {
-  const [listingPrice, setListingPrice] = useState(450000);
-  
-  const viewsBoost = Math.round(250 + (listingPrice / 1000000) * 40);
-  const daysReduction = Math.round(45 - (Math.min(listingPrice, 5000000) / 5000000) * 20);
-  const extraInquiries = Math.round(12 + (listingPrice / 1000000) * 15);
-  const potentialValueAdd = Math.round(listingPrice * 0.012);
-
+const ROIStats: React.FC = () => {
   return (
     <div>
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-4">
           <TrendingUp className="w-3.5 h-3.5" />
-          ROI Calculator
+          The Value of Video
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">What&apos;s Your Listing Worth?</h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">Enter your home&apos;s listing price to see the estimated impact of a Clovrr video tour.</p>
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Proven Results</h2>
+        <p className="text-neutral-400 max-w-xl mx-auto">See the average impact a cinematic Clovrr video tour has on listings.</p>
       </div>
 
-      <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-8">
-        {/* Price Input */}
-        <div>
-          <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Your Listing Price</label>
-          <div className="relative">
-            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
-            <input
-              type="text"
-              value={listingPrice.toLocaleString()}
-              onChange={(e) => {
-                const num = parseInt(e.target.value.replace(/[^0-9]/g, ''), 10);
-                if (!isNaN(num)) setListingPrice(num);
-              }}
-              className="w-full pl-12 pr-4 py-4 bg-neutral-950 border border-neutral-700 rounded-xl text-2xl font-bold text-white focus:outline-none focus:border-emerald-500 transition-colors"
-            />
-          </div>
-          <input
-            type="range"
-            min="100000"
-            max="5000000"
-            step="50000"
-            value={listingPrice}
-            onChange={(e) => setListingPrice(parseInt(e.target.value))}
-            className="w-full mt-4 h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-          />
-          <div className="flex justify-between text-xs text-neutral-500 mt-1">
-            <span>$100K</span>
-            <span>$5M</span>
-          </div>
-        </div>
-
-        {/* Results Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            { label: 'Estimated Views Boost', value: viewsBoost, suffix: '%', icon: Eye, color: 'emerald', description: 'More eyes on your listing in the first 7 days' },
-            { label: 'Days on Market', value: daysReduction, suffix: ' days', icon: Clock, color: 'cyan', description: `Reduced from avg 45 days` },
-            { label: 'Extra Buyer Inquiries', value: extraInquiries, prefix: '+', suffix: '', icon: TrendingUp, color: 'violet', description: 'Additional interested buyers' },
-            { label: 'Potential Value Add', value: potentialValueAdd, prefix: '$', suffix: '', icon: DollarSign, color: 'amber', description: 'From faster sale at asking price' },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.4 }}
-              className="bg-neutral-950 border border-neutral-800 rounded-xl p-5 group hover:border-neutral-700 transition-all"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`w-10 h-10 rounded-lg bg-${stat.color}-950/40 border border-${stat.color}-500/20 flex items-center justify-center`}>
-                  <stat.icon className={`w-5 h-5 text-${stat.color}-500`} />
-                </div>
-                <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">{stat.label}</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+        {[
+          { label: 'Estimated Views Boost', value: 268, suffix: '%', icon: Eye, color: 'emerald', description: 'More eyes on your listing in the first 7 days' },
+          { label: 'Days on Market', value: 36, suffix: ' days', icon: Clock, color: 'cyan', description: `Reduced from national average of 45 days` },
+          { label: 'Extra Buyer Inquiries', value: 18, prefix: '+', suffix: '', icon: TrendingUp, color: 'violet', description: 'Additional interested buyers per listing' },
+          { label: 'Potential Value Add', value: 5400, prefix: '$', suffix: '', icon: DollarSign, color: 'amber', description: 'Average added value from a faster sale' },
+        ].map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1, duration: 0.4 }}
+            className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 group hover:border-neutral-700 transition-all"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`w-10 h-10 rounded-lg bg-${stat.color}-950/40 border border-${stat.color}-500/20 flex items-center justify-center`}>
+                <stat.icon className={`w-5 h-5 text-${stat.color}-500`} />
               </div>
-              <div className="text-3xl font-black text-white mb-1">
-                <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
-              </div>
-              <p className="text-xs text-neutral-500">{stat.description}</p>
-            </motion.div>
-          ))}
-        </div>
+              <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">{stat.label}</span>
+            </div>
+            <div className="text-3xl font-black text-white mb-2">
+              <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
+            </div>
+            <p className="text-sm text-neutral-500">{stat.description}</p>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
@@ -233,9 +310,14 @@ export const LandingPage: React.FC = () => {
 
       {/* Interactive Sections */}
       <div className="max-w-6xl mx-auto px-6 space-y-24 pb-24">
-        {/* Section 3: Performance Calculator */}
+        {/* Section 1: Before/After Visualizer */}
+        <section id="demo">
+          <BeforeAfterVisualizer />
+        </section>
+
+        {/* Section 2: ROI Stats */}
         <section>
-          <PerformanceCalculator />
+          <ROIStats />
         </section>
 
         {/* Feature cards */}
