@@ -134,8 +134,8 @@ export async function POST(request: NextRequest) {
     if (!videoApiKey) {
       console.warn('[Walkthrough] VIDEO_AI_API_KEY not set — skipping clip generation.');
     } else {
-      // Fire and forget — respond to the client immediately
-      fireKlingRequests({ supabase, clips, uploadedImages, videoApiKey, webhookUrl, jobId });
+      // Await so Vercel does not freeze the lambda environment before fetch completes
+      await fireKlingRequests({ supabase, clips, uploadedImages, videoApiKey, webhookUrl, jobId });
     }
 
     return NextResponse.json({ jobId, totalClips }, { status: 201 });
