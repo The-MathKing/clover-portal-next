@@ -36,7 +36,7 @@ const BeforeAfterVisualizer: React.FC = () => {
           Interactive Demo
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">See the Difference</h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">Drag the slider to compare a static listing photo vs. a dynamic Clover cinematic video tour.</p>
+        <p className="text-neutral-400 max-w-xl mx-auto">Drag the slider to compare a static listing photo vs. a dynamic Clovrr cinematic video tour.</p>
       </div>
 
       <div 
@@ -180,7 +180,7 @@ const PerformanceCalculator: React.FC = () => {
           ROI Calculator
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">What&apos;s Your Listing Worth?</h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">Enter your home&apos;s listing price to see the estimated impact of a Clover video tour.</p>
+        <p className="text-neutral-400 max-w-xl mx-auto">Enter your home&apos;s listing price to see the estimated impact of a Clovrr video tour.</p>
       </div>
 
       <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-8">

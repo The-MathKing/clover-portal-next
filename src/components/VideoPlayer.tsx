@@ -129,48 +129,6 @@ const RenderingProgress: React.FC<{ currentStep: RenderingStep | null; progress:
   );
 };
 
-// ─── Audio Visualizer / Waveform Component ──────────────────────────────────
-const AudioVisualizer: React.FC<{ synthRef: React.RefObject<AmbientSynthesizer | null>; isActive: boolean }> = ({ synthRef, isActive }) => {
-  const [bars, setBars] = useState<number[]>(Array(16).fill(0));
-  const frameRef = useRef<number>(0);
-
-  useEffect(() => {
-    if (!isActive) {
-      setBars(Array(16).fill(0));
-      return;
-    }
-
-    const animate = () => {
-      const data = synthRef.current?.getFrequencyData();
-      if (data) {
-        const newBars = Array(16).fill(0).map((_, i) => {
-          const idx = Math.floor((i / 16) * data.length);
-          return (data[idx] / 255) * 100;
-        });
-        setBars(newBars);
-      } else {
-        // Simulated waveform when real data isn't available
-        setBars(prev => prev.map((_, i) => Math.max(5, Math.sin(Date.now() / 200 + i * 0.6) * 40 + 40)));
-      }
-      frameRef.current = requestAnimationFrame(animate);
-    };
-    frameRef.current = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(frameRef.current);
-  }, [isActive, synthRef]);
-
-  return (
-    <div className="flex items-end gap-[2px] h-6">
-      {bars.map((height, i) => (
-        <div
-          key={i}
-          className="w-1 rounded-full bg-emerald-500/70 transition-[height] duration-75"
-          style={{ height: `${Math.max(8, height)}%`, minHeight: '2px' }}
-        />
-      ))}
-    </div>
-  );
-};
 
 // ─── Main Video Player Component ────────────────────────────────────────────
 export const VideoPlayer: React.FC = () => {
@@ -454,7 +412,7 @@ export const VideoPlayer: React.FC = () => {
         ctx.textBaseline = 'bottom';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         ctx.shadowBlur = 4;
-        ctx.fillText('Made with Clover - Sell Your Home Fast', canvas.width - 30, canvas.height - 30);
+        ctx.fillText('Made with Clovrr - Sell Your Home Fast', canvas.width - 30, canvas.height - 30);
         ctx.restore();
       }
     };

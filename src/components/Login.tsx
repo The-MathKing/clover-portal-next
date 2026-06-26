@@ -75,7 +75,7 @@ export const Login: React.FC = () => {
             <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/50">
               <Clover className="w-8 h-8 text-white" />
             </div>
-            <span className="text-3xl font-bold font-heading tracking-tight text-white">Clover</span>
+            <span className="text-3xl font-bold font-heading tracking-tight text-white">Clovrr</span>
           </div>
           <h2 className="text-lg text-neutral-400 font-medium">Cinematic Home Tour Generator</h2>
         </div>

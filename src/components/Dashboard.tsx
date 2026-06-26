@@ -38,7 +38,7 @@ const ReviewSection: React.FC = () => {
           <CheckCircle className="w-7 h-7 text-emerald-500" />
         </div>
         <h3 className="text-lg font-bold text-white mb-2">Thank You for Your Review!</h3>
-        <p className="text-sm text-neutral-400">Your feedback helps us improve Clover for everyone.</p>
+        <p className="text-sm text-neutral-400">Your feedback helps us improve Clovrr for everyone.</p>
       </motion.div>
     );
   }
@@ -50,7 +50,7 @@ const ReviewSection: React.FC = () => {
           <MessageSquare className="w-6 h-6 text-emerald-500" />
         </div>
         <h3 className="text-lg font-bold text-white mb-1">Share Your Experience</h3>
-        <p className="text-xs text-neutral-500">Used Clover for your listing? Let us know how it went.</p>
+        <p className="text-xs text-neutral-500">Used Clovrr for your listing? Let us know how it went.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-5">
@@ -93,7 +93,7 @@ const ReviewSection: React.FC = () => {
         {/* Review Text */}
         <div>
           <textarea
-            placeholder="Tell us about your experience with Clover..."
+            placeholder="Tell us about your experience with Clovrr..."
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             rows={3}
@@ -432,7 +432,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                   Create a Stunning Video Tour of Your Home.
                 </h1>
                 <p className="text-neutral-400 text-lg leading-relaxed mb-10">
-                  Clover makes it easy for homeowners to sell their homes faster. Instantly transform your listing photos into a cinematic, AI-narrated video tour that catches buyers' eyes on Zillow, Redfin, and MLS.
+                  Clovrr makes it easy for homeowners to sell their homes faster. Instantly transform your listing photos into a cinematic, AI-narrated video tour that catches buyers' eyes on Zillow, Redfin, and MLS.
                 </p>
 
                 {/* IMAGES TO VIDEO GRAPHIC */}
@@ -550,7 +550,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                         </div>
                         <div>
                           <div className="flex justify-between text-xs font-bold text-emerald-400 mb-1.5">
-                            <span>With Clover Video Tour</span>
+                            <span>With Clovrr Video Tour</span>
                             <span>~1,000+ views</span>
                           </div>
                           <div className="w-full bg-neutral-900 rounded-full h-2.5 overflow-hidden">
@@ -579,7 +579,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                         </div>
                         <div>
                           <div className="flex justify-between text-xs font-bold text-emerald-400 mb-1.5">
-                            <span>With Clover Video Tour</span>
+                            <span>With Clovrr Video Tour</span>
                             <span>31 Days</span>
                           </div>
                           <div className="w-full bg-neutral-900 rounded-full h-2.5 overflow-hidden">

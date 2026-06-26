@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clover | Cinematic Real Estate Video Tours",
+  title: "Clovrr | Cinematic Real Estate Video Tours",
   description: "Turn your real estate photos into fully-fledged, AI-narrated cinematic video tours in seconds.",
 };
 
