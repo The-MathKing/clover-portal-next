@@ -20,35 +20,35 @@ export const AUDIO_TRACKS = [
     label: 'Luxury Piano',
     description: 'Elegant & upscale',
     emoji: '🎹',
-    url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
   },
   {
     id: 'warm-acoustic',
     label: 'Warm Acoustic',
     description: 'Inviting & homey',
     emoji: '🎸',
-    url: 'https://assets.mixkit.co/music/preview/mixkit-guitar-reflections-593.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
   },
   {
     id: 'modern-ambient',
     label: 'Modern Ambient',
     description: 'Contemporary & clean',
     emoji: '✨',
-    url: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
   },
   {
     id: 'cinematic-strings',
     label: 'Cinematic Strings',
     description: 'Dramatic & inspiring',
     emoji: '🎻',
-    url: 'https://assets.mixkit.co/music/preview/mixkit-cinematic-mystery-suspense-background-433.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
   },
   {
     id: 'upbeat-family',
     label: 'Upbeat & Bright',
     description: 'Fun & family-friendly',
     emoji: '🌟',
-    url: 'https://assets.mixkit.co/music/preview/mixkit-happy-times-167.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
   },
 ];
 
@@ -141,7 +141,7 @@ export const VideoPlayer: React.FC = () => {
   const audioElemRef = useRef<HTMLAudioElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0); // in ms
   const [muted, setMuted] = useState(true);
   const [audioTrack, setAudioTrack] = useState('luxury-piano');

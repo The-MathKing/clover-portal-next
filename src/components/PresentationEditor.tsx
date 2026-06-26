@@ -55,6 +55,35 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
     }
   }, [property]);
 
+  // Auto-start video generation when entering the editor if not already ready
+  useEffect(() => {
+    // Only trigger if we have images and we aren't already generating or finished
+    if (images.length > 0 && property.status !== 'Ready' && !generativeJobId) {
+      // In the future, block free users here: if (subscriptionTier === 'free') return;
+      // Allowing it for now for AI testing.
+      const formData = new FormData();
+      formData.append('propertyId', property.id);
+      images.forEach((img) => {
+        formData.append('images', img.url);
+      });
+      
+      fetch('/api/walkthrough/create', {
+        method: 'POST',
+        body: formData,
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to start generative job');
+        return res.json();
+      })
+      .then(data => {
+        setGenerativeJobId(data.jobId);
+      })
+      .catch(err => {
+        console.error('Auto-generation error:', err);
+      });
+    }
+  }, [images.length, property.status, property.id, generativeJobId]);
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans">
       {/* Editor Header */}

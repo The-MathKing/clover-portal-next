@@ -156,6 +156,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
     let priceId = '';
     let mappedTier: 'one_time' | 'pro_5' | 'unlimited' = 'one_time';
     
+    if (tierName.toLowerCase().includes('enterprise')) {
+      window.location.href = 'mailto:aryan.r.padarthi@gmail.com';
+      return;
+    }
+
     if (tierName.toLowerCase().includes('one time') || tierName.toLowerCase().includes('demo')) {
       priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ONE_TIME || '';
       mappedTier = 'one_time';
@@ -694,8 +699,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 { name: 'One Time Pass', price: '$30', originalPrice: '$50', billing: 'one-time', desc: 'Perfect to try it out for a single listing.', features: ['1 HD Export included', 'Claude 3.5 & AI Voice Narration', 'Standard Email Support'], savings: 'Opening Discount' },
-                { name: '5-Pack', price: '$75', originalPrice: '$125', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true, savings: 'Opening Discount' },
-                { name: 'Unlimited', price: '$150', originalPrice: '$200', billing: '/mo', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports per month', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], savings: 'Opening Discount' }
+                { name: '5-Pack', price: '$100', originalPrice: '$150', billing: 'one-time', desc: 'Best for standard listings.', features: ['5 HD Exports included', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], popular: true, savings: 'Opening Discount' },
+                { name: 'Enterprise', price: 'Custom', billing: 'contact', desc: 'For active agents and flippers.', features: ['Unlimited HD Exports', 'Claude 3.5 & AI Voice Narration', 'Priority Support'], savings: '' }
               ].map((tier, i) => (
                 <motion.div
                   key={i}
@@ -723,7 +728,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                       <span className="text-lg text-neutral-600 line-through">{(tier as any).originalPrice}</span>
                     )}
                     <span className="text-neutral-500 font-semibold text-xs uppercase tracking-wider">
-                      {tier.billing === 'one-time' ? 'one-time' : '/mo'}
+                      {tier.billing === 'one-time' ? 'one-time' : tier.billing === 'contact' ? '' : '/mo'}
                     </span>
                   </div>
                   <ul className="space-y-4 mb-8 flex-1">
@@ -738,7 +743,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                     onClick={() => handleChooseTier(tier.name)}
                     className={`w-full py-3 rounded-xl font-bold transition-all active:scale-[0.98] ${tier.popular ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}
                   >
-                    Choose {tier.name}
+                    {tier.name === 'Enterprise' ? 'Contact Us' : `Choose ${tier.name}`}
                   </button>
                 </motion.div>
               ))}
