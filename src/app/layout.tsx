@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clovrr | Cinematic Real Estate Video Tours",
-  description: "Turn your real estate photos into fully-fledged, AI-narrated cinematic video tours in seconds.",
+  title: "Clovrr | AI Search Optimization & GEO",
+  description: "Engineer your digital presence so Google AI Overviews, ChatGPT, and Perplexity recommend your business first.",
 };
 
 export default function RootLayout({

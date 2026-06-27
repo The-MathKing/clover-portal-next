@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck, X, Briefcase, Building2, CheckCircle, AlertCircle, MapPin, UserCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Login } from './Login';
@@ -75,9 +76,7 @@ export const LandingPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-900">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-neutral-950" />
-            </div>
+            <Image src="/logo.png" alt="Clovrr Logo" width={32} height={32} className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
@@ -278,7 +277,7 @@ export const LandingPage: React.FC = () => {
       <footer className="border-t border-neutral-900 bg-neutral-950 py-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-emerald-500" />
+            <Image src="/logo.png" alt="Clovrr Logo" width={24} height={24} className="w-6 h-6 rounded-md" />
             <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
           </div>
           <p className="text-neutral-500 text-sm">
