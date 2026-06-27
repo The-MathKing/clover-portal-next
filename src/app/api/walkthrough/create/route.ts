@@ -8,7 +8,6 @@ const MAX_IMAGES = 20;
 
 // Kling via PiAPI: minimum duration is 5 seconds per clip.
 // 20 clips × 5s = ~100 second walkthrough video.
-const CLIP_DURATION_SECONDS = '5';
 
 export async function POST(request: NextRequest) {
   try {
@@ -207,16 +206,14 @@ async function fireKlingRequests({
               prompt: CINEMATIC_PROMPT,
               image_url: image.url,
               negative_prompt: 'blurry, shaky cam, low quality, distorted, watermark, text',
-              cfg_scale: 0.5,
-              duration: CLIP_DURATION_SECONDS, // "5" = minimum; results in ~100s total video
+              duration: 5,
               aspect_ratio: '16:9',
-              mode: 'pro',              // "pro" mode = 1080p output
+              mode: 'pro',
             },
             config: {
               webhook_config: {
-                // PiAPI will POST to this URL when the clip is done
                 endpoint: webhookUrl,
-                secret: '',            // optional HMAC secret
+                secret: '',
               },
             },
             // Pass our internal IDs as metadata so the webhook can look up the right row
