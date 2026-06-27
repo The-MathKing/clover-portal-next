@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     const data = await resend.emails.send({
-      from: 'Clovrr Leads <leads@clovrr.net>', // This requires domain verification in Resend, otherwise use 'onboarding@resend.dev' for testing
+      from: 'Clovrr Leads <onboarding@resend.dev>', // Using Resend's default testing domain since clovrr.net is unverified
       to: receivingEmail,
       subject: `🚨 New AI Audit Lead: ${business}`,
       html: `
