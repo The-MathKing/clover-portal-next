@@ -1,371 +1,194 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Play, Pause, ChevronRight, TrendingUp, Clock, DollarSign, Eye, Home, Mic, Music, Clover, Plus, PlayCircle, Video, Zap, Star, Check, User, LogOut } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useStore } from '../store/useStore';
+import React from 'react';
+import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-// ─── Before/After Comparison Slider ─────────────────────────────────────────
-const BeforeAfterVisualizer: React.FC = () => {
-  const [sliderPos, setSliderPos] = useState(50);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const [kenBurnsOffset, setKenBurnsOffset] = useState(0);
-
-  useEffect(() => {
-    let frame: number;
-    const animate = () => {
-      setKenBurnsOffset(prev => (prev + 0.15) % 360);
-      frame = requestAnimationFrame(animate);
-    };
-    frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const handleMove = (clientX: number) => {
-    if (!containerRef.current || !isDragging.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    setSliderPos((x / rect.width) * 100);
-  };
-
-  return (
-    <div className="relative">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
-          <Eye className="w-3.5 h-3.5" />
-          Interactive Demo
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">See the Difference</h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">Drag the slider to compare a static listing photo vs. a dynamic Clovrr cinematic video tour.</p>
-      </div>
-
-      <div 
-        ref={containerRef}
-        className="relative w-full aspect-video rounded-2xl overflow-hidden cursor-col-resize border border-neutral-800 shadow-2xl shadow-black/50"
-        onMouseDown={() => isDragging.current = true}
-        onMouseUp={() => isDragging.current = false}
-        onMouseLeave={() => isDragging.current = false}
-        onMouseMove={(e) => handleMove(e.clientX)}
-        onTouchStart={() => isDragging.current = true}
-        onTouchEnd={() => isDragging.current = false}
-        onTouchMove={(e) => handleMove(e.touches[0].clientX)}
-      >
-        {/* "After" - Dynamic Video Side (full behind) */}
-        <div className="absolute inset-0 overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
-            alt="Dynamic video tour"
-            draggable={false}
-            className="w-full h-full object-cover transition-transform duration-[3000ms] ease-linear pointer-events-none"
-            style={{
-              transform: `scale(1.15) translateX(${Math.sin(kenBurnsOffset * 0.017) * 2}%) translateY(${Math.cos(kenBurnsOffset * 0.013) * 1.5}%)`,
-            }}
-          />
-          {/* Cinematic overlay effects */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">AI Generated Video Tour</span>
-            </div>
-            <p className="text-white font-bold text-lg">124 Bellevue Ave, Newport RI</p>
-            <p className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">Exclusive Tour • $2,450,000 • 5 Beds • 4.5 Baths</p>
-          </div>
-          {/* Animated waveform bars */}
-          <div className="absolute top-6 right-6 flex items-end gap-0.5 h-5">
-            {[...Array(12)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 bg-emerald-400/70 rounded-full"
-                style={{
-                  height: `${30 + Math.sin((kenBurnsOffset * 0.05) + i * 0.8) * 70}%`,
-                  transition: 'height 150ms ease',
-                }}
-              />
-            ))}
-          </div>
-          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-emerald-500/30">
-            <span className="text-xs font-bold text-white">🎬 WITH CLOVRR</span>
-          </div>
-        </div>
-
-        {/* "Before" - Static Photo Side (clipped) */}
-        <div 
-          className="absolute inset-0 overflow-hidden"
-          style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-        >
-          <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
-            alt="Static photo listing"
-            draggable={false}
-            className="w-full h-full object-cover grayscale brightness-75 pointer-events-none"
-          />
-          <div className="absolute inset-0 bg-neutral-900/30" />
-          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-neutral-600/30">
-            <span className="text-xs font-bold text-neutral-300">📷 PHOTOS ONLY</span>
-          </div>
-        </div>
-
-        {/* Slider Handle */}
-        <div 
-          className="absolute top-0 bottom-0 z-10"
-          style={{ left: `${sliderPos}%` }}
-        >
-          <div className="absolute inset-y-0 -translate-x-1/2 w-1 bg-white/90 shadow-lg shadow-white/30" />
-          <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl shadow-black/50 flex items-center justify-center border-2 border-white">
-            <div className="flex items-center gap-0.5 text-neutral-800">
-              <ChevronRight className="w-3 h-3 rotate-180" />
-              <ChevronRight className="w-3 h-3" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ─── Animated Counter Component ─────────────────────────────────────────────
-const AnimatedCounter: React.FC<{ value: number; prefix?: string; suffix?: string; duration?: number }> = ({ value, prefix = '', suffix = '', duration = 1500 }) => {
-  const [displayValue, setDisplayValue] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          const startTime = performance.now();
-          const animate = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-            setDisplayValue(Math.round(eased * value));
-            if (progress < 1) requestAnimationFrame(animate);
-          };
-          requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [value, duration, hasAnimated]);
-
-  return <span ref={ref}>{prefix}{displayValue.toLocaleString()}{suffix}</span>;
-};
-
-const ROIStats: React.FC = () => {
-  return (
-    <div>
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-4">
-          <TrendingUp className="w-3.5 h-3.5" />
-          The Value of Video
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Proven Results</h2>
-        <p className="text-neutral-400 max-w-xl mx-auto">See the average impact a cinematic Clovrr video tour has on listings.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-        {[
-          { label: 'Estimated Views Boost', value: 268, suffix: '%', icon: Eye, color: 'emerald', description: 'More eyes on your listing in the first 7 days' },
-          { label: 'Days on Market', value: 36, suffix: ' days', icon: Clock, color: 'cyan', description: `Reduced from national average of 45 days` },
-          { label: 'Extra Buyer Inquiries', value: 18, prefix: '+', suffix: '', icon: TrendingUp, color: 'violet', description: 'Additional interested buyers per listing' },
-          { label: 'Potential Value Add', value: 5400, prefix: '$', suffix: '', icon: DollarSign, color: 'amber', description: 'Average added value from a faster sale' },
-        ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1, duration: 0.4 }}
-            className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 group hover:border-neutral-700 transition-all"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`w-10 h-10 rounded-lg bg-${stat.color}-950/40 border border-${stat.color}-500/20 flex items-center justify-center`}>
-                <stat.icon className={`w-5 h-5 text-${stat.color}-500`} />
-              </div>
-              <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">{stat.label}</span>
-            </div>
-            <div className="text-3xl font-black text-white mb-2">
-              <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
-            </div>
-            <p className="text-sm text-neutral-500">{stat.description}</p>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// ─── Main Landing Page Component ────────────────────────────────────────────
 export const LandingPage: React.FC = () => {
-  const { setShowAuthModal, setWizardOpen, isAuthenticated } = useStore();
-
-  const handleGetStarted = () => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-    } else {
-      setWizardOpen(true);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans">
-      {/* Minimal top bar */}
-      <header className="border-b border-neutral-900 bg-neutral-950/90 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-650/10 rounded-xl border border-emerald-500/20">
-              <Clover className="w-6 h-6 text-emerald-500" />
+    <div className="min-h-screen bg-neutral-950 font-sans selection:bg-emerald-500/30">
+      {/* ── Navigation ── */}
+      <nav className="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-900">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-neutral-950" />
             </div>
-            <div>
-              <span className="text-xl font-bold tracking-wide">CLOVRR</span>
-              <span className="text-xs block text-neutral-400 font-medium tracking-widest uppercase">Home Seller Video Engine</span>
-            </div>
+            <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium transition-colors"
-            >
-              Log In
-            </button>
-            <button
-              onClick={handleGetStarted}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Get Started</span>
-            </button>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
+            <a href="#problem" className="hover:text-emerald-400 transition-colors">The Shift</a>
+            <a href="#services" className="hover:text-emerald-400 transition-colors">Our Services</a>
+            <a href="mailto:contact@clovrr.com" className="px-5 py-2.5 rounded-full bg-white text-neutral-950 hover:bg-neutral-200 transition-colors font-semibold">
+              Book Audit
+            </a>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-[600px] h-[600px] bg-emerald-500/8 blur-[150px] rounded-full pointer-events-none" />
-        <div className="absolute left-0 bottom-0 w-[400px] h-[400px] bg-violet-500/5 blur-[120px] rounded-full pointer-events-none" />
+      {/* ── Hero Section ── */}
+      <section className="relative pt-40 pb-20 px-6 overflow-hidden">
+        {/* Glow Effects */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-600/20 blur-[120px] rounded-full pointer-events-none" />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-28">
-          <div className="max-w-3xl mx-auto text-center mb-16">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6 }}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-6">
-                <Sparkles className="w-3.5 h-3.5" />
-                AI-Powered Home Video Tours
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
-                Sell Your Home{' '}
-                <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">Faster</span>
-                {' '}with Cinematic Video.
-              </h1>
-              <p className="text-neutral-400 text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
-                Transform your listing photos into stunning, AI-narrated video tours that captivate buyers on Zillow, Redfin, and MLS — in under 60 seconds.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={handleGetStarted}
-                  className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold shadow-xl shadow-emerald-900/40 transition-all hover:-translate-y-1"
-                >
-                  <Plus className="w-5 h-5" />
-                  Create Free Tour
-                </button>
-                <a
-                  href="#demo"
-                  className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-white font-bold transition-all hover:-translate-y-1"
-                >
-                  <PlayCircle className="w-5 h-5" />
-                  Watch Demo
-                </a>
-              </div>
-            </motion.div>
-          </div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-8"
+          >
+            <Zap className="w-3.5 h-3.5 fill-emerald-400" />
+            Generative Engine Optimization (GEO)
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-8 leading-tight"
+          >
+            Get the <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Green Light</span> from AI.
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed"
+          >
+            Traditional SEO is dead. We engineer your digital presence so Google AI Overviews, ChatGPT, and Perplexity recommend your business first. Future-proof your revenue with GEO.
+          </motion.p>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <a href="mailto:contact@clovrr.com" className="w-full sm:w-auto px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all flex items-center justify-center gap-2">
+              See What AI Thinks of You
+              <ChevronRight className="w-5 h-5" />
+            </a>
+            <a href="#problem" className="w-full sm:w-auto px-8 py-4 rounded-full bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-white font-bold text-lg transition-all flex items-center justify-center">
+              Learn About GEO
+            </a>
+          </motion.div>
+        </div>
+      </section>
 
-          {/* Quick stats row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto mb-20">
-            {[
-              { stat: '4x', label: 'More inquiries' },
-              { stat: '30%', label: 'Faster sales' },
-              { stat: '60s', label: 'Tour creation' },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
-                className="text-center"
-              >
-                <div className="text-3xl md:text-4xl font-black text-white mb-1">{item.stat}</div>
-                <div className="text-xs text-neutral-500 font-semibold uppercase tracking-wider">{item.label}</div>
-              </motion.div>
-            ))}
+      {/* ── Problem/Solution Section ── */}
+      <section id="problem" className="py-24 px-6 bg-neutral-950">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">The Search Landscape Has Shifted.</h2>
+              <div className="w-20 h-1 bg-emerald-500 rounded-full" />
+            </div>
+            <div className="space-y-6 text-neutral-400 text-lg leading-relaxed">
+              <p>
+                For the last decade, local businesses fought for the top spot on Google using traditional SEO—stuffing keywords and building backlinks. But the game has fundamentally changed.
+              </p>
+              <p>
+                Your customers are no longer scrolling through 10 blue links; they are asking AI engines directly for recommendations. If your business isn't actively shaping the data that trains these models, you are completely invisible to the next generation of high-intent buyers.
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-10 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none" />
+            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <Bot className="w-8 h-8 text-emerald-400" />
+              The GEO Solution
+            </h3>
+            <p className="text-neutral-300 text-lg leading-relaxed mb-8">
+              Welcome to Generative Engine Optimization (GEO). At Clovrr, we don’t just optimize for algorithms; we optimize for answers.
+            </p>
+            <p className="text-neutral-400 leading-relaxed">
+              We restructure your digital footprint, authoritative mentions, and knowledge graphs so that when a customer asks ChatGPT or Google AI for the "best local expert," the AI confidently gives them the green light to choose you.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Interactive Sections */}
-      <div className="max-w-6xl mx-auto px-6 space-y-24 pb-24">
-        {/* Section 1: Before/After Visualizer */}
-        <section id="demo">
-          <BeforeAfterVisualizer />
-        </section>
-
-        {/* Section 2: ROI Stats */}
-        <section>
-          <ROIStats />
-        </section>
-
-        {/* Feature cards */}
-        <section>
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Everything You Need</h2>
-            <p className="text-neutral-400 max-w-xl mx-auto">Professional video tours without the professional price tag.</p>
+      {/* ── Services Section ── */}
+      <section id="services" className="py-24 px-6 border-t border-neutral-900 bg-neutral-950/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How We Build AI Authority</h2>
+            <p className="text-neutral-400 text-lg">Our structured 3-tier approach to making your business the undeniable recommendation across all AI search engines.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { icon: Video, title: 'Cinematic Ken Burns Tours', desc: 'Smooth, dynamic camera transitions that showcase every room beautifully.' },
-              { icon: Music, title: 'Royalty-Free Music', desc: 'Select from a curated list of background music tracks to set the perfect mood.' },
-              { icon: Zap, title: 'Instant HD Downloads', desc: 'Export your 1080p video tour in seconds, ready for Zillow, MLS, or social media.' },
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                className="p-8 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all group"
-              >
-                <div className="w-12 h-12 bg-emerald-950/30 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <feature.icon className="w-6 h-6 text-emerald-500" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-neutral-400 leading-relaxed text-sm">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
 
-        {/* CTA */}
-        <section className="text-center bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-3xl p-12 md:p-16 relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-[400px] h-[400px] bg-emerald-500/8 blur-[120px] rounded-full pointer-events-none" />
-          <div className="relative z-10">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Ready to Sell Faster?</h2>
-            <p className="text-neutral-400 max-w-lg mx-auto mb-8">Create your first video tour in under a minute. No credit card required for free tier.</p>
-            <button
-              onClick={handleGetStarted}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold shadow-xl shadow-emerald-900/40 transition-all hover:-translate-y-1"
-            >
-              <Plus className="w-5 h-5" />
-              Create Your Free Tour
-            </button>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Tier 1 */}
+            <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 hover:border-emerald-500/50 transition-colors">
+              <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
+                <Search className="w-6 h-6 text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">1. The AI Readiness Audit</h3>
+              <p className="text-neutral-400 leading-relaxed text-sm">
+                Are you invisible to the algorithms of tomorrow? We run a comprehensive diagnostic on your brand across ChatGPT, Perplexity, Claude, and Google AI Overviews. We’ll uncover exactly what AI currently thinks of your business, identify critical data gaps, and provide a strategic roadmap to dominate AI-generated recommendations.
+              </p>
+            </div>
+
+            {/* Tier 2 */}
+            <div className="bg-neutral-900 border border-emerald-500/30 rounded-3xl p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none" />
+              <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-6">
+                <Target className="w-6 h-6 text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">2. The GEO Foundation</h3>
+              <p className="text-neutral-400 leading-relaxed text-sm">
+                We build the data infrastructure that AI engines trust. This tier completely overhauls your digital presence—from injecting advanced Schema markup and restructuring your site's Q&A architecture, to seeding authoritative answers across the web. We feed the AI the exact structured data it needs to position you as the market leader.
+              </p>
+            </div>
+
+            {/* Tier 3 */}
+            <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 hover:border-emerald-500/50 transition-colors">
+              <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
+                <ShieldCheck className="w-6 h-6 text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">3. Algorithmic Authority</h3>
+              <p className="text-neutral-400 leading-relaxed text-sm">
+                AI models learn continuously. We ensure they keep learning good things about you. This ongoing partnership monitors AI search volatility, curates high-authority citations, and actively manages the sentiment of your digital footprint. We don't just secure your spot as the AI's top recommendation—we defend it.
+              </p>
+            </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
+      {/* ── CTA Section ── */}
+      <section className="py-32 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-emerald-950/20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[400px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
+        
+        <div className="max-w-3xl mx-auto text-center relative z-10 bg-neutral-900/80 backdrop-blur-xl border border-neutral-800 rounded-[3rem] p-12 md:p-20 shadow-2xl">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            What is AI telling your customers right now?
+          </h2>
+          <p className="text-neutral-300 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
+            Don't let your competitors control the narrative. Book a live, 1-on-1 demonstration to see exactly how ChatGPT, Perplexity, and Google AI view your business today—and how we can change it tomorrow.
+          </p>
+          <a 
+            href="mailto:contact@clovrr.com"
+            className="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-xl shadow-emerald-900/50 hover:scale-105 hover:-translate-y-1"
+          >
+            Book Your Live AI Audit
+            <ChevronRight className="w-5 h-5" />
+          </a>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-neutral-900 bg-neutral-950 py-12 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <Bot className="w-5 h-5 text-emerald-500" />
+            <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
+          </div>
+          <p className="text-neutral-500 text-sm">
+            © {new Date().getFullYear()} Clovrr Agency. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

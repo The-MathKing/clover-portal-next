@@ -42,31 +42,25 @@ const STEPS: {
 }[] = [
   {
     id: 'uploading',
-    label: () => 'Uploading Images…',
-    sublabel: 'Storing your property photos securely',
+    label: () => 'Uploading Video…',
+    sublabel: 'Storing your walkthrough video securely',
     icon: Layers,
   },
   {
     id: 'processing',
-    label: (ready, total) => `Generating AI Clips (${ready}/${total})…`,
-    sublabel: 'Cinematic 3D animation in progress',
+    label: () => 'Generating 3D Environment…',
+    sublabel: 'Processing Neural Radiance Field (NeRF) / Gaussian Splat',
     icon: Clapperboard,
   },
   {
-    id: 'stitching',
-    label: () => 'Stitching Walkthrough…',
-    sublabel: 'Assembling your 60-second video',
-    icon: Scissors,
-  },
-  {
     id: 'complete',
-    label: () => 'Walkthrough Ready!',
-    sublabel: 'Your 3D walkthrough video is complete',
+    label: () => '3D Walkthrough Ready!',
+    sublabel: 'Your interactive 3D model is complete',
     icon: CheckCircle,
   },
 ];
 
-const STEP_ORDER: JobStatus[] = ['uploading', 'processing', 'stitching', 'complete'];
+const STEP_ORDER: JobStatus[] = ['uploading', 'processing', 'complete'];
 
 function getStepIndex(status: JobStatus): number {
   return STEP_ORDER.indexOf(status);
@@ -315,58 +309,26 @@ export const WalkthroughJobStatus: React.FC<WalkthroughJobStatusProps> = ({
               </div>
             </div>
 
-            {/* Video player */}
+            {/* 3D Viewer */}
             <div className="relative rounded-2xl overflow-hidden bg-black border border-neutral-800 shadow-2xl shadow-black/60 aspect-video group">
-              <video
-                ref={videoRef}
+              <iframe
                 src={finalVideoUrl}
-                className="w-full h-full object-cover"
-                onEnded={() => setIsVideoPlaying(false)}
-                onPlay={() => setIsVideoPlaying(true)}
-                onPause={() => setIsVideoPlaying(false)}
-                playsInline
+                className="w-full h-full border-0"
+                allow="autoplay; fullscreen; xr-spatial-tracking"
+                title="3D Walkthrough Viewer"
               />
-
-              {/* Play overlay */}
-              <AnimatePresence>
-                {!isVideoPlaying && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40"
-                  >
-                    <motion.button
-                      whileHover={{ scale: 1.08 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handlePlayPause}
-                      className="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center shadow-xl"
-                    >
-                      <Play className="w-7 h-7 text-white fill-white ml-1" />
-                    </motion.button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Pause button while playing */}
-              {isVideoPlaying && (
-                <button
-                  onClick={handlePlayPause}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  aria-label="Pause"
-                />
-              )}
             </div>
 
-            {/* Download button */}
-            <motion.button
+            {/* View Original link */}
+            <motion.a
               whileTap={{ scale: 0.97 }}
-              onClick={handleDownload}
+              href={finalVideoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 hover:border-neutral-600 text-white font-semibold rounded-xl transition-all"
             >
-              <Download className="w-4 h-4 text-emerald-400" />
-              Download MP4
-            </motion.button>
+              Open Interactive Viewer in New Tab
+            </motion.a>
           </motion.div>
         )}
       </AnimatePresence>

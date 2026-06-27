@@ -40,6 +40,63 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Job not found' }, { status: 404 });
     }
 
+    // ── Active Polling Fallback (if webhooks fail) ─────────────────────────
+    if (job.status === 'processing') {
+      const { data: clips } = await supabase
+        .from('video_clips')
+        .select('id, external_clip_id, status')
+        .eq('job_id', jobId)
+        .eq('status', 'processing');
+
+      if (clips && clips.length > 0) {
+        const videoApiKey = process.env.VIDEO_AI_API_KEY;
+        if (videoApiKey) {
+          let updatedCount = 0;
+          await Promise.allSettled(clips.map(async (clip) => {
+            if (!clip.external_clip_id) return;
+            try {
+              const res = await fetch(`https://api.piapi.ai/api/v1/task/${clip.external_clip_id}`, {
+                headers: { 'X-API-Key': videoApiKey }
+              });
+              const data = await res.json();
+              const payload = data.data || data;
+              if (payload.status === 'completed') {
+                const clipUrl = payload.output?.works?.[0]?.video?.resource || payload.output?.video?.url || payload.output?.works?.[0]?.url;
+                await supabase.from('video_clips').update({ status: 'done', clip_url: clipUrl }).eq('id', clip.id);
+                updatedCount++;
+              } else if (payload.status === 'failed') {
+                await supabase.from('video_clips').update({ status: 'failed', error_message: 'Failed via PiAPI' }).eq('id', clip.id);
+                updatedCount++;
+              }
+            } catch (err) {
+              console.error('Polling error for clip', clip.id, err);
+            }
+          }));
+
+          if (updatedCount > 0) {
+            // Recalculate job status
+            const { count: doneCount } = await supabase.from('video_clips').select('*', { count: 'exact', head: true }).eq('job_id', jobId).eq('status', 'done');
+            if (doneCount !== null) {
+              job.clips_ready = doneCount;
+              await supabase.from('video_jobs').update({ clips_ready: doneCount }).eq('id', jobId);
+              if (doneCount >= job.total_clips) {
+                job.status = 'stitching';
+                await supabase.from('video_jobs').update({ status: 'stitching' }).eq('id', jobId);
+                
+                // Trigger stitch
+                const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+                fetch(`${appUrl}/api/walkthrough/stitch`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ jobId }),
+                }).catch(console.error);
+              }
+            }
+          }
+        }
+      }
+    }
+
     return NextResponse.json({
       jobId: job.id,
       status: job.status,                          // pending | processing | stitching | complete | failed

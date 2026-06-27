@@ -207,29 +207,7 @@ export default function App() {
 
   return (
     <>
-      {/* Show Landing Page for unauthenticated users when not in editor */}
-      {!isAuthenticated && !selectedProperty ? (
-        <LandingPage />
-      ) : selectedProperty ? (
-        <PresentationEditor 
-          property={selectedProperty} 
-          onBack={() => setSelectedProperty(null)} 
-        />
-      ) : (
-        <Dashboard onSelectProperty={setSelectedProperty} />
-      )}
-      
-      {/* Global Wizard Modal */}
-      <WizardModal />
-
-      {/* Global Auth Modal */}
-      {(!isAuthenticated && showAuthModal) && (
-        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="relative w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-            <Login />
-          </div>
-        </div>
-      )}
+      <LandingPage />
     </>
   );
 }

@@ -44,22 +44,14 @@ export const WizardModal: React.FC = () => {
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const currentCount = images.length;
-      let filesArray = Array.from(e.target.files);
-      
-      if (currentCount + filesArray.length > 20) {
-        alert("You can only upload up to 20 images per presentation.");
-        filesArray = filesArray.slice(0, 20 - currentCount);
-      }
-
-      const newImages = filesArray.map((file) => ({
-        id: `img-${Date.now()}-${Math.random()}`,
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const newVideo = {
+        id: `vid-${Date.now()}-${Math.random()}`,
         url: URL.createObjectURL(file),
         file
-      }));
-      
-      setImages([...images, ...newImages]);
+      };
+      setImages([newVideo]);
     }
   };
 
@@ -298,69 +290,44 @@ export const WizardModal: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-emerald-400">Media Timeline</h3>
+              <h3 className="text-lg font-semibold text-emerald-400">Upload 3D Walkthrough Video</h3>
+              <p className="text-sm text-neutral-400">
+                To create a seamless 3D Gaussian Splat walkthrough, upload a continuous video walking slowly from room to room. Do not upload disconnected photos.
+              </p>
               
               {/* Dropzone */}
               <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-neutral-800 hover:border-emerald-500/50 rounded-xl cursor-pointer bg-neutral-950/50 hover:bg-neutral-950/80 transition-all">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="w-10 h-10 text-neutral-500 mb-3" />
-                  <p className="text-sm text-neutral-300 font-medium">Click or Drag & Drop to upload images</p>
-                  <p className="text-xs text-neutral-500 mt-1">Supports PNG, JPG, WEBP</p>
+                  <p className="text-sm text-neutral-300 font-medium">Click or Drag & Drop to upload video</p>
+                  <p className="text-xs text-neutral-500 mt-1">Supports MP4, MOV</p>
                 </div>
                 <input
                   type="file"
-                  multiple
-                  accept="image/*"
+                  accept="video/mp4,video/quicktime"
                   onChange={handleImageUpload}
                   className="hidden"
                 />
               </label>
 
-              {/* Draggable Image Timeline */}
-              {images.length > 0 && (
+              {/* Selected Video Preview */}
+              {images.length > 0 && images[0].file && (
                 <div className="mt-8">
-                  <p className="text-sm font-semibold text-neutral-300 mb-4">Arrange Timeline Sequence</p>
-                  
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId="images-timeline" direction="vertical">
-                      {(provided) => (
-                        <div 
-                          {...provided.droppableProps} 
-                          ref={provided.innerRef} 
-                          className="space-y-3"
-                        >
-                          {images.map((image, index) => (
-                            <Draggable key={image.id} draggableId={image.id} index={index}>
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className="flex items-center gap-4 p-3 bg-neutral-950 border border-neutral-850 rounded-xl group"
-                                >
-                                  <div {...provided.dragHandleProps} className="text-neutral-600 hover:text-neutral-400 cursor-grab active:cursor-grabbing">
-                                    <GripVertical className="w-5 h-5" />
-                                  </div>
-                                  <div className="w-16 h-10 rounded-lg overflow-hidden bg-neutral-900 border border-neutral-800">
-                                    <img src={image.url} alt="" className="w-full h-full object-cover" />
-                                  </div>
-                                  <span className="flex-1 text-sm text-neutral-350 font-medium">
-                                    Slide {index + 1}
-                                  </span>
-                                  <button
-                                    onClick={() => handleRemoveImage(image.id)}
-                                    className="p-1.5 hover:bg-neutral-800 text-neutral-500 hover:text-rose-400 rounded-lg transition-colors"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
+                  <p className="text-sm font-semibold text-neutral-300 mb-4">Selected Video</p>
+                  <div className="flex items-center gap-4 p-3 bg-neutral-950 border border-neutral-850 rounded-xl group">
+                    <div className="w-20 h-14 rounded-lg overflow-hidden bg-neutral-900 border border-neutral-800 flex items-center justify-center relative">
+                      <video src={images[0].url} className="w-full h-full object-cover" muted />
+                    </div>
+                    <span className="flex-1 text-sm text-neutral-350 font-medium truncate">
+                      {images[0].file.name}
+                    </span>
+                    <button
+                      onClick={() => handleRemoveImage(images[0].id)}
+                      className="p-1.5 hover:bg-neutral-800 text-neutral-500 hover:text-rose-400 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
