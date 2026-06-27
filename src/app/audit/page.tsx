@@ -199,26 +199,32 @@ function AuditReportContent() {
             <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
               <h3 className="text-xl font-bold text-white mb-2">Broad Market Leaders</h3>
               <p className="text-sm text-neutral-400 mb-6">Who AI recommends generally in this space</p>
-              <ul className="space-y-4">
-                {result.competitorsBroad.map((comp, idx) => (
-                  <li key={idx} className="flex items-center justify-between p-4 bg-neutral-950 rounded-xl border border-neutral-800">
-                    <span className="font-semibold text-neutral-300 pr-4">{comp}</span>
-                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold whitespace-nowrap">Rank #{idx + 1}</span>
-                  </li>
-                ))}
+              <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {result.competitorsBroad.map((comp, idx) => {
+                  const isHighlighted = comp.toLowerCase().includes(businessName.toLowerCase());
+                  return (
+                    <li key={idx} className={`flex items-center justify-between p-4 rounded-xl border ${isHighlighted ? 'bg-emerald-500/20 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-neutral-950 border-neutral-800'}`}>
+                      <span className={`font-semibold pr-4 ${isHighlighted ? 'text-emerald-400' : 'text-neutral-300'}`}>{comp}</span>
+                      <span className={`text-xs uppercase tracking-widest font-bold whitespace-nowrap ${isHighlighted ? 'text-emerald-300' : 'text-neutral-500'}`}>Rank #{idx + 1}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
             <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
               <h3 className="text-xl font-bold text-white mb-2">Your Direct Competitors</h3>
               <p className="text-sm text-neutral-400 mb-6">Who AI recommends specifically for your niche</p>
-              <ul className="space-y-4">
-                {result.competitorsNiche.map((comp, idx) => (
-                  <li key={idx} className="flex items-center justify-between p-4 bg-neutral-950 rounded-xl border border-neutral-800 border-l-2 border-l-emerald-500/50">
-                    <span className="font-semibold text-neutral-300 pr-4">{comp}</span>
-                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold whitespace-nowrap">Rank #{idx + 1}</span>
-                  </li>
-                ))}
+              <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {result.competitorsNiche.map((comp, idx) => {
+                  const isHighlighted = comp.toLowerCase().includes(businessName.toLowerCase());
+                  return (
+                    <li key={idx} className={`flex items-center justify-between p-4 rounded-xl border ${isHighlighted ? 'bg-emerald-500/20 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-neutral-950 border-neutral-800 border-l-2 border-l-emerald-500/50'}`}>
+                      <span className={`font-semibold pr-4 ${isHighlighted ? 'text-emerald-400' : 'text-neutral-300'}`}>{comp}</span>
+                      <span className={`text-xs uppercase tracking-widest font-bold whitespace-nowrap ${isHighlighted ? 'text-emerald-300' : 'text-neutral-500'}`}>Rank #{idx + 1}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>

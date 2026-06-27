@@ -25,28 +25,22 @@ export async function POST(req: NextRequest) {
           directRecommendation: Math.floor(Math.random() * 15) + 5
         },
         competitorsBroad: [
-          "Local Broad Competitor 1", 
-          "Local Broad Competitor 2", 
-          "Local Broad Competitor 3",
-          "Local Broad Competitor 4",
-          "Local Broad Competitor 5",
-          "Local Broad Competitor 6",
-          "Local Broad Competitor 7",
-          "Local Broad Competitor 8",
-          "Local Broad Competitor 9",
-          "Local Broad Competitor 10"
+          "Local Broad Competitor 1", "Local Broad Competitor 2", "Local Broad Competitor 3",
+          "Local Broad Competitor 4", "Local Broad Competitor 5", "Local Broad Competitor 6",
+          "Local Broad Competitor 7", "Local Broad Competitor 8", "Local Broad Competitor 9",
+          "Local Broad Competitor 10", "Local Broad Competitor 11", "Local Broad Competitor 12",
+          "Local Broad Competitor 13", "Local Broad Competitor 14", "Local Broad Competitor 15",
+          "Local Broad Competitor 16", "Local Broad Competitor 17", "Local Broad Competitor 18",
+          "Local Broad Competitor 19", businessName
         ],
         competitorsNiche: [
-          "Niche Expert Pros", 
-          "Top Tier Niche Services", 
-          "Premier Niche Solutions",
-          "Elite Niche Specialists",
-          "Next Gen Niche",
-          "Advanced Niche Group",
-          "Pinnacle Niche Services",
-          "Metro Trusted Niche",
-          "Summit Reliable Niche",
-          "Citywide Niche Recommended"
+          "Niche Expert Pros", "Top Tier Niche Services", "Premier Niche Solutions",
+          "Elite Niche Specialists", "Next Gen Niche", "Advanced Niche Group",
+          "Pinnacle Niche Services", "Metro Trusted Niche", "Summit Reliable Niche",
+          "Citywide Niche Recommended", "Niche Leader 11", "Niche Leader 12",
+          "Niche Leader 13", "Niche Leader 14", "Niche Leader 15",
+          "Niche Leader 16", "Niche Leader 17", "Niche Leader 18",
+          "Niche Leader 19", businessName
         ]
       });
     }
@@ -70,33 +64,22 @@ export async function POST(req: NextRequest) {
       },
       "competitorsBroad": [
         "<Broad Competitor 1>", 
-        "<Broad Competitor 2>", 
-        "<Broad Competitor 3>",
-        "<Broad Competitor 4>",
-        "<Broad Competitor 5>",
-        "<Broad Competitor 6>",
-        "<Broad Competitor 7>",
-        "<Broad Competitor 8>",
-        "<Broad Competitor 9>",
-        "<Broad Competitor 10>"
+        "<Broad Competitor 2>",
+        "... up to 20 competitors"
       ],
       "competitorsNiche": [
-        "<Niche Competitor 1 Name>", 
-        "<Niche Competitor 2 Name>", 
-        "<Niche Competitor 3 Name>",
-        "<Niche Competitor 4 Name>",
-        "<Niche Competitor 5 Name>",
-        "<Niche Competitor 6 Name>",
-        "<Niche Competitor 7 Name>",
-        "<Niche Competitor 8 Name>",
-        "<Niche Competitor 9 Name>",
-        "<Niche Competitor 10 Name>"
+        "<Niche Competitor 1>", 
+        "<Niche Competitor 2>",
+        "... up to 20 competitors"
       ]
     }
-    Make sure to provide EXACTLY two robust lists of 10 real competitor businesses in that exact US area. 
-    - competitorsBroad: The top 10 general competitors in the broader industry category (e.g. if the niche is "Mexican Restaurant", broad is all "Restaurants").
-    - competitorsNiche: The top 10 specific competitors matching the exact niche.
-    If you can't find 10 real ones, generate highly realistic-sounding local competitors for that specific US city/zipcode.
+    Make sure to provide EXACTLY two robust lists of 20 real competitor businesses in that exact US area. 
+    - competitorsBroad: The top 20 general competitors in the broader industry category (e.g. if the niche is "Mexican Restaurant", broad is all "Restaurants").
+    - competitorsNiche: The top 20 specific competitors matching the exact niche.
+    
+    IMPORTANT: You MUST include the user's business ("${businessName}") in both of these 20-item arrays at the exact position it currently ranks in your AI training data. If it is entirely unranked, append it at the very bottom of the lists as the 20th item.
+    
+    If you can't find 20 real competitors, generate highly realistic-sounding local competitors for that specific US city/zipcode to fill the list to exactly 20.
     Make sure the response is purely JSON without any markdown formatting like \`\`\`json.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
@@ -139,8 +122,8 @@ export async function POST(req: NextRequest) {
           citationFrequency: 5,
           directRecommendation: 2
         },
-        competitorsBroad: parsed.competitorsBroad || Array.from({length: 10}, (_, i) => `Unknown Broad Competitor ${i + 1}`),
-        competitorsNiche: parsed.competitorsNiche || Array.from({length: 10}, (_, i) => `Unknown Niche Competitor ${i + 1}`)
+        competitorsBroad: parsed.competitorsBroad || Array.from({length: 20}, (_, i) => `Unknown Broad Competitor ${i + 1}`),
+        competitorsNiche: parsed.competitorsNiche || Array.from({length: 20}, (_, i) => `Unknown Niche Competitor ${i + 1}`)
       });
     } catch (parseErr) {
       console.error("Error parsing Gemini JSON:", parseErr, resultText);
