@@ -118,11 +118,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, warning: 'Job not found' });
     }
 
-    // Update clips_ready on the job
-    await supabase
-      .from('video_jobs')
-      .update({ clips_ready: doneCount, updated_at: new Date().toISOString() })
-      .eq('id', jobId);
+    // Update clips_ready on the job (or mark as failed if this clip failed)
+    if (!isSuccess) {
+      console.log(`[Webhook] Clip failed, marking parent job ${jobId} as failed.`);
+      await supabase
+        .from('video_jobs')
+        .update({ 
+          status: 'failed', 
+          error_message: errorMessage || 'A clip generation failed.',
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', jobId);
+    } else {
+      await supabase
+        .from('video_jobs')
+        .update({ clips_ready: doneCount, updated_at: new Date().toISOString() })
+        .eq('id', jobId);
+    }
 
     // ── 7. Trigger stitching when ALL clips are done ──────────────────────────
     const allDone =
