@@ -58,7 +58,7 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
   // Auto-start video generation when entering the editor if not already ready
   useEffect(() => {
     // Only trigger if we have images and we aren't already generating or finished
-    if (images.length > 0 && property.status !== 'Ready' && !generativeJobId) {
+    if (images.length > 0 && property.status !== 'Ready' && !property.video_url && !generativeJobId) {
       // In the future, block free users here: if (subscriptionTier === 'free') return;
       // Allowing it for now for AI testing.
       const formData = new FormData();
@@ -82,7 +82,7 @@ export const PresentationEditor: React.FC<PresentationEditorProps> = ({ property
         console.error('Auto-generation error:', err);
       });
     }
-  }, [images.length, property.status, property.id, generativeJobId]);
+  }, [images.length, property.status, property.video_url, property.id, generativeJobId]);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans">

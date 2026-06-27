@@ -64,7 +64,10 @@ export async function POST(request: NextRequest) {
       if (jobData?.property_id) {
         await supabase
           .from('properties')
-          .update({ video_url: finalVideoUrl })
+          .update({ 
+            video_url: finalVideoUrl,
+            status: 'Ready'
+          })
           .eq('id', jobData.property_id);
       }
 
