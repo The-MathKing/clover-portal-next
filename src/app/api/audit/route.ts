@@ -24,12 +24,25 @@ export async function POST(req: NextRequest) {
           citationFrequency: Math.floor(Math.random() * 20) + 5,
           directRecommendation: Math.floor(Math.random() * 15) + 5
         },
-        competitors: ["Local Expert Pros", "Top Tier Services", "Premier Regional Solutions"]
+        competitors: [
+          "Local Expert Pros", 
+          "Top Tier Services", 
+          "Premier Regional Solutions",
+          "Elite Area Specialists",
+          "Next Gen Local",
+          "Advanced Precision Group",
+          "Pinnacle Neighborhood Services",
+          "Metro Trusted Partners",
+          "Summit Reliable Co.",
+          "Citywide Recommended"
+        ]
       });
     }
 
     // Actual Gemini API Call
     const prompt = `Act as an unbiased AI search engine (like Perplexity or Google AI Overviews). A user is searching for recommendations in the following industry/location: "${industry}".
+    IMPORTANT CONTEXT: If the location includes a 5-digit number, assume it is a United States Zip Code (e.g., 75002 is Allen, Texas, NOT Paris, France). Do not hallucinate European locations for US zip codes.
+    
     Does the business named "${businessName}" come up as a top, highly-recommended result in your training data for this query?
     
     Evaluate their current AI search presence and return ONLY a valid JSON object in this exact format:
@@ -43,8 +56,20 @@ export async function POST(req: NextRequest) {
         "citationFrequency": <score 0-100>,
         "directRecommendation": <score 0-100>
       },
-      "competitors": ["<Competitor 1 Name>", "<Competitor 2 Name>", "<Competitor 3 Name>"]
+      "competitors": [
+        "<Competitor 1 Name>", 
+        "<Competitor 2 Name>", 
+        "<Competitor 3 Name>",
+        "<Competitor 4 Name>",
+        "<Competitor 5 Name>",
+        "<Competitor 6 Name>",
+        "<Competitor 7 Name>",
+        "<Competitor 8 Name>",
+        "<Competitor 9 Name>",
+        "<Competitor 10 Name>"
+      ]
     }
+    Make sure to provide a robust list of exactly 10 real competitor businesses in that exact US area. If you can't find 10, generate highly realistic-sounding local competitors for that specific US city/zipcode.
     Make sure the response is purely JSON without any markdown formatting like \`\`\`json.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
@@ -87,7 +112,18 @@ export async function POST(req: NextRequest) {
           citationFrequency: 5,
           directRecommendation: 2
         },
-        competitors: parsed.competitors || ["Unknown Competitor 1", "Unknown Competitor 2", "Unknown Competitor 3"]
+        competitors: parsed.competitors || [
+          "Unknown Competitor 1", 
+          "Unknown Competitor 2", 
+          "Unknown Competitor 3",
+          "Unknown Competitor 4",
+          "Unknown Competitor 5",
+          "Unknown Competitor 6",
+          "Unknown Competitor 7",
+          "Unknown Competitor 8",
+          "Unknown Competitor 9",
+          "Unknown Competitor 10"
+        ]
       });
     } catch (parseErr) {
       console.error("Error parsing Gemini JSON:", parseErr, resultText);
