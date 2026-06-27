@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck, X, Briefcase, Building2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck, X, Briefcase, Building2, CheckCircle, AlertCircle, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -8,12 +8,16 @@ import { useRouter } from 'next/navigation';
 export const LandingPage: React.FC = () => {
   const router = useRouter();
   const [isAuditModalOpen, setAuditModalOpen] = useState(false);
-  const [auditForm, setAuditForm] = useState({ businessName: '', industry: '' });
+  const [auditForm, setAuditForm] = useState({ businessName: '', industry: 'Roofing', zipcode: '', customIndustry: '' });
 
   const handleAuditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (auditForm.businessName && auditForm.industry) {
-      const query = new URLSearchParams(auditForm).toString();
+    const finalIndustry = auditForm.industry === 'other' ? auditForm.customIndustry : auditForm.industry;
+    if (auditForm.businessName && finalIndustry && auditForm.zipcode) {
+      const query = new URLSearchParams({
+        businessName: auditForm.businessName,
+        industry: `${finalIndustry} in ${auditForm.zipcode}`
+      }).toString();
       router.push(`/audit?${query}`);
     }
   };
@@ -252,15 +256,53 @@ export const LandingPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-neutral-300 ml-1">Industry & Location</label>
+                    <label className="text-sm font-semibold text-neutral-300 ml-1">Industry</label>
                     <div className="relative">
                       <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+                      <select 
+                        required
+                        value={auditForm.industry}
+                        onChange={e => setAuditForm({...auditForm, industry: e.target.value})}
+                        className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white appearance-none outline-none transition-all"
+                      >
+                        <option value="Roofing">Roofing</option>
+                        <option value="HVAC">HVAC</option>
+                        <option value="Medical Clinic">Medical Clinic</option>
+                        <option value="Plumber">Plumbing</option>
+                        <option value="Electrician">Electrician</option>
+                        <option value="Real Estate">Real Estate</option>
+                        <option value="other">Custom / Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {auditForm.industry === 'other' && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-neutral-300 ml-1">Custom Industry</label>
+                      <div className="relative">
+                        <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+                        <input 
+                          required
+                          type="text" 
+                          value={auditForm.customIndustry}
+                          onChange={e => setAuditForm({...auditForm, customIndustry: e.target.value})}
+                          placeholder="e.g. Landscaping"
+                          className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-neutral-300 ml-1">Zip Code</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
                       <input 
                         required
                         type="text" 
-                        value={auditForm.industry}
-                        onChange={e => setAuditForm({...auditForm, industry: e.target.value})}
-                        placeholder="e.g. Roofing in Austin, TX"
+                        value={auditForm.zipcode}
+                        onChange={e => setAuditForm({...auditForm, zipcode: e.target.value})}
+                        placeholder="e.g. 90210"
                         className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
                       />
                     </div>
