@@ -29,21 +29,27 @@ export async function POST(request: NextRequest) {
     console.log('[Webhook video-complete] Received:', JSON.stringify(body).slice(0, 300));
 
     // ── 1. Parse PiAPI webhook payload ────────────────────────────────────────
-    const externalTaskId: string = body.task_id;
-    const isSuccess: boolean = body.status === 'completed';
+    // PiAPI Unified API nests the payload inside `data`
+    const payload = body.data ? body.data : body;
 
-    // PiAPI video URL lives at output.works[0].video.resource
-    const clipUrl: string | undefined = body.output?.works?.[0]?.video?.resource;
+    const externalTaskId: string = payload.task_id;
+    const isSuccess: boolean = payload.status === 'completed';
+
+    // PiAPI video URL can be in multiple locations depending on model version/schema
+    const clipUrl: string | undefined = 
+      payload.output?.works?.[0]?.video?.resource || 
+      payload.output?.video?.url ||
+      payload.output?.works?.[0]?.url;
 
     // Our metadata we passed at task creation time
-    const cloverClipId: string | undefined = body.meta_data?.clover_clip_id;
-    const cloverJobId: string | undefined = body.meta_data?.clover_job_id;
+    const cloverClipId: string | undefined = payload.metadata?.clover_clip_id || payload.meta_data?.clover_clip_id;
+    const cloverJobId: string | undefined = payload.metadata?.clover_job_id || payload.meta_data?.clover_job_id;
 
     const errorMessage: string | undefined =
-      body.error?.raw_message ?? body.error?.message ?? 'Unknown error from PiAPI';
+      payload.error?.raw_message ?? payload.error?.message ?? 'Unknown error from PiAPI';
 
     if (!externalTaskId && !cloverClipId) {
-      console.error('[Webhook] No identifiers found in payload');
+      console.error('[Webhook] No identifiers found in payload. Raw body:', JSON.stringify(body).slice(0, 500));
       // Return 200 to prevent PiAPI from retrying
       return NextResponse.json({ received: true, warning: 'No identifiers' });
     }
