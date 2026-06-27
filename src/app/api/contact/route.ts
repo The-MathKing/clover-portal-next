@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 
 // Initialize Resend with the API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
-const receivingEmail = process.env.LEAD_EMAIL || 'hello@clovrr.net';
+const receivingEmail = process.env.LEAD_EMAIL || 'aryan.r.padarthi@gmail.com';
 
 export async function POST(req: Request) {
   try {
