@@ -194,50 +194,51 @@ function AuditReportContent() {
             </div>
           </div>
 
-          {/* Competitors & CTA */}
-          <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            <div className="lg:col-span-2 grid md:grid-cols-2 gap-8">
-              <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
-                <h3 className="text-xl font-bold text-white mb-2">Broad Market Leaders</h3>
-                <p className="text-sm text-neutral-400 mb-6">Who AI recommends generally in this space</p>
-                <ul className="space-y-4">
-                  {result.competitorsBroad.map((comp, idx) => (
-                    <li key={idx} className="flex items-center justify-between p-4 bg-neutral-950 rounded-xl border border-neutral-800">
-                      <span className="font-semibold text-neutral-300 truncate max-w-[70%]">{comp}</span>
-                      <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold whitespace-nowrap">Rank #{idx + 1}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
-                <h3 className="text-xl font-bold text-white mb-2">Your Direct Competitors</h3>
-                <p className="text-sm text-neutral-400 mb-6">Who AI recommends specifically for your niche</p>
-                <ul className="space-y-4">
-                  {result.competitorsNiche.map((comp, idx) => (
-                    <li key={idx} className="flex items-center justify-between p-4 bg-neutral-950 rounded-xl border border-neutral-800 border-l-2 border-l-emerald-500/50">
-                      <span className="font-semibold text-neutral-300 truncate max-w-[70%]">{comp}</span>
-                      <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold whitespace-nowrap">Rank #{idx + 1}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          {/* Competitors Section */}
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+              <h3 className="text-xl font-bold text-white mb-2">Broad Market Leaders</h3>
+              <p className="text-sm text-neutral-400 mb-6">Who AI recommends generally in this space</p>
+              <ul className="space-y-4">
+                {result.competitorsBroad.map((comp, idx) => (
+                  <li key={idx} className="flex items-center justify-between p-4 bg-neutral-950 rounded-xl border border-neutral-800">
+                    <span className="font-semibold text-neutral-300 pr-4">{comp}</span>
+                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold whitespace-nowrap">Rank #{idx + 1}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            
-            <div className="lg:col-span-1 bg-gradient-to-br from-emerald-900/40 to-neutral-900 border border-emerald-500/30 rounded-3xl p-8 flex flex-col justify-center relative overflow-hidden h-full min-h-[400px]">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 blur-[50px] rounded-full pointer-events-none" />
-              <h3 className="text-3xl font-bold text-white mb-4 relative z-10">Stop losing leads to AI search.</h3>
-              <p className="text-neutral-300 mb-8 relative z-10">
+
+            <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+              <h3 className="text-xl font-bold text-white mb-2">Your Direct Competitors</h3>
+              <p className="text-sm text-neutral-400 mb-6">Who AI recommends specifically for your niche</p>
+              <ul className="space-y-4">
+                {result.competitorsNiche.map((comp, idx) => (
+                  <li key={idx} className="flex items-center justify-between p-4 bg-neutral-950 rounded-xl border border-neutral-800 border-l-2 border-l-emerald-500/50">
+                    <span className="font-semibold text-neutral-300 pr-4">{comp}</span>
+                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold whitespace-nowrap">Rank #{idx + 1}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          
+          {/* CTA Section */}
+          <div className="mb-12 bg-gradient-to-br from-emerald-900/40 to-neutral-900 border border-emerald-500/30 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between relative overflow-hidden gap-8">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full pointer-events-none" />
+            <div className="relative z-10 max-w-2xl text-center md:text-left">
+              <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">Stop losing leads to AI search.</h3>
+              <p className="text-neutral-300 text-lg">
                 Traditional SEO won't fix this. You need to establish Generative Engine Optimization (GEO) before your competitors take your market share.
               </p>
-              <Link 
-                href="/contact"
-                className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-xl shadow-emerald-900/50 relative z-10"
-              >
-                Fix My AI Score
-                <ChevronRight className="w-5 h-5" />
-              </Link>
             </div>
+            <Link 
+              href="/contact"
+              className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-xl shadow-emerald-900/50 relative z-10 whitespace-nowrap w-full md:w-auto"
+            >
+              Fix My AI Score
+              <ChevronRight className="w-5 h-5" />
+            </Link>
           </div>
 
         </motion.div>

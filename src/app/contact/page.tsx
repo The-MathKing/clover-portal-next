@@ -41,7 +41,7 @@ export default function ContactPage() {
       } else {
         const errorData = await res.json().catch(() => null);
         console.error('Failed to submit:', errorData);
-        setErrorMsg('Failed to send request. Please ensure your API key is valid or try emailing us directly at hello@clovrr.net.');
+        setErrorMsg('Failed to send request. Please try emailing us directly at hello@clovrr.net.');
         setStatus('idle');
       }
     } catch (err) {
