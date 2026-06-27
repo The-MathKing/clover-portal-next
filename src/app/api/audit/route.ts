@@ -24,17 +24,29 @@ export async function POST(req: NextRequest) {
           citationFrequency: Math.floor(Math.random() * 20) + 5,
           directRecommendation: Math.floor(Math.random() * 15) + 5
         },
-        competitors: [
-          "Local Expert Pros", 
-          "Top Tier Services", 
-          "Premier Regional Solutions",
-          "Elite Area Specialists",
-          "Next Gen Local",
-          "Advanced Precision Group",
-          "Pinnacle Neighborhood Services",
-          "Metro Trusted Partners",
-          "Summit Reliable Co.",
-          "Citywide Recommended"
+        competitorsBroad: [
+          "Local Broad Competitor 1", 
+          "Local Broad Competitor 2", 
+          "Local Broad Competitor 3",
+          "Local Broad Competitor 4",
+          "Local Broad Competitor 5",
+          "Local Broad Competitor 6",
+          "Local Broad Competitor 7",
+          "Local Broad Competitor 8",
+          "Local Broad Competitor 9",
+          "Local Broad Competitor 10"
+        ],
+        competitorsNiche: [
+          "Niche Expert Pros", 
+          "Top Tier Niche Services", 
+          "Premier Niche Solutions",
+          "Elite Niche Specialists",
+          "Next Gen Niche",
+          "Advanced Niche Group",
+          "Pinnacle Niche Services",
+          "Metro Trusted Niche",
+          "Summit Reliable Niche",
+          "Citywide Niche Recommended"
         ]
       });
     }
@@ -56,20 +68,35 @@ export async function POST(req: NextRequest) {
         "citationFrequency": <score 0-100>,
         "directRecommendation": <score 0-100>
       },
-      "competitors": [
-        "<Competitor 1 Name>", 
-        "<Competitor 2 Name>", 
-        "<Competitor 3 Name>",
-        "<Competitor 4 Name>",
-        "<Competitor 5 Name>",
-        "<Competitor 6 Name>",
-        "<Competitor 7 Name>",
-        "<Competitor 8 Name>",
-        "<Competitor 9 Name>",
-        "<Competitor 10 Name>"
+      "competitorsBroad": [
+        "<Broad Competitor 1>", 
+        "<Broad Competitor 2>", 
+        "<Broad Competitor 3>",
+        "<Broad Competitor 4>",
+        "<Broad Competitor 5>",
+        "<Broad Competitor 6>",
+        "<Broad Competitor 7>",
+        "<Broad Competitor 8>",
+        "<Broad Competitor 9>",
+        "<Broad Competitor 10>"
+      ],
+      "competitorsNiche": [
+        "<Niche Competitor 1 Name>", 
+        "<Niche Competitor 2 Name>", 
+        "<Niche Competitor 3 Name>",
+        "<Niche Competitor 4 Name>",
+        "<Niche Competitor 5 Name>",
+        "<Niche Competitor 6 Name>",
+        "<Niche Competitor 7 Name>",
+        "<Niche Competitor 8 Name>",
+        "<Niche Competitor 9 Name>",
+        "<Niche Competitor 10 Name>"
       ]
     }
-    Make sure to provide a robust list of exactly 10 real competitor businesses in that exact US area. If you can't find 10, generate highly realistic-sounding local competitors for that specific US city/zipcode.
+    Make sure to provide EXACTLY two robust lists of 10 real competitor businesses in that exact US area. 
+    - competitorsBroad: The top 10 general competitors in the broader industry category (e.g. if the niche is "Mexican Restaurant", broad is all "Restaurants").
+    - competitorsNiche: The top 10 specific competitors matching the exact niche.
+    If you can't find 10 real ones, generate highly realistic-sounding local competitors for that specific US city/zipcode.
     Make sure the response is purely JSON without any markdown formatting like \`\`\`json.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
@@ -112,18 +139,8 @@ export async function POST(req: NextRequest) {
           citationFrequency: 5,
           directRecommendation: 2
         },
-        competitors: parsed.competitors || [
-          "Unknown Competitor 1", 
-          "Unknown Competitor 2", 
-          "Unknown Competitor 3",
-          "Unknown Competitor 4",
-          "Unknown Competitor 5",
-          "Unknown Competitor 6",
-          "Unknown Competitor 7",
-          "Unknown Competitor 8",
-          "Unknown Competitor 9",
-          "Unknown Competitor 10"
-        ]
+        competitorsBroad: parsed.competitorsBroad || Array.from({length: 10}, (_, i) => `Unknown Broad Competitor ${i + 1}`),
+        competitorsNiche: parsed.competitorsNiche || Array.from({length: 10}, (_, i) => `Unknown Niche Competitor ${i + 1}`)
       });
     } catch (parseErr) {
       console.error("Error parsing Gemini JSON:", parseErr, resultText);

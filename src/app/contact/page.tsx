@@ -1,16 +1,34 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot, ChevronRight, CheckCircle, Mail, User, Briefcase, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { createClient } from '@/utils/supabase/client';
 
 export default function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
   const [formData, setFormData] = useState({ name: '', email: '', business: '', message: '' });
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setFormData(prev => ({
+          ...prev,
+          email: user.email || '',
+          business: user.user_metadata?.lastAudit?.businessName || prev.business
+        }));
+      }
+    };
+    checkUser();
+  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
+    setErrorMsg('');
     
     try {
       const res = await fetch('/api/contact', {
@@ -21,11 +39,14 @@ export default function ContactPage() {
       if (res.ok) {
         setStatus('success');
       } else {
-        console.error('Failed to submit');
+        const errorData = await res.json().catch(() => null);
+        console.error('Failed to submit:', errorData);
+        setErrorMsg('Failed to send request. Please ensure your API key is valid or try emailing us directly at hello@clovrr.net.');
         setStatus('idle');
       }
     } catch (err) {
       console.error(err);
+      setErrorMsg('A network error occurred. Please try emailing us directly at hello@clovrr.net.');
       setStatus('idle');
     }
   };
@@ -85,6 +106,11 @@ export default function ContactPage() {
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {errorMsg && (
+                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium">
+                    {errorMsg}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-neutral-300 ml-1">Full Name</label>

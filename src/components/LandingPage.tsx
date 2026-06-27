@@ -1,19 +1,66 @@
 'use client';
-import React, { useState } from 'react';
-import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck, X, Briefcase, Building2, CheckCircle, AlertCircle, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck, X, Briefcase, Building2, CheckCircle, AlertCircle, MapPin, UserCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Login } from './Login';
+import { useStore } from '../store/useStore';
+import { createClient } from '@/utils/supabase/client';
 
 export const LandingPage: React.FC = () => {
   const router = useRouter();
+  const { showAuthModal, setShowAuthModal, isAuthenticated, setAuthenticated, userId, setUserId } = useStore();
   const [isAuditModalOpen, setAuditModalOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [auditForm, setAuditForm] = useState({ businessName: '', industry: 'Roofing', zipcode: '', customIndustry: '' });
+  const supabase = createClient();
 
-  const handleAuditSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setAuthenticated(true);
+        setUserId(user.id);
+        setUserEmail(user.email ?? null);
+        if (user.user_metadata?.lastAudit) {
+          setAuditForm({ ...auditForm, ...user.user_metadata.lastAudit });
+        }
+      } else {
+        setAuthenticated(false);
+      }
+    };
+    
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setAuthenticated(true);
+        setUserId(session.user.id);
+        setUserEmail(session.user.email ?? null);
+      } else {
+        setAuthenticated(false);
+        setUserId(null);
+        setUserEmail(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const handleAuditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalIndustry = auditForm.industry === 'other' ? auditForm.customIndustry : auditForm.industry;
     if (auditForm.businessName && finalIndustry && auditForm.zipcode) {
+      // Save details to user_metadata if logged in
+      if (isAuthenticated) {
+        await supabase.auth.updateUser({
+          data: {
+            lastAudit: { businessName: auditForm.businessName, industry: auditForm.industry, zipcode: auditForm.zipcode, customIndustry: auditForm.customIndustry }
+          }
+        });
+      }
+
       const query = new URLSearchParams({
         businessName: auditForm.businessName,
         industry: `${finalIndustry} in ${auditForm.zipcode}`
@@ -36,12 +83,47 @@ export const LandingPage: React.FC = () => {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
             <a href="#problem" className="hover:text-emerald-400 transition-colors">The Shift</a>
             <a href="#services" className="hover:text-emerald-400 transition-colors">Our Services</a>
+            
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-300">
+                <UserCircle className="w-4 h-4 text-emerald-400" />
+                <span className="truncate max-w-[150px]">{userEmail}</span>
+                <button 
+                  onClick={async () => await supabase.auth.signOut()}
+                  className="ml-2 text-neutral-500 hover:text-white text-xs uppercase"
+                >
+                  Log out
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setShowAuthModal(true)}
+                className="hover:text-white transition-colors"
+              >
+                Sign In
+              </button>
+            )}
+
             <Link href="/contact" className="px-6 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold transition-all text-sm">
               Get Free Audit
             </Link>
           </div>
         </div>
       </nav>
+
+      {/* ── Auth Modal ── */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-950/80 backdrop-blur-md"
+          >
+            <Login />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Hero Section ── */}
       <section className="relative pt-40 pb-20 px-6 overflow-hidden">
