@@ -136,6 +136,24 @@ export async function POST(request: NextRequest) {
     } else {
       // Await so Vercel does not freeze the lambda environment before fetch completes
       await fireKlingRequests({ supabase, clips, uploadedImages, videoApiKey, webhookUrl, jobId });
+
+      // Safety Net: Check if ALL clips failed instantly (e.g. PiAPI returns 402 Insufficient Funds)
+      const { data: failedClips } = await supabase
+        .from('video_clips')
+        .select('id, error_message')
+        .eq('job_id', jobId)
+        .eq('status', 'failed');
+
+      if (failedClips && failedClips.length === totalClips && totalClips > 0) {
+        console.error(`[Walkthrough] All clips failed for job ${jobId}. Failing job.`);
+        await supabase
+          .from('video_jobs')
+          .update({ 
+            status: 'failed', 
+            error_message: failedClips[0].error_message || 'PiAPI generation failed instantly.' 
+          })
+          .eq('id', jobId);
+      }
     }
 
     return NextResponse.json({ jobId, totalClips }, { status: 201 });

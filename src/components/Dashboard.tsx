@@ -157,6 +157,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
     let mappedTier: 'one_time' | 'pro_5' | 'unlimited' = 'one_time';
     
     if (tierName.toLowerCase().includes('enterprise')) {
+      alert('Please email us at aryan.r.padarthi@gmail.com to discuss Enterprise pricing!');
       window.location.href = 'mailto:aryan.r.padarthi@gmail.com';
       return;
     }
