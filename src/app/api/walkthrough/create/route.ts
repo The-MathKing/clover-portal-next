@@ -203,14 +203,13 @@ async function fireKlingRequests({
               cfg_scale: 0.5,
               duration: CLIP_DURATION_SECONDS, // "5" = minimum; results in ~100s total video
               aspect_ratio: '16:9',
-              model_name: 'kling-v3',   // Kling 3.0 — best quality
               mode: 'pro',              // "pro" mode = 1080p output
             },
             config: {
               webhook_config: {
                 // PiAPI will POST to this URL when the clip is done
                 endpoint: webhookUrl,
-                secret: '',            // optional HMAC secret — add if you want signature verification
+                secret: '',            // optional HMAC secret
               },
             },
             // Pass our internal IDs as metadata so the webhook can look up the right row
