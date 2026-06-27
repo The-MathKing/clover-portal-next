@@ -132,7 +132,14 @@ export async function POST(request: NextRequest) {
     const webhookUrl = `${appUrl}/api/webhooks/video-complete`;
 
     if (!videoApiKey) {
-      console.warn('[Walkthrough] VIDEO_AI_API_KEY not set — skipping clip generation.');
+      console.warn('[Walkthrough] VIDEO_AI_API_KEY not set — failing job instantly.');
+      await supabase
+        .from('video_jobs')
+        .update({ 
+          status: 'failed', 
+          error_message: 'Server error: VIDEO_AI_API_KEY is not configured in Vercel.' 
+        })
+        .eq('id', jobId);
     } else {
       // Await so Vercel does not freeze the lambda environment before fetch completes
       await fireKlingRequests({ supabase, clips, uploadedImages, videoApiKey, webhookUrl, jobId });
