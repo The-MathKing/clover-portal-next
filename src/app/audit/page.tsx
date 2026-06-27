@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Bot, ChevronRight, AlertCircle, CheckCircle, BarChart3, TrendingUp, Trophy, Activity, MessageSquare, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -18,7 +18,7 @@ type AuditResult = {
   competitors: string[];
 };
 
-export default function AuditReportPage() {
+function AuditReportContent() {
   const searchParams = useSearchParams();
   const businessName = searchParams.get('businessName') || '';
   const industry = searchParams.get('industry') || '';
@@ -253,5 +253,18 @@ function MetricCard({ title, value, icon }: { title: string, value: number, icon
         />
       </div>
     </div>
+  );
+}
+
+export default function AuditReportPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-neutral-400 font-bold uppercase tracking-widest">Loading...</p>
+      </div>
+    }>
+      <AuditReportContent />
+    </Suspense>
   );
 }
