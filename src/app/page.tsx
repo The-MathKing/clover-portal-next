@@ -35,7 +35,7 @@ export default function App() {
     const loadProfile = async (userId: string) => {
       console.log('🔍 [loadProfile] Fetching data for:', userId);
       
-      const withTimeout = <T>(promise: Promise<T>, ms: number = 8000) => {
+      const withTimeout = <T,>(promise: PromiseLike<T>, ms: number = 8000) => {
         return Promise.race([
           promise,
           new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
