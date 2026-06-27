@@ -29,7 +29,7 @@ export default function App() {
   useEffect(() => {
     const supabase = createClient();
     let isMounted = true;
-    let lastProcessedUserId: string | null = null;
+    let lastProcessedUserId: string | null | undefined = undefined;
 
     // Function to load profile subscription tier with a 10-second safety timeout
     const loadProfile = async (userId: string) => {
@@ -99,6 +99,7 @@ export default function App() {
       
       // Prevent redundant fetches for the same user if they are already fully loaded
       if (newUserId === lastProcessedUserId && event !== 'SIGNED_OUT') {
+        if (isMounted) setIsInitializing(false);
         return;
       }
       lastProcessedUserId = newUserId;

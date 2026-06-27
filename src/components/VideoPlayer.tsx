@@ -615,10 +615,12 @@ export const VideoPlayer: React.FC = () => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, canvas.height - 180, canvas.width, 180);
 
+    const maxWidth = canvas.width - 96; // 48px padding on each side
+
     ctx.textAlign = 'left';
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 28px Outfit, sans-serif';
-    ctx.fillText(address, 48, canvas.height - 70);
+    ctx.fillText(address, 48, canvas.height - 70, maxWidth);
 
     ctx.fillStyle = '#059669'; // Emerald
     ctx.font = 'semibold 16px Inter, sans-serif';
@@ -632,7 +634,7 @@ export const VideoPlayer: React.FC = () => {
       subtitleText = `Luxury Residence Details`;
     }
     
-    ctx.fillText(subtitleText.toUpperCase(), 48, canvas.height - 110);
+    ctx.fillText(subtitleText.toUpperCase(), 48, canvas.height - 110, maxWidth);
   };
 
   const handleTimelineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
