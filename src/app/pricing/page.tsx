@@ -26,7 +26,7 @@ export default function PricingPage() {
       if (data.sessionId) {
         const stripe = await stripePromise;
         if (stripe) {
-          await stripe.redirectToCheckout({ sessionId: data.sessionId });
+          await (stripe as any).redirectToCheckout({ sessionId: data.sessionId });
         }
       } else {
         alert(data.error || 'Something went wrong during checkout.');
