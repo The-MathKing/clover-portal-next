@@ -81,7 +81,7 @@ export const LandingPage: React.FC = () => {
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
             <a href="#problem" className="hover:text-emerald-400 transition-colors">The Shift</a>
-            <a href="#services" className="hover:text-emerald-400 transition-colors">Our Services</a>
+            <Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing & Services</Link>
             
             {isAuthenticated ? (
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-300">
@@ -208,51 +208,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Services Section ── */}
-      <section id="services" className="py-24 px-6 border-t border-neutral-900 bg-neutral-950/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How We Build AI Authority</h2>
-            <p className="text-neutral-400 text-lg">Our structured 3-tier approach to making your business the undeniable recommendation across all AI search engines.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Tier 1 */}
-            <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 hover:border-emerald-500/50 transition-colors">
-              <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
-                <Search className="w-6 h-6 text-emerald-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">1. The AI Readiness Audit</h3>
-              <p className="text-neutral-400 leading-relaxed text-sm">
-                Are you invisible to the algorithms of tomorrow? We run a comprehensive diagnostic on your brand across ChatGPT, Perplexity, Claude, and Google AI Overviews. We’ll uncover exactly what AI currently thinks of your business, identify critical data gaps, and provide a strategic roadmap to dominate AI-generated recommendations.
-              </p>
-            </div>
-
-            {/* Tier 2 */}
-            <div className="bg-neutral-900 border border-emerald-500/30 rounded-3xl p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none" />
-              <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-6">
-                <Target className="w-6 h-6 text-emerald-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">2. The GEO Foundation</h3>
-              <p className="text-neutral-400 leading-relaxed text-sm">
-                We build the data infrastructure that AI engines trust. This tier completely overhauls your digital presence—from injecting advanced Schema markup and restructuring your site's Q&A architecture, to seeding authoritative answers across the web. We feed the AI the exact structured data it needs to position you as the market leader.
-              </p>
-            </div>
-
-            {/* Tier 3 */}
-            <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 hover:border-emerald-500/50 transition-colors">
-              <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
-                <ShieldCheck className="w-6 h-6 text-emerald-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">3. Algorithmic Authority</h3>
-              <p className="text-neutral-400 leading-relaxed text-sm">
-                AI models learn continuously. We ensure they keep learning good things about you. This ongoing partnership monitors AI search volatility, curates high-authority citations, and actively manages the sentiment of your digital footprint. We don't just secure your spot as the AI's top recommendation—we defend it.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Services Section Moved to /pricing ── */}
 
       {/* ── CTA Section ── */}
       <section className="py-32 px-6 relative overflow-hidden">

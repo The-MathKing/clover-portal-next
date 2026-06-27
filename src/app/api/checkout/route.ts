@@ -1,73 +1,58 @@
 import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+// Initialize Stripe with the secret key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: '2025-01-27.acacia', // Use a recent stable API version
+});
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { priceId, userId, userEmail, tierName } = await req.json();
+    const { priceId, tierName } = await request.json();
 
-    if (!priceId || !userId) {
-      return NextResponse.json({ error: 'Missing priceId or userId' }, { status: 400 });
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return NextResponse.json({ error: 'Stripe Secret Key is missing in environment variables.' }, { status: 500 });
     }
 
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeSecretKey) {
-      return NextResponse.json({ error: 'Stripe configuration missing' }, { status: 500 });
+    // Since this is a template and we don't have actual price IDs from your Stripe dashboard yet,
+    // we'll dynamically create a price-data object on the fly for demonstration purposes.
+    // In production, you would pass the actual `price_xxxxxx` ID from Stripe instead of this.
+    
+    let unitAmount = 0;
+    if (priceId === 'price_foundation') {
+      unitAmount = 49900; // $499.00 in cents
+    } else if (priceId === 'price_authority') {
+      unitAmount = 99900; // $999.00 in cents
+    } else {
+      return NextResponse.json({ error: 'Invalid price ID' }, { status: 400 });
     }
 
-    // Determine payment mode
-    const isSubscription =
-      tierName.toLowerCase().includes('unlimited') ||
-      tierName.toLowerCase().includes('monthly') ||
-      tierName.toLowerCase().includes('/mo');
-
-    const mode = isSubscription ? 'subscription' : 'payment';
-    const origin = req.headers.get('origin') || 'https://clovrr.net';
-
-    console.log(`🛒 Checkout: "${tierName}" | mode: ${mode} | key: ${stripeSecretKey.slice(0, 12)}... | price: ${priceId}`);
-
-    // Build form-encoded body for Stripe REST API
-    const params = new URLSearchParams();
-    params.append('payment_method_types[]', 'card');
-    params.append('line_items[0][price]', priceId);
-    params.append('line_items[0][quantity]', '1');
-    params.append('mode', mode);
-    params.append('client_reference_id', userId);
-    params.append('metadata[tier]', tierName);
-    params.append('success_url', `${origin}/?payment=success&session_id={CHECKOUT_SESSION_ID}`);
-    params.append('cancel_url', `${origin}/?payment=cancelled`);
-    if (userEmail) {
-      params.append('customer_email', userEmail);
-    }
-
-    // Call Stripe REST API directly (bypasses SDK entirely)
-    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${stripeSecretKey}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
+    // Create a Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: tierName,
+              description: 'Clovrr Generative Engine Optimization Services',
+            },
+            unit_amount: unitAmount,
+            // You can make this recurring by adding: recurring: { interval: 'month' } for the $999 tier
+            ...(priceId === 'price_authority' ? { recurring: { interval: 'month' } } : {})
+          },
+          quantity: 1,
+        },
+      ],
+      mode: priceId === 'price_authority' ? 'subscription' : 'payment',
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/pricing?canceled=true`,
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('❌ Stripe API error:', JSON.stringify(data));
-      return NextResponse.json(
-        { error: data?.error?.message || 'Stripe error' },
-        { status: response.status }
-      );
-    }
-
-    console.log(`✅ Session created: ${data.id}`);
-    return NextResponse.json({ url: data.url });
+    return NextResponse.json({ sessionId: session.id });
   } catch (err: any) {
-    console.error('❌ Checkout error:', err?.message);
-    return NextResponse.json(
-      { error: err.message || 'Internal Server Error' },
-      { status: 500 }
-    );
+    console.error('Error creating Stripe checkout session:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
