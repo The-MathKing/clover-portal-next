@@ -35,48 +35,70 @@ export default function App() {
     const loadProfile = async (userId: string) => {
       console.log('🔍 [loadProfile] Fetching data for:', userId);
       
-      // 1. Fetch Profile
-      try {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('subscription_tier, generations_remaining')
-          .eq('id', userId)
-          .single();
+      const withTimeout = <T>(promise: Promise<T>, ms: number = 8000) => {
+        return Promise.race([
+          promise,
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
+        ]);
+      };
 
-        if (profileError) {
-          console.warn('⚠️ [loadProfile] Profile query error:', profileError.message);
+      try {
+        const profilePromise = withTimeout(
+          supabase
+            .from('profiles')
+            .select('subscription_tier, generations_remaining')
+            .eq('id', userId)
+            .single()
+        );
+
+        const propertiesPromise = withTimeout(
+          supabase
+            .from('properties')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+        );
+
+        const [profileResult, propertiesResult] = await Promise.allSettled([profilePromise, propertiesPromise]);
+
+        // Handle Profile Result
+        if (profileResult.status === 'fulfilled') {
+          const { data: profileData, error: profileError } = profileResult.value;
+          if (profileError) {
+            console.warn('⚠️ [loadProfile] Profile query error:', profileError.message);
+            if (isMounted) {
+              setSubscriptionTier('free');
+              setGenerationsRemaining(0);
+            }
+          } else if (profileData) {
+            console.log('🔍 [loadProfile] Profile loaded:', profileData.subscription_tier);
+            if (isMounted) {
+              setSubscriptionTier((profileData.subscription_tier as any) || 'free');
+              setGenerationsRemaining(profileData.generations_remaining ?? 0);
+            }
+          }
+        } else {
+          console.error('❌ [loadProfile] Profile query rejected/timed out:', profileResult.reason);
           if (isMounted) {
             setSubscriptionTier('free');
             setGenerationsRemaining(0);
           }
-        } else if (profileData) {
-          console.log('🔍 [loadProfile] Profile loaded:', profileData.subscription_tier);
-          if (isMounted) {
-            setSubscriptionTier((profileData.subscription_tier as any) || 'free');
-            setGenerationsRemaining(profileData.generations_remaining ?? 0);
+        }
+
+        // Handle Properties Result
+        if (propertiesResult.status === 'fulfilled') {
+          const { data: propertiesData, error: propertiesError } = propertiesResult.value;
+          if (propertiesError) {
+            console.error('❌ [loadProfile] Properties query error:', propertiesError.message);
+          } else if (propertiesData) {
+            console.log(`🔍 [loadProfile] Loaded ${propertiesData.length} properties for user.`);
+            if (isMounted) setProperties(propertiesData);
           }
+        } else {
+          console.error('❌ [loadProfile] Properties query rejected/timed out:', propertiesResult.reason);
         }
       } catch (err: any) {
-        console.error('❌ [loadProfile] Unexpected profile error:', err.message || err);
-        if (isMounted) setSubscriptionTier('free');
-      }
-
-      // 2. Fetch Properties (Independent of Profile)
-      try {
-        const { data: propertiesData, error: propertiesError } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-
-        if (propertiesError) {
-          console.error('❌ [loadProfile] Properties query error:', propertiesError.message);
-        } else if (propertiesData) {
-          console.log(`🔍 [loadProfile] Loaded ${propertiesData.length} properties for user.`);
-          if (isMounted) setProperties(propertiesData);
-        }
-      } catch (err: any) {
-        console.error('❌ [loadProfile] Unexpected properties error:', err.message || err);
+        console.error('❌ [loadProfile] Unexpected error:', err.message || err);
       }
     };
 
