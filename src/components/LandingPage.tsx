@@ -36,8 +36,8 @@ export const LandingPage: React.FC = () => {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
             <a href="#problem" className="hover:text-emerald-400 transition-colors">The Shift</a>
             <a href="#services" className="hover:text-emerald-400 transition-colors">Our Services</a>
-            <Link href="/contact" className="px-5 py-2.5 rounded-full bg-white text-neutral-950 hover:bg-neutral-200 transition-colors font-semibold">
-              Book Audit
+            <Link href="/contact" className="px-6 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold transition-all text-sm">
+              Get Free Audit
             </Link>
           </div>
         </div>
@@ -179,17 +179,14 @@ export const LandingPage: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[400px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
         
         <div className="max-w-3xl mx-auto text-center relative z-10 bg-neutral-900/80 backdrop-blur-xl border border-neutral-800 rounded-[3rem] p-12 md:p-20 shadow-2xl">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-            What is AI telling your customers right now?
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Ready to claim your spot?
           </h2>
-          <p className="text-neutral-300 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            Don't let your competitors control the narrative. Book a live, 1-on-1 demonstration to see exactly how ChatGPT, Perplexity, and Google AI view your business today—and how we can change it tomorrow.
+          <p className="text-neutral-400 text-xl mb-10 max-w-2xl mx-auto">
+            Stop losing high-ticket jobs to competitors who optimized for AI search. Let's build your GEO foundation today.
           </p>
-          <Link 
-            href="/contact"
-            className="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-xl shadow-emerald-900/50 hover:scale-105 hover:-translate-y-1"
-          >
-            Book Your Live AI Audit
+          <Link href="/contact" className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-xl shadow-emerald-900/20 mx-auto">
+            Get Your Free AI Audit
             <ChevronRight className="w-5 h-5" />
           </Link>
         </div>
@@ -237,7 +234,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-6">
                   <Search className="w-6 h-6 text-emerald-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Live AI Search Audit</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">Free AI Search Audit</h2>
                 <p className="text-neutral-400 mb-8">Enter your business details below. We'll query Google's Gemini AI to see if you are recommended in your local market.</p>
                 
                 <form onSubmit={handleAuditSubmit} className="space-y-5">

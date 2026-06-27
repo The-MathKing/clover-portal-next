@@ -6,15 +6,28 @@ import Link from 'next/link';
 
 export default function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [formData, setFormData] = useState({ name: '', email: '', business: '', message: '' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
     
-    // Simulate network request
-    setTimeout(() => {
-      setStatus('success');
-    }, 1500);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        setStatus('success');
+      } else {
+        console.error('Failed to submit');
+        setStatus('idle');
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('idle');
+    }
   };
 
   return (
@@ -80,6 +93,8 @@ export default function ContactPage() {
                       <input 
                         required
                         type="text" 
+                        value={formData.name}
+                        onChange={e => setFormData({ ...formData, name: e.target.value })}
                         placeholder="John Doe"
                         className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
                       />
@@ -92,6 +107,8 @@ export default function ContactPage() {
                       <input 
                         required
                         type="email" 
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
                         placeholder="john@example.com"
                         className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
                       />
@@ -106,6 +123,8 @@ export default function ContactPage() {
                     <input 
                       required
                       type="text" 
+                      value={formData.business}
+                      onChange={e => setFormData({ ...formData, business: e.target.value })}
                       placeholder="Acme Roofing Co."
                       className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
                     />
@@ -119,6 +138,8 @@ export default function ContactPage() {
                     <textarea 
                       required
                       rows={4}
+                      value={formData.message}
+                      onChange={e => setFormData({ ...formData, message: e.target.value })}
                       placeholder="Tell us a bit about your current marketing challenges..."
                       className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all resize-none"
                     />
