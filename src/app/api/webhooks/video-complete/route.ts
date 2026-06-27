@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * POST /api/webhooks/video-complete
@@ -49,7 +49,10 @@ export async function POST(request: NextRequest) {
     }
 
     // ── 2. Supabase client (server-side, bypasses RLS) ────────────────────────
-    const supabase = await createClient();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     // ── 3. Look up the clip row ───────────────────────────────────────────────
     let clipQuery = supabase

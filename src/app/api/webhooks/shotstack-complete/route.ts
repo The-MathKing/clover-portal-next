@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * POST /api/webhooks/shotstack-complete?jobId=xxx
@@ -40,7 +40,10 @@ export async function POST(request: NextRequest) {
     const finalVideoUrl: string | undefined = body.url;
     const errorMessage: string | undefined = body.error ?? 'Shotstack render failed';
 
-    const supabase = await createClient();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     if (isSuccess && finalVideoUrl) {
       // ── Mark job as complete ───────────────────────────────────────────────
