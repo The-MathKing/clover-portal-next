@@ -265,12 +265,23 @@ export const LandingPage: React.FC = () => {
                         onChange={e => setAuditForm({...auditForm, industry: e.target.value})}
                         className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white appearance-none outline-none transition-all"
                       >
-                        <option value="Roofing">Roofing</option>
-                        <option value="HVAC">HVAC</option>
+                        <option value="Restaurant / Cafe">Restaurant / Cafe</option>
+                        <option value="Retail Store">Retail Store</option>
+                        <option value="Dental Clinic">Dental Clinic</option>
                         <option value="Medical Clinic">Medical Clinic</option>
-                        <option value="Plumber">Plumbing</option>
+                        <option value="Law Firm">Law Firm</option>
+                        <option value="Accounting / Finance">Accounting / Finance</option>
+                        <option value="HVAC">HVAC</option>
+                        <option value="Roofing">Roofing</option>
+                        <option value="Plumbing">Plumbing</option>
                         <option value="Electrician">Electrician</option>
+                        <option value="Landscaping">Landscaping</option>
+                        <option value="Cleaning Services">Cleaning Services</option>
                         <option value="Real Estate">Real Estate</option>
+                        <option value="Auto Repair / Dealership">Auto Repair / Dealership</option>
+                        <option value="Gym / Fitness">Gym / Fitness</option>
+                        <option value="Salon / Spa">Salon / Spa</option>
+                        <option value="Pet Services">Pet Services</option>
                         <option value="other">Custom / Other</option>
                       </select>
                     </div>
