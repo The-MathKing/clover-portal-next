@@ -239,8 +239,13 @@ export const WalkthroughJobStatus: React.FC<WalkthroughJobStatusProps> = ({
                         transition={{ duration: 0.5, ease: 'easeOut' }}
                       />
                     </div>
+                    {/* Time Estimation */}
+                    <div className="flex items-center gap-1.5 pt-1 text-[11px] font-medium text-amber-500/90">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Estimated wait time: ~5-10 minutes. Feel free to close this tab!</span>
+                    </div>
                     {/* Mini clip dots */}
-                    <div className="flex flex-wrap gap-1 pt-1">
+                    <div className="flex flex-wrap gap-1 pt-1.5">
                       {Array.from({ length: totalClips }).map((_, i) => (
                         <motion.div
                           key={i}

@@ -414,6 +414,34 @@ export const VideoPlayer: React.FC = () => {
         // Watermark removed by user request
         ctx.restore();
       }
+
+      // Draw DRAFT PREVIEW watermark while AI video is not ready
+      if (isGenerativeMode && !useStore.getState().videoBlobUrl && useStore.getState().renderingStep === null) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(234, 179, 8, 0.85)'; // amber-500 with opacity
+        ctx.font = 'bold 64px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Add a nice drop shadow for visibility
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(-Math.PI / 8); // Rotate -22.5 degrees
+        
+        // Draw the main text
+        ctx.fillText('DRAFT PREVIEW', 0, -20);
+        
+        // Draw subtitle
+        ctx.font = 'bold 24px Inter, system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillText('AI Video Generation In Progress', 0, 30);
+        
+        ctx.restore();
+      }
     };
 
     render();
