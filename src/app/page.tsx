@@ -31,66 +31,52 @@ export default function App() {
     let isMounted = true;
     let lastProcessedUserId: string | null | undefined = undefined;
 
-    // Function to load profile subscription tier with a 10-second safety timeout
+    // Function to load user data safely
     const loadProfile = async (userId: string) => {
-      console.log('🔍 [loadProfile] Fetching profile for:', userId);
+      console.log('🔍 [loadProfile] Fetching data for:', userId);
       
-      const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error('Profile query timeout')), 10000)
-      );
-
+      // 1. Fetch Profile
       try {
-        const profilePromise = supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('subscription_tier, generations_remaining')
           .eq('id', userId)
           .single();
 
-        const propertiesPromise = supabase
+        if (profileError) {
+          console.warn('⚠️ [loadProfile] Profile query error:', profileError.message);
+          if (isMounted) {
+            setSubscriptionTier('free');
+            setGenerationsRemaining(0);
+          }
+        } else if (profileData) {
+          console.log('🔍 [loadProfile] Profile loaded:', profileData.subscription_tier);
+          if (isMounted) {
+            setSubscriptionTier((profileData.subscription_tier as any) || 'free');
+            setGenerationsRemaining(profileData.generations_remaining ?? 0);
+          }
+        }
+      } catch (err: any) {
+        console.error('❌ [loadProfile] Unexpected profile error:', err.message || err);
+        if (isMounted) setSubscriptionTier('free');
+      }
+
+      // 2. Fetch Properties (Independent of Profile)
+      try {
+        const { data: propertiesData, error: propertiesError } = await supabase
           .from('properties')
           .select('*')
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
 
-        // Race the query against the timeout
-        const result = await Promise.race([
-          Promise.all([profilePromise, propertiesPromise]),
-          timeoutPromise
-        ]) as any;
-
-        if (result) {
-          const [profileRes, propertiesRes] = result;
-          
-          if (profileRes.error) {
-            console.warn('⚠️ [loadProfile] query error (profiles table may not exist yet):', profileRes.error.message);
-            if (isMounted) {
-              setSubscriptionTier('free');
-              setGenerationsRemaining(0);
-            }
-          } else if (profileRes.data && profileRes.data.subscription_tier) {
-            console.log('🔍 [loadProfile] Profile loaded successfully:', profileRes.data.subscription_tier, 'generations:', profileRes.data.generations_remaining);
-            if (isMounted) {
-              setSubscriptionTier(profileRes.data.subscription_tier as any);
-              setGenerationsRemaining(profileRes.data.generations_remaining ?? 0);
-            }
-          } else {
-            if (isMounted) {
-              setSubscriptionTier('free');
-              setGenerationsRemaining(0);
-            }
-          }
-
-          if (propertiesRes && !propertiesRes.error && propertiesRes.data) {
-            console.log(`🔍 [loadProfile] Loaded ${propertiesRes.data.length} properties for user.`);
-            if (isMounted) setProperties(propertiesRes.data);
-          }
-        } else {
-          // Timeout occurred
-          if (isMounted) setSubscriptionTier('free');
+        if (propertiesError) {
+          console.error('❌ [loadProfile] Properties query error:', propertiesError.message);
+        } else if (propertiesData) {
+          console.log(`🔍 [loadProfile] Loaded ${propertiesData.length} properties for user.`);
+          if (isMounted) setProperties(propertiesData);
         }
       } catch (err: any) {
-        console.error('❌ [loadProfile] Error or timeout fetching profile:', err.message || err);
-        if (isMounted) setSubscriptionTier('free');
+        console.error('❌ [loadProfile] Unexpected properties error:', err.message || err);
       }
     };
 
