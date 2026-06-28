@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Search, Target, ShieldCheck, Check, ArrowLeft } from 'lucide-react';
@@ -38,98 +38,115 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white selection:bg-emerald-500/30 selection:text-emerald-200">
-      <div className="max-w-7xl mx-auto px-6 py-12 md:py-24">
+    <div className="min-h-screen bg-black text-[#f5f5f5] selection:bg-white/20 font-sans">
+      {/* ── Minimalist Apple-Style Navigation ── */}
+      <nav className="fixed top-0 w-full z-50 nav-blur transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity">
+            <div className="w-5 h-5 bg-white rounded-md flex items-center justify-center">
+              <span className="text-black font-black text-[10px] tracking-tighter">C</span>
+            </div>
+            <span className="text-sm font-semibold tracking-wide">Clovrr</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-[#a1a1a6]">
+            <Link href="/" className="hover:text-white transition-colors">Overview</Link>
+            <Link href="/pricing" className="text-white">Pricing</Link>
+            <Link href="/contact" className="px-4 py-1.5 rounded-full bg-white text-black font-semibold hover:scale-105 transition-transform">
+              Book Audit
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-6 py-32 md:py-48">
         
-        <Link href="/" className="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition-colors mb-12">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
-        </Link>
-        
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-6">
-            Pricing & <span className="text-emerald-500">Services</span>
+        <div className="text-center max-w-3xl mx-auto mb-24">
+          <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter mb-6 text-white">
+            Pricing.
           </h1>
-          <p className="text-neutral-400 text-lg md:text-xl leading-relaxed">
+          <p className="text-xl md:text-2xl text-[#a1a1a6] tracking-tight">
             Our structured 3-tier approach to making your business the undeniable recommendation across all AI search engines.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Tier 1 */}
-          <div className="glass-panel rounded-3xl p-8 flex flex-col h-full hover:border-neutral-700 hover:-translate-y-2 transition-all duration-300">
-            <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
-              <Search className="w-6 h-6 text-emerald-400" />
+          <div className="bento-box p-10 flex flex-col h-full">
+            <div className="w-12 h-12 bg-[#2d2d2f] rounded-2xl flex items-center justify-center mb-8">
+              <Search className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">The AI Readiness Audit</h3>
-            <div className="mb-6">
-              <span className="text-4xl font-black">Free</span>
+            <h3 className="text-2xl font-semibold text-white mb-2">AI Readiness Audit</h3>
+            <div className="mb-8">
+              <span className="text-5xl font-semibold tracking-tighter text-white">Free</span>
             </div>
-            <p className="text-neutral-400 leading-relaxed text-sm mb-8 flex-grow">
+            <p className="text-[#a1a1a6] text-sm leading-relaxed mb-8 flex-grow">
               Are you invisible to the algorithms of tomorrow? We run a comprehensive diagnostic on your brand across ChatGPT, Perplexity, Claude, and Google AI Overviews.
             </p>
-            <ul className="space-y-4 mb-8 text-sm text-neutral-300">
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> AI Competitor Analysis</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Generative Overviews Simulation</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Actionable GEO Plan</li>
+            <ul className="space-y-4 mb-10 text-sm font-medium text-[#f5f5f5]">
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-[#a1a1a6]" /> AI Competitor Analysis</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-[#a1a1a6]" /> Overviews Simulation</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-[#a1a1a6]" /> Actionable GEO Plan</li>
             </ul>
-            <Link href="/contact" className="w-full block text-center py-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold transition-colors">
+            <Link href="/contact" className="w-full py-4 rounded-full bg-[#1d1d1f] hover:bg-[#2d2d2f] text-white font-semibold text-center transition-colors">
               Get Free Audit
             </Link>
           </div>
 
           {/* Tier 2 */}
-          <div className="glass-panel-emerald rounded-3xl p-8 flex flex-col h-full relative overflow-hidden shadow-2xl shadow-emerald-900/20 animate-glow-pulse hover:-translate-y-2 transition-transform duration-300">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none" />
-            <div className="absolute top-0 inset-x-0 bg-emerald-500 text-neutral-950 text-xs font-bold py-1 text-center uppercase tracking-wider">Most Popular</div>
+          <div className="bento-box-highlight p-10 flex flex-col h-full relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 flex justify-center mt-4">
+              <div className="bg-white text-black text-[10px] font-bold px-3 py-1 rounded-full tracking-widest uppercase">
+                Most Popular
+              </div>
+            </div>
             
-            <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-6 mt-4">
-              <Target className="w-6 h-6 text-emerald-400" />
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-8 mt-6">
+              <Target className="w-6 h-6 text-black" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">The GEO Foundation</h3>
-            <div className="mb-6">
-              <span className="text-4xl font-black">$129</span>
-              <span className="text-neutral-500 ml-2">/month</span>
+            <h3 className="text-2xl font-semibold text-white mb-2">GEO Foundation</h3>
+            <div className="mb-8 flex items-baseline gap-1">
+              <span className="text-5xl font-semibold tracking-tighter text-white">$129</span>
+              <span className="text-[#a1a1a6] text-sm">/mo</span>
             </div>
-            <p className="text-neutral-400 leading-relaxed text-sm mb-8 flex-grow">
+            <p className="text-[#a1a1a6] text-sm leading-relaxed mb-8 flex-grow">
               We build the data infrastructure that AI engines trust. This tier completely overhauls your digital presence.
             </p>
-            <ul className="space-y-4 mb-8 text-sm text-neutral-300">
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Advanced Schema Markup Injection</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Site Q&A Architecture Restructure</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Knowledge Graph Seeding</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Directory Consolidation</li>
+            <ul className="space-y-4 mb-10 text-sm font-medium text-[#f5f5f5]">
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-white" /> Advanced Schema Markup</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-white" /> Site Q&A Restructure</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-white" /> Knowledge Graph Seeding</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-white" /> Directory Consolidation</li>
             </ul>
             <button 
               onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_FOUNDATION_PRICE_ID || 'price_1TnP6fCVfP2wmhsSudX8T4fn', 'The GEO Foundation')}
-              className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold transition-all shadow-lg shadow-emerald-500/25"
+              className="w-full py-4 rounded-full bg-white hover:bg-neutral-200 text-black font-semibold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
               Start Foundation
             </button>
           </div>
 
           {/* Tier 3 */}
-          <div className="glass-panel rounded-3xl p-8 flex flex-col h-full hover:border-neutral-700 hover:-translate-y-2 transition-all duration-300">
-            <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
-              <ShieldCheck className="w-6 h-6 text-emerald-400" />
+          <div className="bento-box p-10 flex flex-col h-full">
+            <div className="w-12 h-12 bg-[#2d2d2f] rounded-2xl flex items-center justify-center mb-8">
+              <ShieldCheck className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">Algorithmic Authority</h3>
-            <div className="mb-6">
-              <span className="text-4xl font-black">$299</span>
-              <span className="text-neutral-500 ml-2">/month</span>
+            <h3 className="text-2xl font-semibold text-white mb-2">Algorithmic Authority</h3>
+            <div className="mb-8 flex items-baseline gap-1">
+              <span className="text-5xl font-semibold tracking-tighter text-white">$299</span>
+              <span className="text-[#a1a1a6] text-sm">/mo</span>
             </div>
-            <p className="text-neutral-400 leading-relaxed text-sm mb-8 flex-grow">
-              AI models learn continuously. This ongoing partnership actively manages the sentiment of your digital footprint to defend your spot.
+            <p className="text-[#a1a1a6] text-sm leading-relaxed mb-8 flex-grow">
+              AI models learn continuously. This ongoing partnership actively manages the sentiment of your footprint to defend your spot.
             </p>
-            <ul className="space-y-4 mb-8 text-sm text-neutral-300">
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Everything in Foundation</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> AI Search Volatility Monitoring</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> High-Authority Citation Curation</li>
-              <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Monthly Sentiment Reports</li>
+            <ul className="space-y-4 mb-10 text-sm font-medium text-[#f5f5f5]">
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-[#a1a1a6]" /> Everything in Foundation</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-[#a1a1a6]" /> Volatility Monitoring</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-[#a1a1a6]" /> High-Authority Citations</li>
+              <li className="flex items-center gap-3"><Check className="w-4 h-4 text-[#a1a1a6]" /> Sentiment Reports</li>
             </ul>
             <button 
               onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_AUTHORITY_PRICE_ID || 'price_1TnPFwCVfP2wmhsSrcTH5CzD', 'Algorithmic Authority')}
-              className="w-full py-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold transition-colors"
+              className="w-full py-4 rounded-full bg-[#1d1d1f] hover:bg-[#2d2d2f] text-white font-semibold transition-colors"
             >
               Subscribe Now
             </button>

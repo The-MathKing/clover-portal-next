@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck, X, Briefcase, Building2, CheckCircle, AlertCircle, MapPin, UserCircle } from 'lucide-react';
+import { Bot, LineChart, Search, ChevronRight, Zap, Target, ShieldCheck, X, Briefcase, Building2, CheckCircle, AlertCircle, MapPin, UserCircle, Globe, Smartphone, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,9 +12,8 @@ import { createClient } from '@/utils/supabase/client';
 
 export const LandingPage: React.FC = () => {
   const router = useRouter();
-  const { showAuthModal, setShowAuthModal, isAuthenticated, setAuthenticated, userId, setUserId } = useStore();
+  const { showAuthModal, setShowAuthModal, isAuthenticated, setAuthenticated, userId, setUserId, userEmail, setUserEmail } = useStore();
   const [isAuditModalOpen, setAuditModalOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [auditForm, setAuditForm] = useState({ businessName: '', industry: 'Roofing', zipcode: '', customIndustry: '' });
   const supabase = createClient();
 
@@ -50,49 +49,29 @@ export const LandingPage: React.FC = () => {
     return () => subscription.unsubscribe();
   }, [supabase]);
 
-  const handleAuditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const finalIndustry = auditForm.industry === 'other' ? auditForm.customIndustry : auditForm.industry;
-    if (auditForm.businessName && finalIndustry && auditForm.zipcode) {
-      // Save details to user_metadata if logged in
-      if (isAuthenticated) {
-        await supabase.auth.updateUser({
-          data: {
-            lastAudit: { businessName: auditForm.businessName, industry: auditForm.industry, zipcode: auditForm.zipcode, customIndustry: auditForm.customIndustry }
-          }
-        });
-      }
-
-      const query = new URLSearchParams({
-        businessName: auditForm.businessName,
-        industry: `${finalIndustry} in ${auditForm.zipcode}`
-      }).toString();
-      router.push(`/audit?${query}`);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-neutral-950 font-sans selection:bg-emerald-500/30">
-      {/* ── Navigation ── */}
-      <nav className="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-900">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Clovrr Logo" width={32} height={32} className="w-8 h-8 rounded-lg" />
-            <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
+    <div className="min-h-screen bg-black font-sans text-[#f5f5f5] selection:bg-white/20">
+      {/* ── Minimalist Apple-Style Navigation ── */}
+      <nav className="fixed top-0 w-full z-50 nav-blur transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
+            <div className="w-5 h-5 bg-white rounded-md flex items-center justify-center">
+              <span className="text-black font-black text-[10px] tracking-tighter">C</span>
+            </div>
+            <span className="text-sm font-semibold tracking-wide">Clovrr</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-            <a href="#problem" className="hover:text-emerald-400 transition-colors">The Shift</a>
-            <Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing & Services</Link>
+          <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-[#a1a1a6]">
+            <a href="#problem" className="hover:text-white transition-colors">The Shift</a>
+            <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             
             {isAuthenticated ? (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-300">
-                <UserCircle className="w-4 h-4 text-emerald-400" />
-                <span className="truncate max-w-[150px]">{userEmail}</span>
+              <div className="flex items-center gap-2 text-white">
+                <span className="truncate max-w-[150px] opacity-70">{userEmail}</span>
                 <button 
                   onClick={async () => await supabase.auth.signOut()}
-                  className="ml-2 text-neutral-500 hover:text-white text-xs uppercase"
+                  className="ml-2 text-[#a1a1a6] hover:text-white transition-colors"
                 >
-                  Log out
+                  Sign Out
                 </button>
               </div>
             ) : (
@@ -104,8 +83,8 @@ export const LandingPage: React.FC = () => {
               </button>
             )}
 
-            <Link href="/contact" className="px-6 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold transition-all text-sm">
-              Get Free Audit
+            <Link href="/contact" className="px-4 py-1.5 rounded-full bg-white text-black font-semibold hover:scale-105 transition-transform">
+              Book Audit
             </Link>
           </div>
         </div>
@@ -118,250 +97,157 @@ export const LandingPage: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-950/80 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-2xl"
           >
             <Login />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Hero Section (The Data Void) ── */}
-      <section className="relative h-screen min-h-[800px] w-full overflow-hidden bg-[#0a0a0a] flex items-center justify-center">
-        {/* Interactive Neural Web Background */}
-        <ParticleNetwork />
+      {/* ── Hero Section (Pro Aesthetic) ── */}
+      <section className="relative h-screen min-h-[800px] w-full overflow-hidden flex items-center justify-center">
+        {/* Subtle background particles to keep the AI feel without overwhelming */}
+        <div className="absolute inset-0 opacity-30">
+          <ParticleNetwork />
+        </div>
         
-        {/* Subtle Dark Gradient Overlay to ensure text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0a]/50 to-[#0a0a0a] pointer-events-none" />
-
-        <div className="max-w-5xl mx-auto text-center relative z-10 px-6">
-          {/* Frosted Glass Pill */}
+        <div className="max-w-5xl mx-auto text-center relative z-10 px-6 mt-16">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="backdrop-blur-2xl bg-neutral-900/30 border border-neutral-700/50 rounded-[3rem] p-10 md:p-16 shadow-[0_0_50px_rgba(0,0,0,0.5)] mx-auto relative overflow-hidden group"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Ambient internal glow */}
-            <div className="absolute inset-0 bg-emerald-500/5 blur-[80px] group-hover:bg-emerald-500/10 transition-colors duration-700" />
+            <h1 className="text-6xl md:text-8xl lg:text-[110px] font-semibold tracking-tighter mb-6 leading-[1.05] text-white">
+              Pro. <br className="md:hidden" />
+              <span className="text-[#a1a1a6]">Engineered.</span>
+            </h1>
             
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-950/80 border border-neutral-800 text-neutral-300 text-xs font-bold uppercase tracking-widest mb-8 shadow-inner">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
-                Generative Engine Optimization
-              </div>
-              
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter mb-8 leading-[1.1]">
-                Get the <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">Green Light</span><br/>from AI.
-              </h1>
-              
-              <p className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-                We engineer your digital presence so Google AI Overviews, ChatGPT, and Perplexity recommend your business first.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button onClick={() => setAuditModalOpen(true)} className="w-full sm:w-auto px-10 py-5 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 font-black text-lg transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:-translate-y-1 flex items-center justify-center gap-3">
-                  Start AI Audit
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-                <a href="#problem" className="w-full sm:w-auto px-10 py-5 rounded-full bg-neutral-950/50 border border-neutral-800 hover:bg-neutral-800 text-white font-bold text-lg transition-all flex items-center justify-center backdrop-blur-md">
-                  View Data Structures
-                </a>
-              </div>
+            <p className="text-xl md:text-2xl text-[#a1a1a6] max-w-2xl mx-auto mb-12 font-medium tracking-tight">
+              Dominate the AI Search revolution. We optimize your brand so ChatGPT, Perplexity, and Google AI Overviews recommend you first.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <Link href="/contact" className="px-8 py-4 rounded-full bg-white text-black font-semibold text-lg hover:scale-105 transition-transform flex items-center gap-2">
+                Start AI Audit
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+              <Link href="/pricing" className="px-8 py-4 rounded-full bg-[#1d1d1f] hover:bg-[#2d2d2f] text-white font-semibold text-lg transition-colors">
+                View Pricing
+              </Link>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ── Problem/Solution Section ── */}
-      <section id="problem" className="py-24 px-6 relative">
-        <div className="absolute top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-neutral-800 to-transparent" />
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center relative z-10">
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">The Search Landscape Has Shifted.</h2>
-              <div className="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-            </div>
-            <div className="space-y-6 text-neutral-400 text-lg leading-relaxed">
-              <p>
-                For the last decade, local businesses fought for the top spot on Google using traditional SEO—stuffing keywords and building backlinks. But the game has fundamentally changed.
-              </p>
-              <p>
-                Your customers are no longer scrolling through 10 blue links; they are asking AI engines directly for recommendations. If your business isn't actively shaping the data that trains these models, you are completely invisible to the next generation of high-intent buyers.
-              </p>
-            </div>
+      {/* ── Problem/Solution Bento Box Section ── */}
+      <section id="problem" className="py-32 px-6 bg-black relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-semibold tracking-tight text-white mb-6">The rules have changed.</h2>
+            <p className="text-xl text-[#a1a1a6] max-w-3xl mx-auto">
+              Your customers are no longer scrolling through 10 blue links. They are asking AI engines directly for recommendations.
+            </p>
           </div>
-          
-          <div className="glass-panel-emerald rounded-3xl p-10 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/30 transition-colors duration-500" />
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <Bot className="w-8 h-8 text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
-              The GEO Solution
-            </h3>
-            <p className="text-neutral-300 text-lg leading-relaxed mb-8">
-              Welcome to Generative Engine Optimization (GEO). At Clovrr, we don’t just optimize for algorithms; we optimize for answers.
-            </p>
-            <p className="text-neutral-400 leading-relaxed relative z-10">
-              We restructure your digital footprint, authoritative mentions, and knowledge graphs so that when a customer asks ChatGPT or Google AI for the "best local expert," the AI confidently gives them the green light to choose you.
-            </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* Bento Box 1: The Old Way */}
+            <div className="bento-box p-10 flex flex-col justify-between md:col-span-2 lg:col-span-1 min-h-[300px]">
+              <div>
+                <Search className="w-10 h-10 text-[#a1a1a6] mb-6" />
+                <h3 className="text-2xl font-semibold text-white mb-4">Traditional SEO is dying.</h3>
+                <p className="text-[#a1a1a6] leading-relaxed">
+                  Stuffing keywords and buying backlinks used to work. Now, AI engines skip the middleman and summarize answers directly.
+                </p>
+              </div>
+            </div>
+
+            {/* Bento Box 2: The New Reality (Highlight) */}
+            <div className="bento-box-highlight p-10 flex flex-col justify-between md:col-span-2 min-h-[300px]">
+              <div>
+                <Bot className="w-10 h-10 text-white mb-6" />
+                <h3 className="text-3xl md:text-4xl font-semibold text-white mb-4 tracking-tight">The AI Reality</h3>
+                <p className="text-[#a1a1a6] text-lg leading-relaxed max-w-lg">
+                  If your business isn't actively shaping the raw data that trains models like ChatGPT and Gemini, you are completely invisible to the next generation of high-intent buyers.
+                </p>
+              </div>
+              <div className="mt-8 flex gap-3">
+                <div className="px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md border border-white/10">ChatGPT</div>
+                <div className="px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md border border-white/10">Perplexity</div>
+                <div className="px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md border border-white/10">Google AI</div>
+              </div>
+            </div>
+
+            {/* Bento Box 3: Solution Step 1 */}
+            <div className="bento-box p-10">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6">
+                <Target className="w-6 h-6 text-black" />
+              </div>
+              <h4 className="text-xl font-semibold text-white mb-3">1. AI Audit</h4>
+              <p className="text-[#a1a1a6] text-sm leading-relaxed">
+                We simulate queries across all major LLMs to see if they recommend your business, or worse, hallucinate wrong information.
+              </p>
+            </div>
+
+            {/* Bento Box 4: Solution Step 2 */}
+            <div className="bento-box p-10">
+              <div className="w-12 h-12 bg-[#2d2d2f] rounded-2xl flex items-center justify-center mb-6">
+                <Globe className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-xl font-semibold text-white mb-3">2. Knowledge Graphing</h4>
+              <p className="text-[#a1a1a6] text-sm leading-relaxed">
+                We inject complex Schema Markup and Semantic structured data directly into your site, giving AI engines the raw facts they crave.
+              </p>
+            </div>
+
+            {/* Bento Box 5: Solution Step 3 */}
+            <div className="bento-box p-10">
+              <div className="w-12 h-12 bg-[#2d2d2f] rounded-2xl flex items-center justify-center mb-6">
+                <ShieldCheck className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-xl font-semibold text-white mb-3">3. Authority Locking</h4>
+              <p className="text-[#a1a1a6] text-sm leading-relaxed">
+                We monitor your sentiment continuously, defending your top-spot recommendation against competitors and volatile algorithmic updates.
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* ── Services Section Moved to /pricing ── */}
-
-      {/* ── CTA Section ── */}
-      <section className="py-32 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 to-emerald-950/20" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[400px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none animate-slow-pan" />
-        
-        <div className="max-w-3xl mx-auto text-center relative z-10 glass-panel rounded-[3rem] p-12 md:p-20 shadow-2xl animate-glow-pulse">
-          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
-            Ready to claim your spot?
+      {/* ── Invisible to AI Section (Bento Approach) ── */}
+      <section className="py-32 px-6 border-t border-[#222]">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl md:text-7xl font-semibold tracking-tighter text-white mb-8">
+            Are you invisible?
           </h2>
-          <p className="text-neutral-400 text-xl mb-10 max-w-2xl mx-auto">
-            Stop losing high-ticket jobs to competitors who optimized for AI search. Let's build your GEO foundation today.
+          <p className="text-xl text-[#a1a1a6] mb-12 max-w-2xl mx-auto">
+            Find out exactly what ChatGPT thinks about your business right now. It takes 60 seconds and it's completely free.
           </p>
-          <Link href="/contact" className="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)] hover:-translate-y-1 mx-auto">
-            Get Your Free AI Audit
-            <ChevronRight className="w-5 h-5" />
+          <Link href="/contact" className="inline-flex items-center justify-center px-10 py-5 rounded-full bg-white text-black font-semibold text-xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+            Book Your Free Audit
           </Link>
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-neutral-900 bg-neutral-950 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Clovrr Logo" width={24} height={24} className="w-6 h-6 rounded-md" />
-            <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
+      <footer className="bg-black py-12 px-6 border-t border-[#222] mt-auto">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+            <div className="w-5 h-5 bg-white rounded-md flex items-center justify-center">
+              <span className="text-black font-black text-[10px] tracking-tighter">C</span>
+            </div>
+            <span className="text-sm font-semibold tracking-wide">Clovrr</span>
           </div>
-          <p className="text-neutral-500 text-sm">
-            © {new Date().getFullYear()} Clovrr Agency. All rights reserved.
-          </p>
+          <div className="text-[#a1a1a6] text-sm">
+            © {new Date().getFullYear()} Clovrr Solutions. All rights reserved.
+          </div>
+          <div className="flex gap-6 text-sm font-medium text-[#a1a1a6]">
+            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+          </div>
         </div>
       </footer>
-
-      {/* ── AI Audit Modal ── */}
-      <AnimatePresence>
-        {isAuditModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
-              onClick={() => setAuditModalOpen(false)}
-              className="absolute inset-0 bg-neutral-950/80 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl overflow-hidden"
-            >
-              <button 
-                onClick={() => setAuditModalOpen(false)}
-                className="absolute top-6 right-6 p-2 rounded-full bg-neutral-800 text-neutral-400 hover:text-white transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              {/* Simplified Modal logic: Only the form */}
-              <div>
-                <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-6">
-                  <Search className="w-6 h-6 text-emerald-400" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Free AI Search Audit</h2>
-                <p className="text-neutral-400 mb-8">Enter your business details below. We'll query Google's Gemini AI to see if you are recommended in your local market.</p>
-                
-                <form onSubmit={handleAuditSubmit} className="space-y-5">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-neutral-300 ml-1">Business Name</label>
-                    <div className="relative">
-                      <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
-                      <input 
-                        required
-                        type="text" 
-                        value={auditForm.businessName}
-                        onChange={e => setAuditForm({...auditForm, businessName: e.target.value})}
-                        placeholder="e.g. Acme Roofing Co."
-                        className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-neutral-300 ml-1">Industry</label>
-                    <div className="relative">
-                      <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
-                      <select 
-                        required
-                        value={auditForm.industry}
-                        onChange={e => setAuditForm({...auditForm, industry: e.target.value})}
-                        className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white appearance-none outline-none transition-all"
-                      >
-                        <option value="Restaurant / Cafe">Restaurant / Cafe</option>
-                        <option value="Retail Store">Retail Store</option>
-                        <option value="Dental Clinic">Dental Clinic</option>
-                        <option value="Medical Clinic">Medical Clinic</option>
-                        <option value="Law Firm">Law Firm</option>
-                        <option value="Accounting / Finance">Accounting / Finance</option>
-                        <option value="HVAC">HVAC</option>
-                        <option value="Roofing">Roofing</option>
-                        <option value="Plumbing">Plumbing</option>
-                        <option value="Electrician">Electrician</option>
-                        <option value="Landscaping">Landscaping</option>
-                        <option value="Cleaning Services">Cleaning Services</option>
-                        <option value="Real Estate">Real Estate</option>
-                        <option value="Auto Repair / Dealership">Auto Repair / Dealership</option>
-                        <option value="Gym / Fitness">Gym / Fitness</option>
-                        <option value="Salon / Spa">Salon / Spa</option>
-                        <option value="Pet Services">Pet Services</option>
-                        <option value="other">Custom / Other</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {auditForm.industry === 'other' && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-neutral-300 ml-1">Custom Industry</label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
-                        <input 
-                          required
-                          type="text" 
-                          value={auditForm.customIndustry}
-                          onChange={e => setAuditForm({...auditForm, customIndustry: e.target.value})}
-                          placeholder="e.g. Landscaping"
-                          className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-neutral-300 ml-1">Zip Code</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
-                      <input 
-                        required
-                        type="text" 
-                        value={auditForm.zipcode}
-                        onChange={e => setAuditForm({...auditForm, zipcode: e.target.value})}
-                        placeholder="e.g. 90210"
-                        className="w-full bg-neutral-950 border border-neutral-800 focus:border-emerald-500 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-neutral-600 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-                  
-                  <button type="submit" className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all mt-4">
-                    Run AI Scan
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </form>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
