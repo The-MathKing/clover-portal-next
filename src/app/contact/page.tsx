@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Bot, ChevronRight, CheckCircle, Mail, User, Briefcase, MessageSquare } from 'lucide-react';
+import { ChevronRight, CheckCircle, Mail, User, Briefcase, MessageSquare } from 'lucide-react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -57,9 +58,7 @@ export default function ContactPage() {
       <nav className="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-900">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-neutral-950" />
-            </div>
+            <Image src="/logo.png" alt="Clovrr Logo" width={32} height={32} className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">

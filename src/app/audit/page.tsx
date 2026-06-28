@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { Bot, ChevronRight, AlertCircle, CheckCircle, BarChart3, TrendingUp, Trophy, Activity, MessageSquare, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type AuditResult = {
   score: number;
@@ -71,9 +72,7 @@ function AuditReportContent() {
       <nav className="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-900">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-neutral-950" />
-            </div>
+            <Image src="/logo.png" alt="Clovrr Logo" width={32} height={32} className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold text-white tracking-tight">Clovrr</span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
@@ -88,7 +87,7 @@ function AuditReportContent() {
           <div className="w-24 h-24 relative mb-8">
             <div className="absolute inset-0 border-4 border-emerald-500/20 rounded-full" />
             <div className="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            <Bot className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-emerald-400 animate-pulse" />
+            <Image src="/logo.png" alt="Clovrr Logo" width={32} height={32} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-md animate-pulse" />
           </div>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
