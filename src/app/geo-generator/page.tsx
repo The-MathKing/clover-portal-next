@@ -2,14 +2,31 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Lock, Unlock } from 'lucide-react';
 
 export default function GeoGenerator() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passcode, setPasscode] = useState('');
+  
   const [businessName, setBusinessName] = useState('');
   const [industry, setIndustry] = useState('');
   const [customIndustry, setCustomIndustry] = useState('');
   const [zipcode, setZipcode] = useState('');
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleAuth = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Basic client-side check to prevent accidental submissions,
+    // Real security happens on the backend API route.
+    if (passcode.trim() === 'CLOVRR_ADMIN_77X') {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('Invalid developer passcode');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +39,7 @@ export default function GeoGenerator() {
       const res = await fetch('/api/geo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessName, industry: finalIndustry, zipcode })
+        body: JSON.stringify({ businessName, industry: finalIndustry, zipcode, passcode })
       });
 
       const data = await res.json();
@@ -44,6 +61,46 @@ export default function GeoGenerator() {
     }
   };
 
+  // ── Locked Screen ──
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center py-20 px-6 font-sans">
+        <div className="max-w-md w-full bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl text-center">
+          <div className="w-16 h-16 bg-neutral-950 border border-neutral-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8 text-emerald-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-2">Developer Access Required</h1>
+          <p className="text-neutral-400 mb-8 text-sm">Please enter the developer passcode to access the internal GEO generator tool.</p>
+          
+          <form onSubmit={handleAuth} className="space-y-4">
+            <input 
+              type="password" 
+              value={passcode}
+              onChange={(e) => setPasscode(e.target.value)}
+              required 
+              autoFocus
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-center text-white focus:outline-none focus:border-emerald-500 transition-colors tracking-widest" 
+              placeholder="••••••••••••" 
+            />
+            {error && (
+              <div className="text-rose-500 text-sm font-medium">{error}</div>
+            )}
+            <button 
+              type="submit" 
+              className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold transition-colors flex items-center justify-center gap-2"
+            >
+              <Unlock className="w-4 h-4" /> Unlock Generator
+            </button>
+          </form>
+          <div className="mt-6 pt-6 border-t border-neutral-800">
+            <Link href="/" className="text-sm text-neutral-500 hover:text-neutral-300">Return to public site</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Generator Screen ──
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center py-20 px-6 font-sans">
       <div className="max-w-3xl w-full">
@@ -61,8 +118,13 @@ export default function GeoGenerator() {
           </p>
         </div>
 
-        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 mb-8 shadow-xl shadow-emerald-900/20">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 mb-8 shadow-xl shadow-emerald-900/20 relative">
+          
+          <div className="absolute top-4 right-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full flex items-center gap-1.5 font-bold tracking-wider">
+            <Unlock className="w-3 h-3" /> ADMIN
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-neutral-300 mb-2">Business Name</label>
@@ -133,7 +195,7 @@ export default function GeoGenerator() {
             </div>
 
             {error && (
-              <div className="p-4 bg-rose-500/10 border border-rose-500/50 rounded-xl text-rose-500 font-medium">
+              <div className="p-4 bg-rose-500/10 border border-rose-500/50 rounded-xl text-rose-500 font-medium whitespace-pre-wrap">
                 {error}
               </div>
             )}

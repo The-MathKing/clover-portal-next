@@ -3,7 +3,11 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { businessName, industry, zipcode } = await req.json();
+    const { businessName, industry, zipcode, passcode } = await req.json();
+
+    if (passcode !== 'CLOVRR_ADMIN_77X') {
+      return NextResponse.json({ error: 'Invalid developer passcode' }, { status: 401 });
+    }
 
     if (!businessName || !industry || !zipcode) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -51,7 +55,9 @@ Where scores and growths are arrays of realistic integers. For currentScores, gi
     });
 
     if (!response.ok) {
-      throw new Error("Failed to authenticate or generate plan with Gemini API.");
+      const errorText = await response.text();
+      console.error("Gemini API Error:", errorText);
+      throw new Error(`Failed to authenticate with Gemini API: ${errorText}`);
     }
 
     const data = await response.json();
