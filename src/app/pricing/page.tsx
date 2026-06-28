@@ -57,7 +57,7 @@ export default function PricingPage() {
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Tier 1 */}
-          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 flex flex-col h-full hover:border-neutral-700 transition-colors">
+          <div className="glass-panel rounded-3xl p-8 flex flex-col h-full hover:border-neutral-700 hover:-translate-y-2 transition-all duration-300">
             <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
               <Search className="w-6 h-6 text-emerald-400" />
             </div>
@@ -79,7 +79,7 @@ export default function PricingPage() {
           </div>
 
           {/* Tier 2 */}
-          <div className="bg-neutral-900 border-2 border-emerald-500 rounded-3xl p-8 flex flex-col h-full relative overflow-hidden shadow-2xl shadow-emerald-900/20">
+          <div className="glass-panel-emerald rounded-3xl p-8 flex flex-col h-full relative overflow-hidden shadow-2xl shadow-emerald-900/20 animate-glow-pulse hover:-translate-y-2 transition-transform duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none" />
             <div className="absolute top-0 inset-x-0 bg-emerald-500 text-neutral-950 text-xs font-bold py-1 text-center uppercase tracking-wider">Most Popular</div>
             
@@ -109,7 +109,7 @@ export default function PricingPage() {
           </div>
 
           {/* Tier 3 */}
-          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 flex flex-col h-full hover:border-neutral-700 transition-colors">
+          <div className="glass-panel rounded-3xl p-8 flex flex-col h-full hover:border-neutral-700 hover:-translate-y-2 transition-all duration-300">
             <div className="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center mb-6">
               <ShieldCheck className="w-6 h-6 text-emerald-400" />
             </div>

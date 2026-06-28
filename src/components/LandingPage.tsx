@@ -125,15 +125,16 @@ export const LandingPage: React.FC = () => {
       </AnimatePresence>
 
       {/* ── Hero Section ── */}
-      <section className="relative pt-40 pb-20 px-6 overflow-hidden">
+      <section className="relative pt-40 pb-20 px-6 overflow-hidden min-h-[90vh] flex items-center justify-center">
         {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-600/20 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-600/30 via-transparent to-transparent blur-[120px] rounded-full pointer-events-none animate-slow-pan" />
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-8 animate-float shadow-[0_0_15px_rgba(16,185,129,0.2)]"
           >
             <Zap className="w-3.5 h-3.5 fill-emerald-400" />
             Generative Engine Optimization (GEO)
@@ -145,7 +146,7 @@ export const LandingPage: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-8 leading-tight"
           >
-            Get the <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Green Light</span> from AI.
+            Get the <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-600 animate-slow-pan bg-[length:200%_auto]">Green Light</span> from AI.
           </motion.h1>
           
           <motion.p 
@@ -175,12 +176,13 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ── Problem/Solution Section ── */}
-      <section id="problem" className="py-24 px-6 bg-neutral-950">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+      <section id="problem" className="py-24 px-6 relative">
+        <div className="absolute top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-neutral-800 to-transparent" />
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center relative z-10">
           <div className="space-y-8">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">The Search Landscape Has Shifted.</h2>
-              <div className="w-20 h-1 bg-emerald-500 rounded-full" />
+              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">The Search Landscape Has Shifted.</h2>
+              <div className="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
             </div>
             <div className="space-y-6 text-neutral-400 text-lg leading-relaxed">
               <p>
@@ -192,16 +194,16 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-10 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none" />
+          <div className="glass-panel-emerald rounded-3xl p-10 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/30 transition-colors duration-500" />
             <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <Bot className="w-8 h-8 text-emerald-400" />
+              <Bot className="w-8 h-8 text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
               The GEO Solution
             </h3>
             <p className="text-neutral-300 text-lg leading-relaxed mb-8">
               Welcome to Generative Engine Optimization (GEO). At Clovrr, we don’t just optimize for algorithms; we optimize for answers.
             </p>
-            <p className="text-neutral-400 leading-relaxed">
+            <p className="text-neutral-400 leading-relaxed relative z-10">
               We restructure your digital footprint, authoritative mentions, and knowledge graphs so that when a customer asks ChatGPT or Google AI for the "best local expert," the AI confidently gives them the green light to choose you.
             </p>
           </div>
@@ -212,17 +214,17 @@ export const LandingPage: React.FC = () => {
 
       {/* ── CTA Section ── */}
       <section className="py-32 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-emerald-950/20" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[400px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 to-emerald-950/20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[400px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none animate-slow-pan" />
         
-        <div className="max-w-3xl mx-auto text-center relative z-10 bg-neutral-900/80 backdrop-blur-xl border border-neutral-800 rounded-[3rem] p-12 md:p-20 shadow-2xl">
+        <div className="max-w-3xl mx-auto text-center relative z-10 glass-panel rounded-[3rem] p-12 md:p-20 shadow-2xl animate-glow-pulse">
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
             Ready to claim your spot?
           </h2>
           <p className="text-neutral-400 text-xl mb-10 max-w-2xl mx-auto">
             Stop losing high-ticket jobs to competitors who optimized for AI search. Let's build your GEO foundation today.
           </p>
-          <Link href="/contact" className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-xl shadow-emerald-900/20 mx-auto">
+          <Link href="/contact" className="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-lg transition-all shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)] hover:-translate-y-1 mx-auto">
             Get Your Free AI Audit
             <ChevronRight className="w-5 h-5" />
           </Link>
