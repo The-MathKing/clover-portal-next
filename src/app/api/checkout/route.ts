@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// Initialize Stripe with the secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'dummy_key_for_build', {
-  apiVersion: '2023-10-16' as any, // Use a real, stable API version
-});
+// We initialize Stripe inside the handler to prevent Next.js caching empty env variables
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +10,15 @@ export async function POST(request: Request) {
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json({ error: 'Stripe Secret Key is missing in environment variables.' }, { status: 500 });
     }
+
+    const secretKey = process.env.STRIPE_SECRET_KEY.trim();
+    if (!secretKey.startsWith('sk_')) {
+      return NextResponse.json({ error: 'Invalid Stripe Secret Key format (must start with sk_)' }, { status: 500 });
+    }
+
+    const stripe = new Stripe(secretKey, {
+      apiVersion: '2024-04-10' as any, 
+    });
 
     if (!priceId || !priceId.startsWith('price_')) {
       return NextResponse.json({ error: 'Invalid price ID format' }, { status: 400 });
