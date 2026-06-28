@@ -73,7 +73,7 @@ export default function PricingPage() {
               <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Generative Overviews Simulation</li>
               <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Actionable GEO Plan</li>
             </ul>
-            <Link href="/?audit=true" className="w-full block text-center py-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold transition-colors">
+            <Link href="/contact" className="w-full block text-center py-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold transition-colors">
               Get Free Audit
             </Link>
           </div>
@@ -101,7 +101,7 @@ export default function PricingPage() {
               <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Directory Consolidation</li>
             </ul>
             <button 
-              onClick={() => handleCheckout('price_foundation', 'The GEO Foundation')}
+              onClick={() => handleCheckout('price_1TnP6fCVfP2wmhsSudX8T4fn', 'The GEO Foundation')}
               className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold transition-all shadow-lg shadow-emerald-500/25"
             >
               Start Foundation
@@ -128,7 +128,7 @@ export default function PricingPage() {
               <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Monthly Sentiment Reports</li>
             </ul>
             <button 
-              onClick={() => handleCheckout('price_authority', 'Algorithmic Authority')}
+              onClick={() => handleCheckout('price_1TnPFwCVfP2wmhsSrcTH5CzD', 'Algorithmic Authority')}
               className="w-full py-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold transition-colors"
             >
               Subscribe Now
