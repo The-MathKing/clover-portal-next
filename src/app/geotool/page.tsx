@@ -16,9 +16,12 @@ export default function GeoToolPage() {
   const [config, setConfig] = useState({
     businessName: '',
     websiteUrl: '',
+    phone: '',
+    zipCode: '',
     googleApiKey: '',
     cmsToken: '',
-    yextKey: ''
+    yextKey: '',
+    brightLocalSecret: ''
   });
 
   // Module States
@@ -181,6 +184,27 @@ export default function GeoToolPage() {
                   />
                 </div>
                 
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#a1a1a6] uppercase tracking-wider mb-2">Phone</label>
+                    <input 
+                      type="text" 
+                      value={config.phone}
+                      onChange={(e) => setConfig({...config, phone: e.target.value})}
+                      className="w-full bg-black border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#a1a1a6] uppercase tracking-wider mb-2">Zip Code</label>
+                    <input 
+                      type="text" 
+                      value={config.zipCode}
+                      onChange={(e) => setConfig({...config, zipCode: e.target.value})}
+                      className="w-full bg-black border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm" 
+                    />
+                  </div>
+                </div>
+                
                 <div className="pt-4 border-t border-[#222]">
                   <label className="block text-xs font-semibold text-[#a1a1a6] uppercase tracking-wider mb-2 flex items-center gap-2">
                     <Key className="w-3 h-3" /> GBP API Key
@@ -204,16 +228,29 @@ export default function GeoToolPage() {
                     className="w-full bg-black border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm font-mono" 
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#a1a1a6] uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <Database className="w-3 h-3" /> Directory API Key
-                  </label>
-                  <input 
-                    type="password" 
-                    value={config.yextKey}
-                    onChange={(e) => setConfig({...config, yextKey: e.target.value})}
-                    className="w-full bg-black border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm font-mono" 
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#a1a1a6] uppercase tracking-wider mb-2 flex items-center gap-2">
+                      <Database className="w-3 h-3" /> BrightLocal Key
+                    </label>
+                    <input 
+                      type="password" 
+                      value={config.yextKey}
+                      onChange={(e) => setConfig({...config, yextKey: e.target.value})}
+                      className="w-full bg-black border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm font-mono" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#a1a1a6] uppercase tracking-wider mb-2 flex items-center gap-2">
+                      <Lock className="w-3 h-3" /> BrightLocal Secret
+                    </label>
+                    <input 
+                      type="password" 
+                      value={config.brightLocalSecret}
+                      onChange={(e) => setConfig({...config, brightLocalSecret: e.target.value})}
+                      className="w-full bg-black border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm font-mono" 
+                    />
+                  </div>
                 </div>
               </div>
             </div>
