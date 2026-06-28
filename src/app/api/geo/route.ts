@@ -24,48 +24,47 @@ export async function POST(req: NextRequest) {
     
     if (inputType === 'url') {
       prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
-A business with the website "${websiteUrl}" needs a highly-structured, actionable audit report formatted in Markdown to show them their visibility gaps in AI search. First, deduce their likely industry, business name, and target location from the URL.
-
-The audit MUST contain the following sections:
-1. **The AI Search Reality:** Show exactly what ChatGPT or Google AI Overviews says when a user asks for the "Best [their industry] in [their location]". Highlight that a competitor was recommended instead of them.
-2. **Technical AI Gaps:** List what is broken with their digital footprint (DO NOT tell them how to fix it). Explicitly state that their website lacks machine-readable structure (like JSON-LD, FAQPage, and LocalBusiness schema) and that AI crawlers cannot extract their key attributes clearly. State they need broad directory consolidation, but do NOT give a specific list of platforms.
-3. **Critical AI Hallucination:** Show one major hallucination or error. For example, if an AI engine currently thinks they don't offer a core service (even if they do), highlight that as a critical error costing them money.`;
+A business with the website "${websiteUrl}" needs a visual audit dashboard to show their visibility gaps in AI search. 
+First, deduce their likely industry, business name, and target location from the URL. Then generate realistic data to populate a dashboard.`;
     } else {
       const fullNiche = `${industry} in ${zipcode}`;
       prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
-A business named "${businessName}" operating in the "${fullNiche}" space needs a highly-structured, actionable audit report formatted in Markdown to show them their visibility gaps in AI search.
-
-The audit MUST contain the following sections:
-1. **The AI Search Reality:** Show exactly what ChatGPT or Google AI Overviews says when a user asks for the "Best ${industry} in ${zipcode}". Highlight that a competitor was recommended instead of them.
-2. **Technical AI Gaps:** List what is broken with their digital footprint (DO NOT tell them how to fix it). Explicitly state that their website lacks machine-readable structure (like JSON-LD, FAQPage, and LocalBusiness schema) and that AI crawlers cannot extract their key attributes clearly. State they need broad directory consolidation, but do NOT give a specific list of platforms.
-3. **Critical AI Hallucination:** Show one major hallucination or error. For example, if an AI engine currently thinks they don't offer a core service (even if they do), highlight that as a critical error costing them money.`;
+A business named "${businessName}" operating in the "${fullNiche}" space needs a visual audit dashboard to show their visibility gaps in AI search. Generate realistic data to populate a dashboard.`;
     }
 
     prompt += `
 CRITICAL RULES:
-- DO NOT write exact FAQ copy. State they need optimized FAQs, but do not provide the questions or answers.
-- DO NOT write any schema code.
-- DO NOT list specific directory platforms.
-- DO NOT give specific PR angles or outreach strategies.
-- Keep the tone professional, urgent, and highly valuable, focusing on the need for infrastructure installation.
-
-OUTPUT FORMAT:
-First, output your full, beautifully formatted Markdown audit.
-Then, on a new line, write exactly "---DATA---" (without quotes).
-Finally, on the next line, output ONLY a valid JSON object matching this exact schema:
+- Output ONLY a valid JSON object. No markdown formatting, no preamble.
+- The JSON object must perfectly match this structure:
 {
-  "currentScores": [score_chatgpt, score_perplexity, score_claude, score_google_sge],
-  "projectedGrowth": [month1, month2, month3, month4, month5, month6],
-  "competitorGrowth": [month1, month2, month3, month4, month5, month6]
+  "verdict": "A 2-3 sentence explanation of why their AI visibility is critically low in their specific location/niche.",
+  "geoScore": 28, // A low integer score out of 100
+  "metrics": {
+    "brandAuthority": 25, // Low integer out of 100
+    "sentimentAnalysis": 55, // Low/Medium integer out of 100
+    "citationFrequency": 20, // Low integer out of 100
+    "directRecommendation": 10 // Critically low integer out of 100
+  },
+  "competitors": [
+    { "name": "Competitor 1 Name", "rank": 15 },
+    { "name": "Competitor 2 Name", "rank": 16 },
+    { "name": "Competitor 3 Name", "rank": 17 },
+    { "name": "Competitor 4 Name", "rank": 18 },
+    { "name": "Competitor 5 Name", "rank": 19 },
+    { "name": "Their Business Name", "rank": 20 }
+  ]
 }
-Where scores and growths are arrays of realistic integers. For currentScores, give realistic low scores out of 100 representing their poor AI visibility. For projectedGrowth, show a steady increase up to ~95. For competitorGrowth, keep it relatively flat around ~15.`;
+Make sure the competitors are real or highly realistic businesses in their exact niche and location. Ensure the user's business is ranked dead last.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7 }
+        generationConfig: { 
+          temperature: 0.7,
+          responseMimeType: "application/json"
+        }
       })
     });
 
@@ -76,24 +75,17 @@ Where scores and growths are arrays of realistic integers. For currentScores, gi
     }
 
     const data = await response.json();
-    const rawText = data.candidates[0].content.parts[0].text;
+    let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     
-    const parts = rawText.split('---DATA---');
-    const markdownReport = parts[0].trim();
+    // Clean up just in case Gemini ignored responseMimeType
+    rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
     
-    let result = {
-        currentScores: [15, 20, 10, 35],
-        projectedGrowth: [5, 12, 25, 45, 75, 92],
-        competitorGrowth: [15, 16, 15, 14, 15, 13]
-    };
-    
-    if (parts.length > 1) {
-        try {
-            const jsonStr = parts[1].replace(/```json/g, '').replace(/```/g, '').trim();
-            result = JSON.parse(jsonStr);
-        } catch (e) {
-            console.error("Failed to parse chart JSON from Gemini, falling back to defaults", e);
-        }
+    let dashboardData;
+    try {
+      dashboardData = JSON.parse(rawText);
+    } catch (e) {
+      console.error("Failed to parse JSON from Gemini", e);
+      throw new Error("Failed to generate valid dashboard data.");
     }
 
     // Generate a unique slug for the report URL
@@ -108,10 +100,10 @@ Where scores and growths are arrays of realistic integers. For currentScores, gi
         slug,
         business_name: safeBusinessName,
         industry: industry || 'Website Audit',
-        markdown_report: markdownReport,
-        current_scores: result.currentScores,
-        projected_growth: result.projectedGrowth,
-        competitor_growth: result.competitorGrowth
+        markdown_report: JSON.stringify(dashboardData),
+        current_scores: [],
+        projected_growth: [],
+        competitor_growth: []
       });
 
     if (dbError) {
