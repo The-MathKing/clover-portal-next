@@ -101,7 +101,7 @@ export default function PricingPage() {
               <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Directory Consolidation</li>
             </ul>
             <button 
-              onClick={() => handleCheckout('price_1TnP6fCVfP2wmhsSudX8T4fn', 'The GEO Foundation')}
+              onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_FOUNDATION_PRICE_ID || 'price_1TnP6fCVfP2wmhsSudX8T4fn', 'The GEO Foundation')}
               className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold transition-all shadow-lg shadow-emerald-500/25"
             >
               Start Foundation
@@ -128,7 +128,7 @@ export default function PricingPage() {
               <li className="flex items-start gap-3"><Check className="w-5 h-5 text-emerald-500 shrink-0" /> Monthly Sentiment Reports</li>
             </ul>
             <button 
-              onClick={() => handleCheckout('price_1TnPFwCVfP2wmhsSrcTH5CzD', 'Algorithmic Authority')}
+              onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_AUTHORITY_PRICE_ID || 'price_1TnPFwCVfP2wmhsSrcTH5CzD', 'Algorithmic Authority')}
               className="w-full py-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold transition-colors"
             >
               Subscribe Now
