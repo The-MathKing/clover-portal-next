@@ -172,10 +172,10 @@ export default function TermsOfServicePage() {
           <br />
           Email:{" "}
           <a
-            href="mailto:aryan@clovrr.com"
+            href="mailto:aryan.r.padarthi@gmail.com"
             className="text-emerald-600 underline"
           >
-            aryan@clovrr.com
+            aryan.r.padarthi@gmail.com
           </a>
         </address>
       </section>

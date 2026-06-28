@@ -228,22 +228,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="bg-black py-12 px-6 border-t border-[#222] mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3 opacity-50 hover:opacity-100 transition-opacity">
-            <Image src="/logo.png" alt="Clovrr Logo" width={20} height={20} className="rounded-sm grayscale hover:grayscale-0 transition-all" />
-            <span className="text-sm font-semibold tracking-wide">Clovrr</span>
-          </div>
-          <div className="text-[#a1a1a6] text-sm">
-            © {new Date().getFullYear()} Clovrr Solutions. All rights reserved.
-          </div>
-          <div className="flex gap-6 text-sm font-medium text-[#a1a1a6]">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-          </div>
-        </div>
-      </footer>
+
     </div>
   );
 };

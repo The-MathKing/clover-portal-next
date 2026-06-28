@@ -1,32 +1,25 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-[var(--border)] bg-[var(--bg)]">
-      <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-        {/* Copyright */}
-        <p className="text-sm text-neutral-500 text-center sm:text-left">
-          &copy; 2026 Aryan Padarthi Clovrr Solutions. All rights reserved.
-        </p>
-
-        {/* Legal links */}
-        <nav aria-label="Legal" className="flex items-center gap-6">
-          <Link
-            href="/privacy-policy"
-            className="text-sm text-neutral-500 hover:text-emerald-600 transition-colors duration-200"
-          >
+    <footer className="bg-black py-12 px-6 border-t border-[#222] mt-auto">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex items-center gap-3 opacity-50 hover:opacity-100 transition-opacity">
+          <Image src="/logo.png" alt="Clovrr Logo" width={20} height={20} className="rounded-sm grayscale hover:grayscale-0 transition-all" />
+          <span className="text-sm font-semibold tracking-wide text-white">Clovrr</span>
+        </div>
+        <div className="text-[#a1a1a6] text-sm">
+          © {new Date().getFullYear()} Clovrr Solutions. All rights reserved.
+        </div>
+        <div className="flex gap-6 text-sm font-medium text-[#a1a1a6]">
+          <Link href="/privacy-policy" className="hover:text-white transition-colors">
             Privacy Policy
           </Link>
-          <span className="text-neutral-300 dark:text-neutral-700 select-none">
-            |
-          </span>
-          <Link
-            href="/terms-of-service"
-            className="text-sm text-neutral-500 hover:text-emerald-600 transition-colors duration-200"
-          >
+          <Link href="/terms-of-service" className="hover:text-white transition-colors">
             Terms of Service
           </Link>
-        </nav>
+        </div>
       </div>
     </footer>
   );

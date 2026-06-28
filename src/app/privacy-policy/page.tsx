@@ -149,10 +149,10 @@ export default function PrivacyPolicyPage() {
           believe a child under 13 has provided us with personal information,
           please contact us immediately at{" "}
           <a
-            href="mailto:aryan@clovrr.com"
+            href="mailto:aryan.r.padarthi@gmail.com"
             className="text-emerald-600 underline"
           >
-            aryan@clovrr.com
+            aryan.r.padarthi@gmail.com
           </a>{" "}
           and we will take steps to delete that information promptly.
         </p>
@@ -247,10 +247,10 @@ export default function PrivacyPolicyPage() {
           <br />
           Email:{" "}
           <a
-            href="mailto:aryan@clovrr.com"
+            href="mailto:aryan.r.padarthi@gmail.com"
             className="text-emerald-600 underline"
           >
-            aryan@clovrr.com
+            aryan.r.padarthi@gmail.com
           </a>
         </address>
       </section>
