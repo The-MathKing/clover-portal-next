@@ -125,7 +125,7 @@ export const LandingPage: React.FC = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="/geo-generator" className="px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-lg hover:scale-105 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+              <Link href="/free-audit" className="px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-lg hover:scale-105 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                 Start AI Audit
                 <ChevronRight className="w-4 h-4" />
               </Link>
@@ -222,7 +222,7 @@ export const LandingPage: React.FC = () => {
           <p className="text-xl text-[#a1a1a6] mb-12 max-w-2xl mx-auto">
             Find out exactly what ChatGPT thinks about your business right now. It takes 60 seconds and it's completely free.
           </p>
-          <Link href="/geo-generator" className="inline-flex items-center justify-center px-10 py-5 rounded-full bg-white text-black font-semibold text-xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+          <Link href="/free-audit" className="inline-flex items-center justify-center px-10 py-5 rounded-full bg-white text-black font-semibold text-xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.15)]">
             Generate Free Audit
           </Link>
         </div>
