@@ -3,6 +3,7 @@
 import React from 'react';
 import { Search, Target, ShieldCheck, Check, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { loadStripe } from '@stripe/stripe-js';
 
 // Load Stripe outside of a component's render to avoid recreating the object
@@ -43,15 +44,13 @@ export default function PricingPage() {
       <nav className="fixed top-0 w-full z-50 nav-blur transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity">
-            <div className="w-5 h-5 bg-white rounded-md flex items-center justify-center">
-              <span className="text-black font-black text-[10px] tracking-tighter">C</span>
-            </div>
+            <Image src="/logo.png" alt="Clovrr Logo" width={24} height={24} className="rounded-md" />
             <span className="text-sm font-semibold tracking-wide">Clovrr</span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-[#a1a1a6]">
             <Link href="/" className="hover:text-white transition-colors">Overview</Link>
             <Link href="/pricing" className="text-white">Pricing</Link>
-            <Link href="/contact" className="px-4 py-1.5 rounded-full bg-white text-black font-semibold hover:scale-105 transition-transform">
+            <Link href="/contact" className="px-4 py-1.5 rounded-full bg-emerald-500 text-black font-semibold hover:bg-emerald-400 hover:scale-105 transition-all">
               Book Audit
             </Link>
           </div>
@@ -95,7 +94,7 @@ export default function PricingPage() {
           {/* Tier 2 */}
           <div className="bento-box-highlight p-10 flex flex-col h-full relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 flex justify-center mt-4">
-              <div className="bg-white text-black text-[10px] font-bold px-3 py-1 rounded-full tracking-widest uppercase">
+              <div className="bg-emerald-500 text-black text-[10px] font-bold px-3 py-1 rounded-full tracking-widest uppercase shadow-[0_0_10px_rgba(16,185,129,0.3)]">
                 Most Popular
               </div>
             </div>
@@ -119,7 +118,7 @@ export default function PricingPage() {
             </ul>
             <button 
               onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_FOUNDATION_PRICE_ID || 'price_1TnP6fCVfP2wmhsSudX8T4fn', 'The GEO Foundation')}
-              className="w-full py-4 rounded-full bg-white hover:bg-neutral-200 text-black font-semibold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+              className="w-full py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold transition-colors shadow-[0_0_20px_rgba(16,185,129,0.2)]"
             >
               Start Foundation
             </button>

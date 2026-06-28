@@ -55,9 +55,7 @@ export const LandingPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 nav-blur transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-            <div className="w-5 h-5 bg-white rounded-md flex items-center justify-center">
-              <span className="text-black font-black text-[10px] tracking-tighter">C</span>
-            </div>
+            <Image src="/logo.png" alt="Clovrr Logo" width={24} height={24} className="rounded-md" />
             <span className="text-sm font-semibold tracking-wide">Clovrr</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-[#a1a1a6]">
@@ -83,7 +81,7 @@ export const LandingPage: React.FC = () => {
               </button>
             )}
 
-            <Link href="/contact" className="px-4 py-1.5 rounded-full bg-white text-black font-semibold hover:scale-105 transition-transform">
+            <Link href="/contact" className="px-4 py-1.5 rounded-full bg-emerald-500 text-black font-semibold hover:bg-emerald-400 hover:scale-105 transition-all">
               Book Audit
             </Link>
           </div>
@@ -119,7 +117,7 @@ export const LandingPage: React.FC = () => {
           >
             <h1 className="text-6xl md:text-8xl lg:text-[110px] font-semibold tracking-tighter mb-6 leading-[1.05] text-white">
               Pro. <br className="md:hidden" />
-              <span className="text-[#a1a1a6]">Engineered.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">Engineered.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-[#a1a1a6] max-w-2xl mx-auto mb-12 font-medium tracking-tight">
@@ -127,7 +125,7 @@ export const LandingPage: React.FC = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="/contact" className="px-8 py-4 rounded-full bg-white text-black font-semibold text-lg hover:scale-105 transition-transform flex items-center gap-2">
+              <Link href="/contact" className="px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-lg hover:scale-105 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                 Start AI Audit
                 <ChevronRight className="w-4 h-4" />
               </Link>
@@ -233,10 +231,8 @@ export const LandingPage: React.FC = () => {
       {/* ── Footer ── */}
       <footer className="bg-black py-12 px-6 border-t border-[#222] mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
-            <div className="w-5 h-5 bg-white rounded-md flex items-center justify-center">
-              <span className="text-black font-black text-[10px] tracking-tighter">C</span>
-            </div>
+          <div className="flex items-center gap-3 opacity-50 hover:opacity-100 transition-opacity">
+            <Image src="/logo.png" alt="Clovrr Logo" width={20} height={20} className="rounded-sm grayscale hover:grayscale-0 transition-all" />
             <span className="text-sm font-semibold tracking-wide">Clovrr</span>
           </div>
           <div className="text-[#a1a1a6] text-sm">
