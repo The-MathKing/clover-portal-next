@@ -46,15 +46,13 @@ CRITICAL RULES:
     "directRecommendation": 10 // Critically low integer out of 100
   },
   "competitors": [
-    { "name": "Competitor 1 Name", "rank": 15 },
-    { "name": "Competitor 2 Name", "rank": 16 },
-    { "name": "Competitor 3 Name", "rank": 17 },
-    { "name": "Competitor 4 Name", "rank": 18 },
-    { "name": "Competitor 5 Name", "rank": 19 },
+    { "name": "Competitor 1 Name", "rank": 1 },
+    { "name": "Competitor 2 Name", "rank": 2 },
+    // ... Generate EXACTLY 20 competitors ...
     { "name": "Their Business Name", "rank": 20 }
   ]
 }
-Make sure the competitors are real or highly realistic businesses in their exact niche and location. Ensure the user's business is ranked dead last.`;
+Make sure you generate EXACTLY 20 competitors. The first 19 should be real or highly realistic businesses in their exact niche and location. Ensure the user's business is ranked dead last at #20.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',

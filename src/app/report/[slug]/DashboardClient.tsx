@@ -167,7 +167,7 @@ export default function DashboardClient({ data, businessName, industry }: Dashbo
             <p className="text-[#a1a1a6]">Who AI recommends specifically for your niche</p>
           </div>
 
-          <div className="bg-[#151515] border border-[#222] rounded-3xl p-6 md:p-8 space-y-4">
+          <div className="bg-[#151515] border border-[#222] rounded-3xl p-6 md:p-8 space-y-4 max-h-[450px] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-emerald-500/30 hover:[&::-webkit-scrollbar-thumb]:bg-emerald-500/80 [&::-webkit-scrollbar-thumb]:rounded-full pr-2">
             {data.competitors.map((comp, i) => {
               // Check if this is the user's business (usually the last one as per prompt)
               const isUser = comp.name.toLowerCase().includes(businessName.toLowerCase()) || i === data.competitors.length - 1;
