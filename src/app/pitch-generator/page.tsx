@@ -14,6 +14,7 @@ export default function PitchGeneratorPage() {
   const [form, setForm] = useState({
     businessName: '',
     industry: '',
+    zipCode: '',
     targetAudience: '',
     coreService: ''
   });
@@ -59,7 +60,7 @@ export default function PitchGeneratorPage() {
 
   const resetGenerator = () => {
     setPitchMarkdown('');
-    setForm({ businessName: '', industry: '', targetAudience: '', coreService: '' });
+    setForm({ businessName: '', industry: '', zipCode: '', targetAudience: '', coreService: '' });
   };
 
   return (
@@ -122,10 +123,15 @@ export default function PitchGeneratorPage() {
                   <input required value={form.industry} onChange={e => setForm({...form, industry: e.target.value})} type="text" placeholder="e.g. Commercial Roofing" className="w-full bg-black border border-[#333] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors" />
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#a1a1a6]">Target Location / Zip Code</label>
+                <input required value={form.zipCode} onChange={e => setForm({...form, zipCode: e.target.value})} type="text" placeholder="e.g. Dallas, TX or 75001" className="w-full bg-black border border-[#333] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors" />
+              </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-medium text-[#a1a1a6]">Target Audience</label>
-                <input required value={form.targetAudience} onChange={e => setForm({...form, targetAudience: e.target.value})} type="text" placeholder="e.g. Property Managers in Texas" className="w-full bg-black border border-[#333] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors" />
+                <input required value={form.targetAudience} onChange={e => setForm({...form, targetAudience: e.target.value})} type="text" placeholder="e.g. Property Managers" className="w-full bg-black border border-[#333] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors" />
               </div>
 
               <div className="space-y-2">

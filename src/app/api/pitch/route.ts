@@ -4,13 +4,13 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { businessName, industry, targetAudience, coreService, passcode } = await req.json();
+    const { businessName, industry, zipCode, targetAudience, coreService, passcode } = await req.json();
 
     if (passcode !== 'CLOVRR_ADMIN_77X') {
       return NextResponse.json({ error: 'Invalid developer passcode' }, { status: 401 });
     }
 
-    if (!businessName || !industry || !targetAudience || !coreService) {
+    if (!businessName || !industry || !targetAudience || !coreService || !zipCode) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     const prompt = `Act as an elite B2B Sales Executive and Generative Engine Optimization (GEO) expert.
 You are preparing a 5-slide Marketing Pitch Deck for a sales call with a potential client named "${businessName}". 
-They operate in the "${industry}" industry, their target audience is "${targetAudience}", and their core service/product is "${coreService}".
+They operate in the "${industry}" industry, their target audience is "${targetAudience}", their location/zip code is "${zipCode}", and their core service/product is "${coreService}".
 
 Write a highly-persuasive, punchy, and structured 5-slide pitch deck formatted in Markdown.
 
