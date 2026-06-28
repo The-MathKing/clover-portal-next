@@ -24,6 +24,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid price ID format' }, { status: 400 });
     }
 
+    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
     // Create a Stripe Checkout Session using the exact Price ID from the Stripe Dashboard
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -34,8 +36,8 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'subscription', // Since both your $129 and $299 tiers are monthly subscriptions
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/pricing?canceled=true`,
+      success_url: `${origin}/?success=true`,
+      cancel_url: `${origin}/pricing?canceled=true`,
     });
 
     return NextResponse.json({ url: session.url });
