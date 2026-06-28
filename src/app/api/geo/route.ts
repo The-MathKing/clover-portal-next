@@ -97,7 +97,8 @@ Where scores and growths are arrays of realistic integers. For currentScores, gi
     }
 
     // Generate a unique slug for the report URL
-    const slug = `${businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.random().toString(36).substring(2, 8)}`;
+    const safeBusinessName = businessName || websiteUrl?.replace(/^https?:\/\//, '').split('/')[0] || 'website-audit';
+    const slug = `${safeBusinessName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.random().toString(36).substring(2, 8)}`;
 
     const supabase = await createClient();
 
@@ -105,8 +106,8 @@ Where scores and growths are arrays of realistic integers. For currentScores, gi
       .from('geo_reports')
       .insert({
         slug,
-        business_name: businessName,
-        industry,
+        business_name: safeBusinessName,
+        industry: industry || 'Website Audit',
         markdown_report: markdownReport,
         current_scores: result.currentScores,
         projected_growth: result.projectedGrowth,
