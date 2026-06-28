@@ -3,14 +3,16 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { businessName, industry, zipcode, passcode } = await req.json();
+    const { inputType, businessName, industry, zipcode, websiteUrl } = await req.json();
 
-    if (passcode !== 'CLOVRR_ADMIN_77X') {
-      return NextResponse.json({ error: 'Invalid developer passcode' }, { status: 401 });
-    }
-
-    if (!businessName || !industry || !zipcode) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (inputType === 'details') {
+      if (!businessName || !industry || !zipcode) {
+        return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      }
+    } else if (inputType === 'url') {
+      if (!websiteUrl) {
+        return NextResponse.json({ error: 'Missing website URL' }, { status: 400 });
+      }
     }
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
@@ -18,15 +20,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'GEMINI_API_KEY is not configured on the server.' }, { status: 500 });
     }
 
-    const fullNiche = `${industry} in ${zipcode}`;
-    const prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
+    let prompt = '';
+    
+    if (inputType === 'url') {
+      prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
+A business with the website "${websiteUrl}" needs a highly-structured, actionable audit report formatted in Markdown to show them their visibility gaps in AI search. First, deduce their likely industry, business name, and target location from the URL.
+
+The audit MUST contain the following sections:
+1. **The AI Search Reality:** Show exactly what ChatGPT or Google AI Overviews says when a user asks for the "Best [their industry] in [their location]". Highlight that a competitor was recommended instead of them.
+2. **Technical AI Gaps:** List what is broken with their digital footprint (DO NOT tell them how to fix it). Explicitly state that their website lacks machine-readable structure (like JSON-LD, FAQPage, and LocalBusiness schema) and that AI crawlers cannot extract their key attributes clearly. State they need broad directory consolidation, but do NOT give a specific list of platforms.
+3. **Critical AI Hallucination:** Show one major hallucination or error. For example, if an AI engine currently thinks they don't offer a core service (even if they do), highlight that as a critical error costing them money.`;
+    } else {
+      const fullNiche = `${industry} in ${zipcode}`;
+      prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
 A business named "${businessName}" operating in the "${fullNiche}" space needs a highly-structured, actionable audit report formatted in Markdown to show them their visibility gaps in AI search.
 
 The audit MUST contain the following sections:
 1. **The AI Search Reality:** Show exactly what ChatGPT or Google AI Overviews says when a user asks for the "Best ${industry} in ${zipcode}". Highlight that a competitor was recommended instead of them.
 2. **Technical AI Gaps:** List what is broken with their digital footprint (DO NOT tell them how to fix it). Explicitly state that their website lacks machine-readable structure (like JSON-LD, FAQPage, and LocalBusiness schema) and that AI crawlers cannot extract their key attributes clearly. State they need broad directory consolidation, but do NOT give a specific list of platforms.
-3. **Critical AI Hallucination:** Show one major hallucination or error. For example, if an AI engine currently thinks they don't offer a core service (even if they do), highlight that as a critical error costing them money.
+3. **Critical AI Hallucination:** Show one major hallucination or error. For example, if an AI engine currently thinks they don't offer a core service (even if they do), highlight that as a critical error costing them money.`;
+    }
 
+    prompt += `
 CRITICAL RULES:
 - DO NOT write exact FAQ copy. State they need optimized FAQs, but do not provide the questions or answers.
 - DO NOT write any schema code.
