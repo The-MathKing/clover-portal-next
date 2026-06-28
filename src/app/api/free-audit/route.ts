@@ -52,7 +52,7 @@ CRITICAL RULES:
     { "name": "Their Business Name", "rank": 20 }
   ]
 }
-Make sure you generate EXACTLY 20 competitors. The first 19 should be real or highly realistic businesses in their exact niche and location. Ensure the user's business is ranked dead last at #20.`;
+Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-LOCAL businesses operating in their exact city/zip code (e.g. independent shops, local clinics, local restaurants). ABSOLUTELY DO NOT list massive national chains or franchises (like Starbucks, Peet's, Walmart, etc.) unless no local businesses exist. The competitors must feel intimately local to the user. Ensure the user's business is ranked dead last at #20.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
