@@ -4,10 +4,6 @@ import React from 'react';
 import { Search, Target, ShieldCheck, Check, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { loadStripe } from '@stripe/stripe-js';
-
-// Load Stripe outside of a component's render to avoid recreating the object
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
 export default function PricingPage() {
   const handleCheckout = async (priceId: string, tierName: string) => {
@@ -24,11 +20,8 @@ export default function PricingPage() {
       });
       const data = await response.json();
       
-      if (data.sessionId) {
-        const stripe = await stripePromise;
-        if (stripe) {
-          await (stripe as any).redirectToCheckout({ sessionId: data.sessionId });
-        }
+      if (data.url) {
+        window.location.href = data.url;
       } else {
         alert(data.error || 'Something went wrong during checkout.');
       }

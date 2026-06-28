@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/pricing?canceled=true`,
     });
 
-    return NextResponse.json({ sessionId: session.id });
+    return NextResponse.json({ url: session.url });
   } catch (err: any) {
     console.error('Error creating Stripe checkout session:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
