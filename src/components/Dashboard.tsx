@@ -347,7 +347,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
                 CLOVRR
               </span>
               <span className="text-xs block text-neutral-400 font-medium tracking-widest uppercase">
-                Home Seller Video Engine
+                Generative Engine Optimization
               </span>
             </div>
           </div>
@@ -381,7 +381,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-lg shadow-emerald-950/30 transition-all hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Create Presentation</span>
+              <span className="hidden sm:inline">Get AI Audit</span>
             </button>
             
             {/* Profile Menu */}
@@ -445,13 +445,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectProperty }) => {
               <div className="relative z-10 max-w-2xl">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-6">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Showcase Your Home Like a Pro
+                  Dominate AI Recommendations
                 </div>
                 <h1 className="text-4xl md:text-6xl font-bold font-heading text-white tracking-tight mb-6 leading-tight">
-                  Create a Stunning Video Tour of Your Home.
+                  Become the Undeniable Answer for AI Engines.
                 </h1>
                 <p className="text-neutral-400 text-lg leading-relaxed mb-10">
-                  Clovrr makes it easy for homeowners to sell their homes faster. Instantly transform your listing photos into a cinematic, AI-narrated video tour that catches buyers' eyes on Zillow, Redfin, and MLS.
+                  Clovrr restructures your digital footprint so that when customers ask ChatGPT or Google AI for the best local expert, the AI confidently gives them the green light to choose you.
                 </p>
 
                 {/* IMAGES TO VIDEO GRAPHIC */}

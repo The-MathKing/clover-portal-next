@@ -77,12 +77,12 @@ export const Login: React.FC = () => {
             </div>
             <span className="text-3xl font-bold font-heading tracking-tight text-white">Clovrr</span>
           </div>
-          <h2 className="text-lg text-neutral-400 font-medium">Cinematic Home Tour Generator</h2>
+          <h2 className="text-lg text-neutral-400 font-medium">Generative Engine Optimization</h2>
         </div>
 
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-white mb-2">{isSignUp ? 'Create Account' : 'Welcome Back'}</h1>
-            <p className="text-sm text-neutral-500">Sign in to create beautiful video tours and sell your home faster.</p>
+            <p className="text-sm text-neutral-500">Sign in to manage your AI search footprint and optimize for generative engines.</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
