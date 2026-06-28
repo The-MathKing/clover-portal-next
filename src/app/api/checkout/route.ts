@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
+export const dynamic = 'force-dynamic';
+
 // We initialize Stripe inside the handler to prevent Next.js caching empty env variables
 
 export async function POST(request: Request) {

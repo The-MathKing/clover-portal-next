@@ -6,9 +6,25 @@ export const metadata: Metadata = {
     "Read the Terms of Service for Aryan Padarthi Clovrr Solutions, a sole proprietorship based in Allen, Texas.",
 };
 
+import Link from 'next/link';
+import Image from 'next/image';
+
 export default function TermsOfServicePage() {
   return (
-    <main className="max-w-3xl mx-auto px-6 py-16 text-[var(--text)]">
+    <div className="bg-black text-[#f5f5f5] min-h-screen font-sans">
+      <nav className="fixed top-0 w-full z-50 nav-blur border-b border-[#222]">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity">
+            <Image src="/logo.png" alt="Clovrr Logo" width={24} height={24} className="rounded-md" />
+            <span className="text-sm font-semibold tracking-wide">Clovrr</span>
+          </Link>
+          <Link href="/" className="text-[13px] font-medium text-[#a1a1a6] hover:text-white transition-colors">
+            Back to Home
+          </Link>
+        </div>
+      </nav>
+      
+      <main className="max-w-3xl mx-auto px-6 pt-32 pb-16">
       <h1 className="text-4xl font-bold mb-2">Terms of Service</h1>
       <p className="text-sm text-neutral-500 mb-10">
         Effective Date: June 25, 2026 &nbsp;|&nbsp; Last Updated: June 25, 2026
@@ -180,5 +196,6 @@ export default function TermsOfServicePage() {
         </address>
       </section>
     </main>
+    </div>
   );
 }
