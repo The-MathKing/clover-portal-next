@@ -88,8 +88,8 @@ export default function PricingPage() {
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">The GEO Foundation</h3>
             <div className="mb-6">
-              <span className="text-4xl font-black">$499</span>
-              <span className="text-neutral-500 ml-2">one-time</span>
+              <span className="text-4xl font-black">$129</span>
+              <span className="text-neutral-500 ml-2">/month</span>
             </div>
             <p className="text-neutral-400 leading-relaxed text-sm mb-8 flex-grow">
               We build the data infrastructure that AI engines trust. This tier completely overhauls your digital presence.
@@ -115,7 +115,7 @@ export default function PricingPage() {
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">Algorithmic Authority</h3>
             <div className="mb-6">
-              <span className="text-4xl font-black">$999</span>
+              <span className="text-4xl font-black">$299</span>
               <span className="text-neutral-500 ml-2">/month</span>
             </div>
             <p className="text-neutral-400 leading-relaxed text-sm mb-8 flex-grow">
