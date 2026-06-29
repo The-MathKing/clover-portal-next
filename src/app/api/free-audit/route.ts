@@ -23,9 +23,29 @@ export async function POST(req: NextRequest) {
     let prompt = '';
     
     if (inputType === 'url') {
+      let siteContext = "";
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const urlToFetch = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
+        const res = await fetch(urlToFetch, { signal: controller.signal, headers: { 'User-Agent': 'Mozilla/5.0' } });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const html = await res.text();
+          const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+          const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i);
+          if (titleMatch) siteContext += `Website Title: ${titleMatch[1].trim()}\n`;
+          if (descMatch) siteContext += `Website Description: ${descMatch[1].trim()}\n`;
+        }
+      } catch (e) {
+        console.log(`Could not fetch ${websiteUrl}`);
+      }
+
       prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
 A business with the website "${websiteUrl}" needs a visual audit dashboard to show their visibility gaps in AI search. 
-First, use Google Search to deduce their likely industry, business name, and target location. Then, search for the top ranking local businesses in that exact industry and location. Based on your live search results, calculate the user's real AI visibility and generate accurate data to populate a dashboard.`;
+${siteContext ? `Here is context scraped from their homepage:\n${siteContext}\n` : ''}
+First, deduce their EXACT business name, their specific hyper-local industry/niche, and their exact city or zipcode. 
+Then, using that deduced Industry and Location (e.g. "Mexican Restaurant in Dallas, TX"), use Google Search to find the top ranking local businesses in that exact space. Based on your live search results, calculate the user's real AI visibility and generate accurate data to populate a dashboard.`;
     } else {
       const fullNiche = `${industry} in ${zipcode}`;
       prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
