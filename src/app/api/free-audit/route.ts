@@ -38,21 +38,21 @@ CRITICAL RULES:
 - The JSON object must perfectly match this structure:
 {
   "verdict": "A 2-3 sentence explanation of why their AI visibility is critically low in their specific location/niche.",
-  "geoScore": 28, // A low integer score out of 100
+  "geoScore": <RANDOM_INTEGER_BETWEEN_18_AND_38>,
   "metrics": {
-    "brandAuthority": 25, // Low integer out of 100
-    "sentimentAnalysis": 55, // Low/Medium integer out of 100
-    "citationFrequency": 20, // Low integer out of 100
-    "directRecommendation": 10 // Critically low integer out of 100
+    "brandAuthority": <RANDOM_INTEGER_BETWEEN_15_AND_40>,
+    "sentimentAnalysis": <RANDOM_INTEGER_BETWEEN_40_AND_65>,
+    "citationFrequency": <RANDOM_INTEGER_BETWEEN_10_AND_30>,
+    "directRecommendation": <RANDOM_INTEGER_BETWEEN_0_AND_15>
   },
   "competitors": [
     { "name": "Competitor 1 Name", "rank": 1 },
     { "name": "Competitor 2 Name", "rank": 2 },
     // ... Generate EXACTLY 20 competitors ...
-    { "name": "Their Business Name", "rank": 20 }
+    { "name": "Their Business Name", "rank": <RANDOM_INTEGER_BETWEEN_14_AND_20> }
   ]
 }
-Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-LOCAL businesses operating in their exact city/zip code (e.g. independent shops, local clinics, local restaurants). ABSOLUTELY DO NOT list massive national chains or franchises (like Starbucks, Peet's, Walmart, etc.) unless no local businesses exist. The competitors must feel intimately local to the user. Ensure the user's business is ranked dead last at #20.`;
+Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-LOCAL businesses operating in their exact city/zip code (e.g. independent shops, local clinics, local restaurants). ABSOLUTELY DO NOT list massive national chains or franchises (like Starbucks, Peet's, Walmart, etc.) unless no local businesses exist. The competitors must feel intimately local to the user. Ensure the user's business is ranked poorly, somewhere between #14 and #20. Do NOT always put them at #20.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
