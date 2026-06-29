@@ -25,11 +25,11 @@ export async function POST(req: NextRequest) {
     if (inputType === 'url') {
       prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
 A business with the website "${websiteUrl}" needs a visual audit dashboard to show their visibility gaps in AI search. 
-First, deduce their likely industry, business name, and target location from the URL. Then generate realistic data to populate a dashboard.`;
+First, use Google Search to deduce their likely industry, business name, and target location. Then, search for the top ranking local businesses in that exact industry and location. Based on your live search results, calculate the user's real AI visibility and generate accurate data to populate a dashboard.`;
     } else {
       const fullNiche = `${industry} in ${zipcode}`;
       prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
-A business named "${businessName}" operating in the "${fullNiche}" space needs a visual audit dashboard to show their visibility gaps in AI search. Generate realistic data to populate a dashboard.`;
+A business named "${businessName}" operating in the "${fullNiche}" space needs a visual audit dashboard to show their visibility gaps in AI search. Use Google Search to find the top ranking local businesses in "${fullNiche}". Based on your live search results, calculate the user's real AI visibility and generate accurate data to populate a dashboard.`;
     }
 
     prompt += `
@@ -49,18 +49,19 @@ CRITICAL RULES:
     { "name": "Competitor 1 Name", "rank": 1 },
     { "name": "Competitor 2 Name", "rank": 2 },
     // ... Generate EXACTLY 20 competitors ...
-    { "name": "Their Business Name", "rank": <RANDOM_INTEGER_BETWEEN_14_AND_20> }
+    { "name": "Their Business Name", "rank": 17 } // The actual rank you found
   ]
 }
-Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-LOCAL businesses operating in their exact city/zip code (e.g. independent shops, local clinics, local restaurants). ABSOLUTELY DO NOT list massive national chains or franchises (like Starbucks, Peet's, Walmart, etc.) unless no local businesses exist. The competitors must feel intimately local to the user. Ensure the user's business is ranked poorly, somewhere between #14 and #20. Do NOT always put them at #20.`;
+Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-LOCAL businesses operating in their exact city/zip code that you found during your live Google Search (e.g. independent shops, local clinics, local restaurants). ABSOLUTELY DO NOT list massive national chains or franchises (like Starbucks, Peet's, Walmart, etc.) unless no local businesses exist. The competitors must be real competitors you found. Based on your analysis of the search results, estimate their true geoScore (a low score if they lack visibility, or high if they are truly dominating) and rank the user's business appropriately among the 20 (it can be dead last at #20 if they have zero visibility, or higher if they do).`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
+        tools: [{ googleSearch: {} }],
         generationConfig: { 
-          temperature: 0.7,
+          temperature: 0.1, // Lower temperature for more factual search results
           responseMimeType: "application/json"
         }
       })
