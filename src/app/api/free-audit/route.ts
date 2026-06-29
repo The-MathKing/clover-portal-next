@@ -41,18 +41,22 @@ export async function POST(req: NextRequest) {
         console.log(`Could not fetch ${websiteUrl}`);
       }
 
-      prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
-A business with the website "${websiteUrl}" needs a visual audit dashboard to show their visibility gaps in AI search. 
-${siteContext ? `Here is context scraped from their homepage:\n${siteContext}\n` : ''}
-First, deduce their EXACT business name, their specific hyper-local industry/niche, and their exact city or zipcode. 
-Then, using that deduced Industry and Location (e.g. "Mexican Restaurant in Dallas, TX"), use Google Search to find the top ranking local businesses in that exact space. Based on your live search results, calculate the user's real AI visibility and generate accurate data to populate a dashboard.`;
+      prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert performing a real-time web search audit.
+You are analyzing a business based on their website URL: "${websiteUrl}".
+${siteContext ? `Homepage Metadata:\n${siteContext}\n` : ''}
+First, deduce their EXACT business name, their specific industry/niche, and their exact city or zipcode.`;
     } else {
-      const fullNiche = `${industry} in ${zipcode}`;
-      prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert. 
-A business named "${businessName}" operating in the "${fullNiche}" space needs a visual audit dashboard to show their visibility gaps in AI search. Use Google Search to find the top ranking local businesses in "${fullNiche}". Based on your live search results, calculate the user's real AI visibility and generate accurate data to populate a dashboard.`;
+      prompt = `Act as a top-tier Generative Engine Optimization (GEO) expert performing a real-time web search audit.
+You are analyzing a business named "${businessName}" operating as a "${industry}" in the location "${zipcode}".`;
     }
 
     prompt += `
+
+Your task is to evaluate their actual AI search visibility completely objectively.
+Step 1: Use Google Search to find the top ranking local businesses in their exact industry and location.
+Step 2: Analyze the search results to see where the target business truly ranks among local competitors.
+Step 3: Calculate their REAL AI visibility scores based entirely on this live search data. Do not bias the score based on whether you were given a URL or manual details—judge them purely on their search presence.
+
 CRITICAL RULES:
 - Output ONLY a valid JSON object. No markdown formatting, no preamble.
 - The JSON object must perfectly match this structure:
