@@ -37,19 +37,19 @@ CRITICAL RULES:
 - Output ONLY a valid JSON object. No markdown formatting, no preamble.
 - The JSON object must perfectly match this structure:
 {
-  "verdict": "A 2-3 sentence explanation of why their AI visibility is critically low in their specific location/niche.",
-  "geoScore": <RANDOM_INTEGER_BETWEEN_18_AND_38>,
+  "verdict": "A 2-3 sentence explanation of why their AI visibility is at the calculated level based on your search.",
+  "geoScore": 65, // A calculated integer score (1-100) based on actual search visibility
   "metrics": {
-    "brandAuthority": <RANDOM_INTEGER_BETWEEN_15_AND_40>,
-    "sentimentAnalysis": <RANDOM_INTEGER_BETWEEN_40_AND_65>,
-    "citationFrequency": <RANDOM_INTEGER_BETWEEN_10_AND_30>,
-    "directRecommendation": <RANDOM_INTEGER_BETWEEN_0_AND_15>
+    "brandAuthority": 70, // A calculated integer score (1-100)
+    "sentimentAnalysis": 55, // A calculated integer score (1-100)
+    "citationFrequency": 40, // A calculated integer score (1-100)
+    "directRecommendation": 30 // A calculated integer score (1-100)
   },
   "competitors": [
     { "name": "Competitor 1 Name", "rank": 1, "isUserBusiness": false },
     { "name": "Competitor 2 Name", "rank": 2, "isUserBusiness": false },
     // ... Generate EXACTLY 20 competitors ...
-    { "name": "Their Business Name", "rank": 17, "isUserBusiness": true } // The actual rank you found
+    { "name": "Their Business Name", "rank": 12, "isUserBusiness": true } // Replace 12 with the actual rank you calculated
   ]
 }
 Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-LOCAL businesses operating in their exact city/zip code that you found during your live Google Search (e.g. independent shops, local clinics, local restaurants). ABSOLUTELY DO NOT list massive national chains or franchises (like Starbucks, Peet's, Walmart, etc.) unless no local businesses exist. The competitors must be real competitors you found. Based on your analysis of the search results, estimate their true geoScore (a low score if they lack visibility, or high if they are truly dominating) and rank the user's business appropriately among the 20 (it can be dead last at #20 if they have zero visibility, or higher if they do).`;
