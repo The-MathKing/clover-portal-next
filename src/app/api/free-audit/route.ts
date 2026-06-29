@@ -20,6 +20,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'GEMINI_API_KEY is not configured on the server.' }, { status: 500 });
     }
 
+    const safeBusinessName = businessName || websiteUrl?.replace(/^https?:\/\//, '').split('/')[0] || 'website-audit';
+    const supabase = await createClient();
+
+    // Check if a report already exists for this exact business to ensure deterministic, consistent results
+    const { data: existingReport } = await supabase
+      .from('geo_reports')
+      .select('slug')
+      .eq('business_name', safeBusinessName)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingReport) {
+      return NextResponse.json({ slug: existingReport.slug });
+    }
+
     let prompt = '';
     
     if (inputType === 'url') {
@@ -58,6 +73,7 @@ Step 2: Analyze the search results to see where the target business truly ranks 
 Step 3: Calculate their REAL AI visibility scores based entirely on this live search data. Do not bias the score based on whether you were given a URL or manual details—judge them purely on their search presence.
 
 CRITICAL RULES:
+- DO NOT INVENT OR RANDOMIZE COMPETITORS. You MUST output the EXACT businesses returned by your Google Search tool in the EXACT order they appeared in the search results.
 - Output ONLY a valid JSON object. No markdown formatting, no preamble.
 - The JSON object must perfectly match this structure:
 {
@@ -111,10 +127,7 @@ Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-
     }
 
     // Generate a unique slug for the report URL
-    const safeBusinessName = businessName || websiteUrl?.replace(/^https?:\/\//, '').split('/')[0] || 'website-audit';
     const slug = `${safeBusinessName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.random().toString(36).substring(2, 8)}`;
-
-    const supabase = await createClient();
 
     const { error: dbError } = await supabase
       .from('geo_reports')
