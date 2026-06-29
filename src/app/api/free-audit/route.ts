@@ -46,10 +46,10 @@ CRITICAL RULES:
     "directRecommendation": <RANDOM_INTEGER_BETWEEN_0_AND_15>
   },
   "competitors": [
-    { "name": "Competitor 1 Name", "rank": 1 },
-    { "name": "Competitor 2 Name", "rank": 2 },
+    { "name": "Competitor 1 Name", "rank": 1, "isUserBusiness": false },
+    { "name": "Competitor 2 Name", "rank": 2, "isUserBusiness": false },
     // ... Generate EXACTLY 20 competitors ...
-    { "name": "Their Business Name", "rank": 17 } // The actual rank you found
+    { "name": "Their Business Name", "rank": 17, "isUserBusiness": true } // The actual rank you found
   ]
 }
 Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-LOCAL businesses operating in their exact city/zip code that you found during your live Google Search (e.g. independent shops, local clinics, local restaurants). ABSOLUTELY DO NOT list massive national chains or franchises (like Starbucks, Peet's, Walmart, etc.) unless no local businesses exist. The competitors must be real competitors you found. Based on your analysis of the search results, estimate their true geoScore (a low score if they lack visibility, or high if they are truly dominating) and rank the user's business appropriately among the 20 (it can be dead last at #20 if they have zero visibility, or higher if they do).`;

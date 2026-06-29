@@ -6,6 +6,7 @@ import Link from 'next/link';
 interface Competitor {
   name: string;
   rank: number;
+  isUserBusiness?: boolean;
 }
 
 interface DashboardData {
@@ -44,6 +45,9 @@ export default function DashboardClient({ data, businessName, industry }: Dashbo
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (data.geoScore / 100) * circumference;
+
+  const userCompetitor = data.competitors.find(c => c.isUserBusiness);
+  const userRank = userCompetitor ? userCompetitor.rank : 'Unranked';
 
   const getScoreColor = (score: number) => {
     if (score < 30) return 'text-rose-500 bg-rose-500';
@@ -143,7 +147,7 @@ export default function DashboardClient({ data, businessName, industry }: Dashbo
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-white">The AI's Verdict</h2>
                 <div className="px-3 py-1 rounded-full bg-[#222] text-[#a1a1a6] text-xs font-bold flex items-center gap-1.5 border border-[#333]">
-                  <Trophy className="w-3 h-3 text-emerald-400" /> Rank: #{data.competitors.length} out of {data.competitors.length}
+                  <Trophy className="w-3 h-3 text-emerald-400" /> Rank: #{userRank} out of {data.competitors.length}
                 </div>
               </div>
               <p className="text-[#a1a1a6] leading-relaxed text-lg">"{data.verdict}"</p>
@@ -169,8 +173,8 @@ export default function DashboardClient({ data, businessName, industry }: Dashbo
 
           <div className="bg-[#151515] border border-[#222] rounded-3xl p-6 md:p-8 space-y-4 max-h-[450px] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-emerald-500/30 hover:[&::-webkit-scrollbar-thumb]:bg-emerald-500/80 [&::-webkit-scrollbar-thumb]:rounded-full pr-2">
             {data.competitors.map((comp, i) => {
-              // Check if this is the user's business (usually the last one as per prompt)
-              const isUser = comp.name.toLowerCase().includes(businessName.toLowerCase()) || i === data.competitors.length - 1;
+              // Check if this is the user's business
+              const isUser = comp.isUserBusiness;
 
               return (
                 <div 
