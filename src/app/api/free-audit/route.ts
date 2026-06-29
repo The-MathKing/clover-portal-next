@@ -61,8 +61,7 @@ Make sure you generate EXACTLY 20 competitors. The first 19 MUST be real, HYPER-
         contents: [{ parts: [{ text: prompt }] }],
         tools: [{ googleSearch: {} }],
         generationConfig: { 
-          temperature: 0.1, // Lower temperature for more factual search results
-          responseMimeType: "application/json"
+          temperature: 0.1 // Lower temperature for more factual search results
         }
       })
     });
