@@ -22,7 +22,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           body, html { background-color: #0a0a0a !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          @page { margin: 0; }
+          @page { margin: 1in !important; }
         }
       `}} />
       <div className="max-w-4xl mx-auto py-12 px-6 print:max-w-none print:w-full print:py-12 print:px-12">
@@ -56,7 +56,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
         </div>
 
         {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-neutral-800 text-center">
+        <div className="mt-16 pt-8 border-t border-neutral-800 text-center print:hidden">
           <p className="text-sm text-neutral-500 font-semibold">Ready to dominate AI search?</p>
           <a href="https://clovrr.net" className="text-sm text-emerald-500 hover:text-emerald-400 mt-1 transition-colors">Visit www.clovrr.net to get started.</a>
         </div>
