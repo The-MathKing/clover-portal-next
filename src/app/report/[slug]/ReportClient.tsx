@@ -43,7 +43,7 @@ export default function ReportClient({
   
   if (markdownReport) {
     return (
-      <div className="prose prose-invert prose-emerald max-w-none prose-headings:font-bold prose-h1:text-emerald-400 prose-h2:text-emerald-400 prose-h3:text-teal-400 prose-p:text-neutral-300 prose-li:text-neutral-300">
+      <div className="prose prose-invert prose-emerald max-w-none print:prose-slate print:!text-black prose-headings:font-bold prose-h1:text-emerald-400 prose-h2:text-emerald-400 prose-h3:text-teal-400 prose-p:text-neutral-300 prose-li:text-neutral-300 print:prose-h1:!text-black print:prose-h2:!text-black print:prose-h3:!text-black print:prose-p:!text-black print:prose-li:!text-black [&>*:not(h1):not(h2):not(h3)]:break-inside-avoid">
         <ReactMarkdown>{markdownReport}</ReactMarkdown>
       </div>
     );

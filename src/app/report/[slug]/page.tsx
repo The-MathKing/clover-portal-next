@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import ReportClient from './ReportClient';
+import PrintButton from './PrintButton';
 
 export default async function ReportPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -17,8 +18,8 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-neutral-200 font-sans">
-      <div className="max-w-4xl mx-auto py-12 px-6">
+    <div className="min-h-screen bg-[#0a0a0a] text-neutral-200 font-sans print:bg-white print:text-black">
+      <div className="max-w-4xl mx-auto py-12 px-6 print:py-0 print:px-0">
         {/* Branded Header */}
         <div className="border-b-4 border-emerald-500 pb-8 mb-12 flex flex-col md:flex-row md:justify-between md:items-end gap-6">
           <div>
@@ -26,9 +27,12 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
             <p className="text-xl text-emerald-400 font-medium">{data.business_name}</p>
             <p className="text-sm text-neutral-400 mt-1">{data.industry}</p>
           </div>
-          <div className="md:text-right">
-            <p className="text-2xl font-black text-white tracking-tighter">CLOVRR</p>
+          <div className="md:text-right print:text-right">
+            <p className="text-2xl font-black text-white print:text-black tracking-tighter">CLOVRR</p>
             <p className="text-xs text-emerald-500 mt-1 font-bold tracking-widest uppercase">Live AI Audit</p>
+            <div className="mt-4 print:hidden">
+              <PrintButton />
+            </div>
           </div>
         </div>
 
@@ -41,7 +45,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
         />
 
         {/* Markdown Content via Client Component */}
-        <div className="mt-12 bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-xl">
+        <div className="mt-12 bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-xl print:bg-white print:border-none print:shadow-none print:p-0">
           <ReportClient markdownReport={data.markdown_report} />
         </div>
 
