@@ -114,14 +114,14 @@ export default function ReportClient({
     };
 
     return (
-      <div className="flex flex-col md:flex-row print:!flex-col gap-8 print:gap-12 w-full">
-        <div className="flex-1 p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:break-inside-avoid">
+      <div className="grid md:grid-cols-2 print:grid-cols-2 gap-8 print:gap-6 w-full">
+        <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:break-inside-avoid">
           <h2 className="text-sm font-bold text-white mb-6 text-center tracking-wide uppercase">Projected AI Share of Voice</h2>
           <div className="w-full h-64 relative">
             <Line data={lineData} options={lineOptions} />
           </div>
         </div>
-        <div className="flex-1 p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:break-inside-avoid">
+        <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:break-inside-avoid">
           <h2 className="text-sm font-bold text-white mb-6 text-center tracking-wide uppercase">Authority by AI Engine</h2>
           <div className="w-full h-64 relative">
             <Bar data={barData} options={barOptions} />
