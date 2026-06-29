@@ -56,7 +56,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
         </div>
 
         {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-neutral-800 text-center print:hidden">
+        <div className="mt-16 pt-8 border-t border-neutral-800 text-center">
           <p className="text-sm text-neutral-500 font-semibold">Ready to dominate AI search?</p>
           <a href="https://clovrr.net" className="text-sm text-emerald-500 hover:text-emerald-400 mt-1 transition-colors">Visit www.clovrr.net to get started.</a>
         </div>

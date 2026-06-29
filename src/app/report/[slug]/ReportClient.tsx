@@ -43,7 +43,7 @@ export default function ReportClient({
   
   if (markdownReport) {
     return (
-      <div className="prose prose-invert prose-emerald max-w-none prose-headings:font-bold prose-h1:text-emerald-400 prose-h2:text-emerald-400 prose-h3:text-teal-400 prose-p:text-neutral-300 prose-li:text-neutral-300 [&>*:not(h1):not(h2):not(h3)]:break-inside-avoid">
+      <div className="prose prose-invert prose-emerald max-w-none prose-headings:font-bold prose-h1:text-emerald-400 prose-h2:text-emerald-400 prose-h3:text-teal-400 prose-p:text-neutral-300 prose-li:text-neutral-300 print:prose-headings:break-after-avoid [&>p]:break-inside-avoid [&>li]:break-inside-avoid">
         <ReactMarkdown>{markdownReport}</ReactMarkdown>
       </div>
     );
@@ -114,14 +114,14 @@ export default function ReportClient({
     };
 
     return (
-      <div className="grid md:grid-cols-2 print:grid-cols-1 gap-8 print:gap-12">
-        <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:bg-transparent print:border-none print:shadow-none print:p-0">
+      <div className="flex flex-col md:flex-row print:!flex-col gap-8 print:gap-12 w-full">
+        <div className="flex-1 p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:break-inside-avoid">
           <h2 className="text-sm font-bold text-white mb-6 text-center tracking-wide uppercase">Projected AI Share of Voice</h2>
           <div className="w-full h-64 relative">
             <Line data={lineData} options={lineOptions} />
           </div>
         </div>
-        <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:bg-transparent print:border-none print:shadow-none print:p-0">
+        <div className="flex-1 p-6 bg-neutral-900 border border-neutral-800 rounded-3xl shadow-lg print:break-inside-avoid">
           <h2 className="text-sm font-bold text-white mb-6 text-center tracking-wide uppercase">Authority by AI Engine</h2>
           <div className="w-full h-64 relative">
             <Bar data={barData} options={barOptions} />

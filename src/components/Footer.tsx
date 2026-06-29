@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="bg-black py-12 px-6 border-t border-[#222] mt-auto">
+    <footer className="bg-black py-12 px-6 border-t border-[#222] mt-auto print:hidden">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-3 opacity-50 hover:opacity-100 transition-opacity">
           <Image src="/logo.png" alt="Clovrr Logo" width={20} height={20} className="rounded-sm grayscale hover:grayscale-0 transition-all" />
