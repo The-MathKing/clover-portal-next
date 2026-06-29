@@ -21,11 +21,11 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
     <div className="min-h-screen bg-[#0a0a0a] text-neutral-200 font-sans">
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
-          body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          @page { margin: 0; }
+          body, html { background-color: #0a0a0a !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          @page { margin: 0.5in; }
         }
       `}} />
-      <div className="max-w-4xl mx-auto py-12 px-6 print:py-12 print:px-8">
+      <div className="max-w-4xl mx-auto py-12 px-6 print:max-w-none print:w-full print:py-0 print:px-0">
         {/* Branded Header */}
         <div className="border-b-4 border-emerald-500 pb-8 mb-12 flex flex-col md:flex-row md:justify-between md:items-end gap-6">
           <div>
@@ -51,7 +51,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
         />
 
         {/* Markdown Content via Client Component */}
-        <div className="mt-12 bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-xl">
+        <div className="mt-12 bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-xl print:mt-8 print:bg-transparent print:border-none print:shadow-none print:rounded-none print:p-0">
           <ReportClient markdownReport={data.markdown_report} />
         </div>
 
