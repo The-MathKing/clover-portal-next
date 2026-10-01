@@ -18,13 +18,12 @@ export default function GeoGenerator() {
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
-    // Basic client-side check to prevent accidental submissions,
-    // Real security happens on the backend API route.
-    if (passcode.trim() === 'CLOVRR_ADMIN_77X') {
+    // the API routes check the passcode; the page only gates the form.
+    if (passcode.trim()) {
       setIsAuthenticated(true);
       setError('');
     } else {
-      setError('Invalid developer passcode');
+      setError('Enter the developer passcode.');
     }
   };
 

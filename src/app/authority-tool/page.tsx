@@ -29,11 +29,12 @@ export default function AuthorityToolPage() {
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode === 'CLOVRR_ADMIN_77X') {
+    // the API routes check the passcode; the page only gates the form.
+    if (passcode.trim()) {
       setIsAuthenticated(true);
       setAuthError('');
     } else {
-      setAuthError('Invalid developer passcode.');
+      setAuthError('Enter the developer passcode.');
     }
   };
 
@@ -58,7 +59,7 @@ export default function AuthorityToolPage() {
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config)
+        body: JSON.stringify({ ...config, passcode })
       });
 
       const data = await response.json();

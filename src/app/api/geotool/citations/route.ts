@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAdminPasscode } from '@/utils/adminPasscode';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    if (!isAdminPasscode(body.passcode)) {
+      return NextResponse.json({ error: 'Invalid developer passcode' }, { status: 401 });
+    }
     const { businessName, phone, zipCode, yextKey: brightLocalKey, brightLocalSecret } = body;
 
     if (!businessName || !phone || !zipCode) {

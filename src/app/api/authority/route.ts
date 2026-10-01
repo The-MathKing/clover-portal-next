@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAdminPasscode } from '@/utils/adminPasscode';
 
 export const dynamic = 'force-dynamic';
 
@@ -6,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { businessName, industry, recentNews, passcode } = await req.json();
 
-    if (passcode !== 'CLOVRR_ADMIN_77X') {
+    if (!isAdminPasscode(passcode)) {
       return NextResponse.json({ error: 'Invalid developer passcode' }, { status: 401 });
     }
 
