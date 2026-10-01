@@ -24,11 +24,12 @@ export default function PitchGeneratorPage() {
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode === 'CLOVRR_ADMIN_77X') {
+    // the API routes check the passcode; the page only gates the form.
+    if (passcode.trim()) {
       setIsAuthenticated(true);
       setError('');
     } else {
-      setError('Invalid developer passcode.');
+      setError('Enter the developer passcode.');
     }
   };
 

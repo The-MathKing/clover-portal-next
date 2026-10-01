@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAdminPasscode } from '@/utils/adminPasscode';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    if (!isAdminPasscode(body.passcode)) {
+      return NextResponse.json({ error: 'Invalid developer passcode' }, { status: 401 });
+    }
     const { businessName, googleApiKey } = body;
 
     if (!businessName) {
